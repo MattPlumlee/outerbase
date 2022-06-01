@@ -99,14 +99,17 @@ om = new(outermod)
 
 ```{r}
 setcovfs(om, rep("mat25",3))
-gethyp(om)
-om$updatehyp(rep(-0.5,3))
-gethyp(om)
 
 knotlist = list(seq(0,1,by=0.025),
                 seq(0,1,by=0.025),
                 seq(0,1,by=0.025))
 setknot(om, knotlist)
+```
+
+```{r}
+gethyp(om)
+om$updatehyp(rep(-0.5,3))
+gethyp(om)
 ```
 
 ### outerbase
