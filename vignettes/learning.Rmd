@@ -1,0 +1,141 @@
+---
+title: "Learning from data"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Learning from data}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+```{r setup}
+library(outerbase)
+```
+
+```{r}
+sampsize = 20
+d = 3
+x = matrix(runif(sampsize*d),ncol=d)
+y = obtest_borehole3d(x)
+```
+
+```{r}
+xtest = matrix(runif(100*d),ncol=d) #prediction points
+ytest = obtest_borehole3d(xtest)
+```
+
+
+```{r}
+om = new(outermod)
+```
+
+```{r}
+setcovfs(om, rep("mat25pow",3))
+knotlist = list(seq(0.01,1,by=0.01),
+                seq(0.01,1,by=0.01),
+                seq(0.01,1,by=0.01))
+setknot(om, knotlist) #40 knot point for each dim
+```
+
+```{r}
+hyp0 = gethyp(om)
+hyp0 = c(-0.5,0,-0.5,0,-0.5,0)
+om$updatehyp(hyp0)
+hyp0 = gethyp(om)
+```
+
+```{r}
+p = 40
+terms = om$selectterms(p)
+```
+
+```{r}
+loglik = new(loglik_std, om, terms, y, x) 
+coeffhere = rep(0,loglik$nterms)
+loglik$compute_gradhyp = T
+loglik$compute_gradpara = T
+loglik$update(coeffhere)
+loglik$val
+loglik$grad
+loglik$gradhyp
+loglik$gradpara
+```
+
+```{r}
+
+hyp1 = hyp0 
+hyp1[2] = hyp1[2] + 10^(-4)
+
+logpr = new(logpr_gauss, om, terms)
+logpdf = new(lpdfvec, loglik, logpr)
+logpdf$updatepara(c(0,2))
+#loglik$updatepara(-2)
+#logpdf$fullhess = T
+logpdf$domarg = T
+logpdf$compute_gradhyp = T
+logpdf$compute_gradpara = T
+logpdf$optnewton()
+predt = new(predictor,loglik)
+predt$update(xtest)
+yhat = as.vector(predt$mean())
+varpred = as.vector(predt$var())
+
+par(mfrow=c(1,2))
+plot(ytest,yhat)
+hist((ytest-yhat)/sqrt(varpred), main="standarized test residuals",
+     xlab = "standarized test residuals")
+sqrt(mean((ytest-yhat)^2))
+```
+
+```{r}
+totobj = function(hypl) { #my optimization function for tuning
+  regpara = logpdf$paralpdf(hypl$para)
+  reghyp = om$hyplpdf(hypl$hyp)
+  if(is.finite(regpara) && is.finite(reghyp)) { #if outside prior, ignore
+    om$updatehyp(hypl$hyp)
+    logpdf$updateom()
+    logpdf$updatepara(hypl$para)
+    logpdf$optnewton()
+    
+    gval = hypl #match structure
+    gval$hyp = -logpdf$gradhyp-om$hyplpdf_grad(hypl$hyp)
+    gval$para = -logpdf$gradpara-logpdf$paralpdf_grad(hypl$para)#
+    list(val = -logpdf$val-reghyp-regpara, gval = gval)#
+  } else list(val = Inf, gval = hypl) }
+hypl = list(para = getpara(logpdf), hyp = gethyp(om))
+opth = BFGS_std(totobj, hypl, verbose=3) #do a quick and dirty optimization first
+```
+
+```{r}
+om$updatehyp(opth$vec$hyp)
+logpdf$updatepara(opth$vec$para)
+logpdf$optnewton()
+```
+
+```{r}
+opth = BFGS_lpdf(om, logpdf, 
+                 rho=hypl, 
+                 verbose = 3, newt= T)  
+```
+
+```{r}
+predtt = new(predictor,loglik)
+predtt$update(xtest)
+yhat = as.vector(predtt$mean())
+varpred = as.vector(predtt$var())
+
+par(mfrow=c(1,2))
+plot(ytest,yhat)
+hist((ytest-yhat)/sqrt(varpred), main="standarized test residuals",
+     xlab = "standarized test residuals")
+sqrt(mean((ytest-yhat)^2))
+
+```
+
+

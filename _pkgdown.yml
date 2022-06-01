@@ -1,0 +1,97 @@
+url: https://mattplumlee.github.io/outerbase/
+template:
+  bootstrap: 5
+  bslib:
+    primary: "#447099"
+    base_font: {google: {family: "Source Sans Pro", wght: [400, 600], ital: [0, 1]}}
+    code_font: {google: "Source Code Pro"}
+    font_scale: 1.2
+    fg: "#172431"
+    bg: "#fcfcfc"
+    border-radius: 5px
+    btn-border-radius: 5%
+    grid-gutter-width: 3rem
+    pkgdown-nav-height: 78px
+
+
+code:
+  width: 74
+
+navbar:
+  structure:
+    left:
+    - intialize
+    - basics
+    - versions
+    right:
+    - reference
+    - search
+    - github
+  components:
+    intialize:
+      text: Get started
+      href: articles/gettingstarted.html
+    basics:
+      text: Basics
+      menu:
+      - text: Models and Bases
+        href: articles/basebasics.html
+      - text: Learning
+        href: articles/learning.html
+      - text: Speed
+        href: articles/speed.html
+    versions:
+      text: Versions
+      href: CHANGELOG.html
+
+
+articles:
+- title: Base Basics
+  navbar: ~
+  contents: basebasics
+- title: Learning
+  navbar: ~
+  contents: learning
+- title: Speed
+  navbar: ~
+  contents: speed
+reference:
+- title: outermod
+  contents:
+  - outermod
+  - setcovfs
+  - setknot
+  - gethyp
+  - starts_with("outermod")
+- title: outerbase
+  contents:
+  - outerbase-package
+  - outerbase
+  - starts_with("outerbase")
+- title: Statistical models and lpdfs
+  contents:
+  - lpdf
+  - lpdfvec
+  - getpara
+  - starts_with("lpdf")
+- subtitle: Log-likelihoods
+- contents: starts_with("loglik")
+- subtitle: Log-priors
+- contents: starts_with("logpr")
+- title: Covariance Functions
+  contents: covf
+- subtitle: Matern Variations
+- contents: starts_with("covf_")
+- title: Predictions
+  contents: predictor
+- title: Fitting
+  contents:
+  - fitob
+  - predob
+  - listcov
+- title: Helpers
+  contents:
+  - starts_with("BFGS")
+- title: Test Functions
+  contents:
+  - starts_with("obtest")

@@ -1,0 +1,118 @@
+---
+title: "Speeding up inference"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Speeding up inference}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+  
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+```{r setup}
+library(outerbase)
+```
+
+```{r}
+sampsize = 1000
+d = 8
+x = matrix(runif(sampsize*d),ncol=d)
+y = obtest_borehole8d(x)
+```
+
+```{r}
+xtest = matrix(runif(1000*d),ncol=d) #prediction points
+ytest =  obtest_borehole8d(xtest)
+```
+
+
+```{r}
+om = new(outermod)
+```
+
+```{r}
+setcovfs(om, rep("mat25",8))
+knotlist = list();
+for(k in 1:d) knotlist[[k]] = seq(0.01,1,by=0.025)
+
+setknot(om, knotlist) #40 knot point for each dim
+```
+
+```{r}
+p = 200
+terms = om$selectterms(p)
+```
+
+```{r}
+loglik_slow = new(loglik_std, om, terms, y, x) 
+logpr_slow = new(logpr_gauss, om, terms)
+logpdf_slow = new(lpdfvec, loglik_slow, logpr_slow)
+logpdf_slow$domarg = T
+logpdf_slow$optnewton()
+```
+
+```{r}
+loglik_fast = new(loglik_gauss, om, terms, y, x) 
+logpr_fast = new(logpr_gauss, om, terms)
+logpdf_fast = new(lpdfvec, loglik_fast, logpr_fast)
+logpdf_fast$domarg = T
+logpdf_fast$optcg(0.001, 100)
+logpdf_fast$setnthreads(4)
+loglik_slow$val
+loglik_fast$val
+logpr_slow$val
+logpr_fast$val
+logpdf_slow$val
+logpdf_fast$val
+
+hyp0_slow = list(para = getpara(logpdf_fast), hyp = gethyp(om))
+hyp0_fast = list(para = getpara(logpdf_fast), hyp = gethyp(om))
+```
+
+
+```{r}
+ptm = proc.time()
+opth = BFGS_lpdf(om, logpdf_slow, verbose = 1, newt= T)  
+t_slow = proc.time() - ptm
+print(t_slow)
+pred_slow = new(predictor,loglik_slow)
+pred_slow$update(xtest)
+yhat_slow = as.vector(pred_slow$mean())
+```
+
+
+```{r}
+ptm = proc.time()
+ptm <- proc.time()
+opth = BFGS_lpdf(rho=hyp0_fast, verbose = 1,
+                  om, logpdf_fast,  F)  
+t_fast = proc.time() - ptm
+pred_fast = new(predictor,loglik_fast)
+pred_fast$update(xtest)
+yhat_fast = as.vector(pred_fast$mean())
+```
+## Comparison of results
+
+```{r}
+par(mfrow=c(1,2))
+rmse_slow = sqrt(mean((ytest-yhat_slow)^2))
+hist((ytest-yhat_slow), main=paste("slow method \n rmse:", 
+                                    round(rmse_slow,3),
+                                   ", time:",
+                                   round(t_slow[3],2),'s'),
+     xlab = "prediction residuals")
+rmse_fast = sqrt(mean((ytest-yhat_fast)^2))
+hist((ytest-yhat_fast), main=paste("fast method \n rmse =",
+                                      round(rmse_fast,3),
+                                   ", time:",
+                                   round(t_fast[3],2),'s'), 
+     xlab = "prediction residuals")
+
+```
+
+

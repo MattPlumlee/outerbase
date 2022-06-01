@@ -1,0 +1,83 @@
+---
+title: "Getting started"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Getting started}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+```{r setup}
+library(outerbase)
+```
+
+
+```{r}
+sampsize = 1000
+d = 8
+x = matrix(runif(sampsize*d),ncol=d)
+y = obtest_borehole8d(x) + 0.5*rnorm(sampsize)
+```
+
+```{r}
+xtest = matrix(runif(1000*d),ncol=d) #prediction points
+ytest =  obtest_borehole8d(xtest) + 0.5*rnorm(sampsize)
+```
+## Covariance functions
+Type `listcov` to discover what covariance functions are deployed.
+```{r}
+listcov()
+```
+If you are curious about any of them, `?covf_covname`.  Note that there are some checks to make sure you do not mess up this entry point, examples are below.
+```{r, error=TRUE}
+gpm = fitob(x, y, numb = 250, covnames=rep("elephant",5))
+gpm = fitob(x, y, numb = 250, covnames=rep("elephant",8))
+gpm = fitob(100*x, y, numb = 250, covnames=rep("mat25pow",8))
+gpm = fitob(0.001*x, y, numb = 250, covnames=rep("mat25pow",8))
+```
+
+## Building
+```{r}
+# gpm = fitob(x, y, numb = 250) does same thing
+gpm = fitob(x, y, numb = 250, covnames=rep("mat25pow",8))
+```
+
+## Prediction
+
+```{r}
+predtr = predob(gpm, x)
+rmsetr = sqrt(mean((y-predtr$mean)^2))
+plot(predtr$mean, y, main= paste("training \n RMSE = ", 
+                                    round(rmsetr,3)),
+     xlab = "prediction", ylab = "actual")
+```
+
+```{r}
+ytrue = obtest_borehole8d(x)
+rmsetr = sqrt(mean((ytrue-predtr$mean)^2))
+plot(predtr$mean, ytrue, main= paste("oracle \n RMSE = ", 
+                                    round(rmsetr,3)),
+     xlab = "prediction", ylab = "actual")
+```
+
+```{r}
+predtest = predob(gpm, xtest)
+
+rmsetr = sqrt(mean((ytest-predtest$mean)^2))
+plot(predtest$mean, ytest, main= paste("testing \n RMSE = ", 
+                                    round(rmsetr,3)),
+     xlab = "prediction", ylab = "actual")
+
+hist((ytest-predtest$mean),main="testing \n  residuals",xlab="residuals")
+hist((ytest-predtest$mean)/sqrt(predtest$var),
+     main="testing \n standarized residuals",xlab="standarized residuals")
+```
+

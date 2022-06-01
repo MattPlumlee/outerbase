@@ -1,0 +1,212 @@
+---
+title: "Base walkthrough"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Base walkthrough}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+```{r setup}
+library(outerbase)
+```
+
+## Covariance functions
+
+```{r}
+sampsize = 20
+d = 3
+design1d = seq(1/(2*sampsize),1-1/(2*sampsize),1/sampsize)
+x = cbind(design1d,sample(design1d),sample(design1d))
+y = obtest_borehole3d(x)
+```
+
+```{r}
+testsampsize = 100
+xtest = matrix(runif(testsampsize*d),ncol=d) #prediction points
+ytest = obtest_borehole3d(xtest)
+```
+
+```{r}
+corf1 = new(covf_mat25)
+?covf_mat25
+```
+
+```{r}
+cormat1 = corf1$cov(x[,1],x[,1])
+print(cormat1[1:5,1:5])
+```
+
+```{r}
+corf1$hyp
+```
+
+```{r}
+par(mfrow = c(1, 2))
+plot(x[,1],corf1$cov(x[,1],0.5), type='l')
+corf1$hyp = c(-0.5)
+plot(x[,1],corf1$cov(x[,1],0.5), type='l')
+```
+
+## Gaussian processes
+
+```{r}
+corf2 = new(covf_mat25)
+corf3 = new(covf_mat25)
+corf2$hyp = c(-0.5)
+corf3$hyp = c(-0.5)
+
+covftot = function(x1,x2){
+  corf1$cov(x1[,1],x2[,1])*
+  corf2$cov(x1[,2],x2[,2])*
+  corf3$cov(x1[,3],x2[,3])
+}
+
+cormattot = covftot(x,x)
+```
+
+```{r}
+yhat = covftot(xtest,x) %*% solve(cormattot,y)
+plot(yhat,ytest)
+hist((ytest-yhat), main="test residuals",
+     xlab = "test residuals")
+```
+
+```{r}
+sigma2hat = as.double( t(y) %*% solve(cormattot,y) / length(y))
+
+varpred = sigma2hat * (covftot(xtest,xtest) - t(covftot(x,xtest)) %*% 
+  solve(cormattot,covftot(x,xtest)))
+hist((ytest-yhat)/sqrt(diag(varpred)), main="standarized test residuals",
+     xlab = "standarized test residuals")
+```
+
+
+## mod and base
+
+### outermod
+
+```{r}
+om = new(outermod)
+```
+
+```{r}
+setcovfs(om, rep("mat25",3))
+gethyp(om)
+om$updatehyp(rep(-0.5,3))
+gethyp(om)
+
+knotlist = list(seq(0,1,by=0.025),
+                seq(0,1,by=0.025),
+                seq(0,1,by=0.025))
+setknot(om, knotlist)
+```
+
+### outerbase
+
+`outerbase` is the equivalent of a basis matrix with 
+fast computation built in
+```{r}
+ob = new(outerbase, 
+         om, #give it the outermod (reference)
+          x) #give it the input matrix
+```
+
+```{r}
+basis_func = ob$getbase(1)
+matplot(x[,1],basis_func[,1:4], 
+        type='l', ylab="func", xlab="first dim")
+```
+
+### outermod and outerbase
+
+```{r}
+p = 60
+terms = om$selectterms(p)
+print(terms)
+```
+
+
+```{r}
+basismat = ob$getmat(terms)
+
+
+basevec = ob$getbase(1)[,terms[5,1]+1]*
+  ob$getbase(2)[,terms[5,2]+1]*
+  ob$getbase(3)[,terms[5,3]+1]
+cbind(basevec[1:5],basismat[1:5,5])
+```
+
+```{r}
+covcoeff = as.vector(om$getvar(terms))
+```
+
+## outerbase inference
+
+```{r}
+cormatob = basismat %*% diag(covcoeff ) %*% t(basismat)
+
+print(round(cormatob[1:5,1:5],4))
+print(round(cormattot[1:5,1:5],4))
+```
+
+
+```{r}
+cormatob = basismat %*% diag(covcoeff) %*% t(basismat)
+
+paraep = 10^(-2)
+postcov = solve(1/paraep * t(basismat) %*% basismat + 
+                  1/sigma2hat*diag(1/covcoeff))
+coeffest = postcov %*% (1/paraep * t(basismat) %*% y)
+```
+
+
+```{r}
+paraep = 10^(-2)
+postcov = solve(1/paraep * t(basismat) %*% basismat + 
+                  1/sigma2hat*diag(1/covcoeff))
+coeffest = postcov %*% (1/paraep * t(basismat) %*% y)
+
+```
+
+## Predictions and comparison
+
+```{r}
+obtest = new(outerbase, 
+         om, #give it the outermod (reference)
+          xtest) #give it the input matrix
+
+basistest = obtest$getmat(terms)
+```
+
+```{r}
+yhatob = basistest %*% coeffest
+par(mfrow=c(1,2))
+plot(yhat,ytest, main = "typical gp")
+plot(yhatob,ytest, main = "outerbase equiv.")
+```
+
+```{r}
+par(mfrow=c(1,2))
+hist(ytest-yhat, main="typical gp",
+     xlab = "test residuals")
+hist(ytest-yhatob, main="outerbase equiv.",
+     xlab = "test residuals")
+```
+
+```{r}
+varpredob = basistest %*% postcov %*% t(basistest) 
+par(mfrow=c(1,2))
+hist((ytest-yhat)/sqrt(diag(varpred)), main="typical gp",
+     xlab = "standarized test residuals")
+hist((ytest-yhatob)/sqrt(diag(varpredob)), main="outerbase equiv.",
+     xlab = "standarized test residuals")
+```
+
