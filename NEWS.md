@@ -1,4 +1,4 @@
-# outerbase 0.0.1
+# outerbase 0.1.0
 
 * Initial release!
 * Contains base functionality.

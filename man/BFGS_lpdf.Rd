@@ -2,22 +2,27 @@
 % Please edit documentation in R/outersupport.R
 \name{BFGS_lpdf}
 \alias{BFGS_lpdf}
-\title{Do optimization}
+\title{BFGS lpdf}
 \usage{
 BFGS_lpdf(om, logpdf, rho = list(), newt = F, ...)
 }
 \arguments{
-\item{om}{An initial point}
+\item{om}{an \code{\link{outermod}} object}
 
-\item{logpdf}{An initial point}
+\item{logpdf}{a \code{\link{lpdf}} object}
 
-\item{rho}{An initial point}
+\item{rho}{an initial point, initialized from objects if needed}
 
-\item{...}{additional parameters passed to \code{obBFGS}}
+\item{newt}{bool for if Newtons method should be used}
+
+\item{...}{additional parameters passed to \code{\link{BFGS_std}}}
 }
 \value{
 A list of information from optimization
 }
 \description{
-Do optimization
+A wrapper for code{\link{BFGS_std}} that is useful for easily calling 
+parameter optimization for this package with as few lines as possible.
+Note that \code{om} and \code{logpdf} will be set to optimal 
+parameters, the return is simply for information.
 }

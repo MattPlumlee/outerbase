@@ -2,20 +2,16 @@
 % Please edit documentation in R/outersupport.R
 \name{BFGS_std}
 \alias{BFGS_std}
-\title{Do optimization}
+\title{BFGS standard}
 \usage{
-BFGS_std(funcw, rho, ..., Bs = NULL, lr0 = 0.1, verbose = 0)
+BFGS_std(funcw, rho, ..., verbose = 0)
 }
 \arguments{
 \item{funcw}{An object to optimize}
 
 \item{rho}{An initial point}
 
-\item{...}{additional parameters passed to \code{ll}}
-
-\item{Bs}{initial inverse hessian}
-
-\item{lr0}{initial learning rate}
+\item{...}{additional parameters passed to \code{funcw}}
 
 \item{verbose}{Integer from 0-3 where larger prints more information}
 }
@@ -23,5 +19,8 @@ BFGS_std(funcw, rho, ..., Bs = NULL, lr0 = 0.1, verbose = 0)
 A list of information from optimization
 }
 \description{
-Do optimization
+Do generic minimization of a function \code{funcw} that takes
+a list rho using the Broyden-Fletcher-Goldfarb-Shanno algorithm.
+Useful for hyperparameter optimization because it handles infs 
+fairly easily.
 }

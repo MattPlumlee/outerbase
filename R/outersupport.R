@@ -5,27 +5,29 @@
 #' @import methods
 #' @import Rcpp
 #' @importFrom utils relist
+#' @importFrom stats quantile
 #' @useDynLib outerbase, .registration = TRUE
 #' @exportPattern "^[[:alpha:]]+"
 "_PACKAGE"
 Rcpp::loadModule("obmod", TRUE)
 
-# devtools::check(manual=TRUE,vignettes = FALSE)
-
-
-#' Do optimization
+#' BFGS standard
+#' 
+#' Do generic minimization of a function \code{funcw} that takes
+#' a list rho using the Broyden-Fletcher-Goldfarb-Shanno algorithm.
+#' Useful for hyperparameter optimization because it handles infs 
+#' fairly easily.  
 #' 
 #' @param funcw An object to optimize
 #' @param rho An initial point
-#' @param ... additional parameters passed to \code{ll}
-#' @param Bs initial inverse hessian
-#' @param lr0 initial learning rate
+#' @param ... additional parameters passed to \code{funcw}
 #' @param verbose Integer from 0-3 where larger prints more information
 #' @return A list of information from optimization
 #' @export
-BFGS_std <- function(funcw, rho, ..., Bs=NULL, lr0=0.1,
-                       verbose = 0){
+BFGS_std <- function(funcw, rho, ...,verbose = 0){
   #linesearchparameters
+  Bs = NULL #initial inverse hessian
+  lr0 = 0.1 #initial learning rate
   c1 = 0.0001
   c2 = 0.9
   numatte0 = 5
@@ -143,36 +145,38 @@ BFGS_std <- function(funcw, rho, ..., Bs=NULL, lr0=0.1,
   list(vec=relist(rhov,rho), B=B, lr=lr, optid=optid)
 }
 
-#' Do optimization
+#' BFGS lpdf
 #' 
-#' @param rho An initial point
-#' @param om An initial point
-#' @param logpdf An initial point
-#' @param ... additional parameters passed to \code{obBFGS}
+#' A wrapper for code{\link{BFGS_std}} that is useful for easily calling 
+#' parameter optimization for this package with as few lines as possible.
+#' Note that \code{om} and \code{logpdf} will be set to optimal 
+#' parameters, the return is simply for information.
+#' 
+#' @param om an \code{\link{outermod}} object
+#' @param logpdf a \code{\link{lpdf}} object
+#' @param rho an initial point, initialized from objects if needed
+#' @param newt bool for if Newtons method should be used
+#' @param ... additional parameters passed to \code{\link{BFGS_std}}
 #' @return A list of information from optimization
 #' @export
 BFGS_lpdf <- function(om, logpdf, rho=list(), newt=F, ...){
   if(is.null(rho$hyp)) rho$hyp = gethyp(om)
   if(is.null(rho$para)) rho$para = getpara(logpdf)
   
-  lpdfwrapper(rho, om, logpdf, newt=newt)
+  .lpdfwrapper(rho, om, logpdf, newt=newt)
   
-  optsum = BFGS_std(lpdfwrapper, rho, om=om,
+  optsum = BFGS_std(.lpdfwrapper, rho, om=om,
                     logpdf=logpdf, ...)
   
-  lpdfwrapper(optsum$vec, om, logpdf, newt=newt)
+  .lpdfwrapper(optsum$vec, om, logpdf, newt=newt)
   
   optsum
 }
 
-#' Optimization wrapper
-#' 
-#' @param hypl parameter list
-#' @param om an \code{\link{outermod}} object
-#' @param logpdf a \code{\link{lpdf}} object
-#' @param newt bool for if newtons method should be used
-#' @return list of \code{val} and \code{grad}
-lpdfwrapper = function(hypl, om, logpdf, newt = F) {
+# Optimization wrapper
+# 
+# returns list of \code{val} and \code{grad}
+.lpdfwrapper = function(hypl, om, logpdf, newt = F) {
   regpara = logpdf$paralpdf(hypl$para)
   reghyp = om$hyplpdf(hypl$hyp)
   if(is.finite(regpara) && is.finite(reghyp)) { 

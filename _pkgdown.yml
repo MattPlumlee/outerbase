@@ -20,7 +20,7 @@ code:
 navbar:
   structure:
     left:
-    - intialize
+    - initi
     - basics
     - versions
     right:
@@ -28,8 +28,8 @@ navbar:
     - search
     - github
   components:
-    intialize:
-      text: Get started
+    initi:
+      text: Get Started
       href: articles/gettingstarted.html
     basics:
       text: Basics
@@ -42,10 +42,15 @@ navbar:
         href: articles/speed.html
     versions:
       text: Versions
-      href: CHANGELOG.html
+      href: news/index.html
+
+
 
 
 articles:
+- title: Get started
+  navbar: ~
+  contents: gettingstarted
 - title: Base Basics
   navbar: ~
   contents: basebasics

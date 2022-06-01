@@ -7,54 +7,11 @@ listcov = function() {
   c("mat25pow", "mat25", "mat25ang")
 }
 
-#' check covariance functions
-#' 
-#' @param covname string of the covariance name
-#' @param x vector of values 
-#' @keywords internal
-#' @noRd
-checkcov = function(covname, x) {
-  if (!(covname %in% listcov())) {
-    stop('\n covariances must be from listcov()')
-  }
-  eval(parse(text=
-               paste("covobj = new(","covf_",covname,")",sep="")))
-  
-  if (min(x) <covobj$lowbnd || max(x) > covobj$uppbnd){
-    stop(paste('\n x ranges exceed limits of covariance functions \n',
-    'the limits are between', covobj$lowbnd, 'and', covobj$uppbnd,
-               ' \n try rescaling'))
-  }
-  
-  if (diff(range(x)) < 1/20*(covobj$uppbnd-covobj$lowbnd)){
-    stop(paste('\n x are too small for ranges\n',
-         'the limits are between', covobj$lowbnd, 'and', covobj$uppbnd,
-         ' \n try rescaling'))
-  }
-}
-
-#' generate some knots
-#' 
-#' @param bassize number of knots
-#' @param x vector of values 
-#' @return list of knots to use for each dim
-#' @keywords internal
-#' @noRd
-genknotlist <- function(bassize, x) {
-  knotlist = list()
-  for(k in 1:d) 
-    knotlist[[k]] = quantile(x[,k],
-         seq(0,1,length=bassize[k])*bassize[k]/
-         (bassize[k]+1)+0.5/(bassize[k]+1))
-  knotlist
-}
-
-
 #' fit an outerbase
 #' 
 #' @param x a n by d sized matrix of inputs
 #' @param y a n length vector of outputs
-#' @param numb number of bases to use
+#' @param numb size of basis to use
 #' @param covnames a d length vector of covariance names
 #' @return Saving important model information
 #' @export
@@ -85,11 +42,11 @@ fitob = function(x, y, numb=100, covnames=NULL) {
   
   if(is.null(covnames)) covnames = rep(listcov()[1],d)
   
-  for(k in 1:d) checkcov(covnames[k], x[,k]) 
+  for(k in 1:d) .checkcov(covnames[k], x[,k]) 
   
   om = new(outermod)
   setcovfs(om, covnames)
-  setknot(om, genknotlist(rep(40,d), x)) #40 knot point for each dim
+  setknot(om, .genknotlist(rep(40,d), x)) #40 knot point for each dim
   
   terms = om$selectterms(min(numb, 100*d)) #small number of terms
   
@@ -104,7 +61,7 @@ fitob = function(x, y, numb=100, covnames=NULL) {
   bassize = ceiling(pmax(16,
                          pmin(70,
                               2*apply(terms,2,max))))
-  setknot(om, genknotlist(bassize, x))
+  setknot(om, .genknotlist(bassize, x))
   loglik_faster = new(loglik_gauss, om, terms, y, x) #initial parameter
   logpdf_faster = new(lpdfvec, logpr, loglik_faster)
   logpdf_faster$domarg = T
@@ -127,9 +84,39 @@ fitob = function(x, y, numb=100, covnames=NULL) {
 #' @return A list with \code{mean} and \code{var} at new x
 #' @export
 predob = function(obmodel, x){
-  gpm$predobj$update(x)
+  obmodel$predobj$update(x)
   out = list()
-  out$mean = gpm$predobj$mean()
-  out$var = gpm$predobj$var()
+  out$mean = obmodel$predobj$mean()
+  out$var = obmodel$predobj$var()
   out
+}
+
+
+.checkcov = function(covname, x) {
+  if (!(covname %in% listcov())) {
+    stop('\n covariances must be from listcov()')
+  }
+  covobj = new(get(paste("covf_",covname,sep="")))
+  
+  if (min(x) <covobj$lowbnd || max(x) > covobj$uppbnd){
+    stop(paste('\n x ranges exceed limits of covariance functions \n',
+               'the limits are between', covobj$lowbnd, 'and', covobj$uppbnd,
+               ' \n try rescaling'))
+  }
+  
+  if (diff(range(x)) < 1/20*(covobj$uppbnd-covobj$lowbnd)){
+    stop(paste('\n x are too small for ranges\n',
+               'the limits are between', covobj$lowbnd, 'and', covobj$uppbnd,
+               ' \n try rescaling'))
+  }
+}
+
+.genknotlist <- function(bassize, x) {
+  knotlist = list()
+  d = dim(x)[2]
+  for(k in 1:d) 
+    knotlist[[k]] = quantile(x[,k],
+                             seq(0,1,length=bassize[k])*bassize[k]/
+                               (bassize[k]+1)+0.5/(bassize[k]+1))
+  knotlist
 }

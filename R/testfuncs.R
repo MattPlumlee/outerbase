@@ -1,4 +1,6 @@
-#' Three demensional Borehole
+#' Three dim borehole example
+#' 
+#' A three dimensional Borehole function used in illustrations.
 #' 
 #' @param x a n by 3 vector of inputs
 #' @return a length n vector of outputs
@@ -20,7 +22,9 @@ obtest_borehole3d <- function(x) {
   return(m1 / m2 / m3 - 77) #approximately centering
 }
 
-#' Eight demensional Borehole
+#' Eight dim borehole example
+#' 
+#' An eight dimensional Borehole function used in illustrations.
 #' 
 #' @param x a n by 8 vector of inputs
 #' @return a length n vector of outputs

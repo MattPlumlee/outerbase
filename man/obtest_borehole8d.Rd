@@ -2,7 +2,7 @@
 % Please edit documentation in R/testfuncs.R
 \name{obtest_borehole8d}
 \alias{obtest_borehole8d}
-\title{Eight demensional Borehole}
+\title{Eight dim borehole example}
 \usage{
 obtest_borehole8d(x)
 }
@@ -13,5 +13,5 @@ obtest_borehole8d(x)
 a length n vector of outputs
 }
 \description{
-Eight demensional Borehole
+An eight dimensional Borehole function used in illustrations.
 }

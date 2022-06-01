@@ -11,7 +11,7 @@ fitob(x, y, numb = 100, covnames = NULL)
 
 \item{y}{a n length vector of outputs}
 
-\item{numb}{number of bases to use}
+\item{numb}{size of basis to use}
 
 \item{covnames}{a d length vector of covariance names}
 }

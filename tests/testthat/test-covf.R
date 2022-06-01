@@ -1,7 +1,6 @@
 testcovgrad <- function(covname) {
   ss = 10
-  eval(parse(text=
-               paste("covobj = new(","covf_",covname,")",sep="")))
+  covobj = new(get(paste("covf_",covname,sep="")))
   
   xo = runif(ss)*(covobj$uppbnd-covobj$lowbnd)+covobj$lowbnd
   hyp0 = covobj$hyp0 + (covobj$hypub-covobj$hyplb)*

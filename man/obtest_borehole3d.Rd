@@ -2,7 +2,7 @@
 % Please edit documentation in R/testfuncs.R
 \name{obtest_borehole3d}
 \alias{obtest_borehole3d}
-\title{Three demensional Borehole}
+\title{Three dim borehole example}
 \usage{
 obtest_borehole3d(x)
 }
@@ -13,5 +13,5 @@ obtest_borehole3d(x)
 a length n vector of outputs
 }
 \description{
-Three demensional Borehole
+A three dimensional Borehole function used in illustrations.
 }
