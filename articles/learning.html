@@ -88,7 +88,7 @@
     
     
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://mattplumlee.github.io/outerbase/index.html">outerbase</a></span><span class="op">)</span></code></pre></div>
+<code class="sourceCode R"><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://mattplumlee.github.io/outerbase">outerbase</a></span><span class="op">)</span></code></pre></div>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">sampsize</span> <span class="op">=</span> <span class="fl">20</span>
 <span class="va">d</span> <span class="op">=</span> <span class="fl">3</span>
@@ -120,49 +120,49 @@
 <span class="va">loglik</span><span class="op">$</span><span class="va">compute_gradpara</span> <span class="op">=</span> <span class="cn">T</span>
 <span class="va">loglik</span><span class="op">$</span><span class="fu">update</span><span class="op">(</span><span class="va">coeffhere</span><span class="op">)</span>
 <span class="va">loglik</span><span class="op">$</span><span class="va">val</span>
-<span class="co">#&gt; [1] -101.0724</span>
+<span class="co">#&gt; [1] -108.6753</span>
 <span class="va">loglik</span><span class="op">$</span><span class="va">grad</span>
 <span class="co">#&gt;               [,1]</span>
-<span class="co">#&gt;  [1,] -0.214782352</span>
-<span class="co">#&gt;  [2,]  1.239716187</span>
-<span class="co">#&gt;  [3,] -0.551230874</span>
-<span class="co">#&gt;  [4,] -0.433790562</span>
-<span class="co">#&gt;  [5,] -0.438614947</span>
-<span class="co">#&gt;  [6,]  0.045394695</span>
-<span class="co">#&gt;  [7,] -0.303939760</span>
-<span class="co">#&gt;  [8,] -0.471086926</span>
-<span class="co">#&gt;  [9,] -0.263255507</span>
-<span class="co">#&gt; [10,] -0.077929958</span>
-<span class="co">#&gt; [11,] -0.026762207</span>
-<span class="co">#&gt; [12,]  0.486313338</span>
-<span class="co">#&gt; [13,]  0.004691373</span>
-<span class="co">#&gt; [14,]  0.108039305</span>
-<span class="co">#&gt; [15,] -0.554569287</span>
-<span class="co">#&gt; [16,] -0.082179057</span>
-<span class="co">#&gt; [17,] -0.254663617</span>
-<span class="co">#&gt; [18,]  0.389637159</span>
-<span class="co">#&gt; [19,]  0.254808908</span>
-<span class="co">#&gt; [20,] -0.125157579</span>
-<span class="co">#&gt; [21,]  0.325482290</span>
-<span class="co">#&gt; [22,]  0.639361612</span>
-<span class="co">#&gt; [23,]  0.121397203</span>
-<span class="co">#&gt; [24,]  0.320707702</span>
-<span class="co">#&gt; [25,]  0.400882900</span>
-<span class="co">#&gt; [26,]  0.598376944</span>
-<span class="co">#&gt; [27,]  0.080551270</span>
-<span class="co">#&gt; [28,] -0.046618566</span>
-<span class="co">#&gt; [29,]  0.476755910</span>
-<span class="co">#&gt; [30,] -0.149323492</span>
-<span class="co">#&gt; [31,] -0.024598480</span>
-<span class="co">#&gt; [32,] -0.415995519</span>
-<span class="co">#&gt; [33,]  0.300439992</span>
-<span class="co">#&gt; [34,] -0.415316865</span>
-<span class="co">#&gt; [35,]  0.575252775</span>
-<span class="co">#&gt; [36,] -0.027421308</span>
-<span class="co">#&gt; [37,] -0.014354222</span>
-<span class="co">#&gt; [38,] -0.335234506</span>
-<span class="co">#&gt; [39,] -0.256127425</span>
-<span class="co">#&gt; [40,]  0.452745240</span>
+<span class="co">#&gt;  [1,] -0.038274172</span>
+<span class="co">#&gt;  [2,]  2.425036913</span>
+<span class="co">#&gt;  [3,] -0.691595549</span>
+<span class="co">#&gt;  [4,]  0.657873632</span>
+<span class="co">#&gt;  [5,]  0.017231699</span>
+<span class="co">#&gt;  [6,]  0.065124474</span>
+<span class="co">#&gt;  [7,] -0.298016728</span>
+<span class="co">#&gt;  [8,] -0.137920072</span>
+<span class="co">#&gt;  [9,] -0.048336880</span>
+<span class="co">#&gt; [10,]  0.772967495</span>
+<span class="co">#&gt; [11,] -0.007694948</span>
+<span class="co">#&gt; [12,]  0.471530156</span>
+<span class="co">#&gt; [13,] -0.431885580</span>
+<span class="co">#&gt; [14,] -0.033985676</span>
+<span class="co">#&gt; [15,]  0.085605751</span>
+<span class="co">#&gt; [16,]  0.343361758</span>
+<span class="co">#&gt; [17,]  0.525404206</span>
+<span class="co">#&gt; [18,] -0.134303901</span>
+<span class="co">#&gt; [19,]  0.201202931</span>
+<span class="co">#&gt; [20,] -1.419905856</span>
+<span class="co">#&gt; [21,] -0.437399106</span>
+<span class="co">#&gt; [22,] -0.237961666</span>
+<span class="co">#&gt; [23,] -0.400036932</span>
+<span class="co">#&gt; [24,] -0.131710291</span>
+<span class="co">#&gt; [25,]  0.133371303</span>
+<span class="co">#&gt; [26,] -0.160438827</span>
+<span class="co">#&gt; [27,] -0.815107033</span>
+<span class="co">#&gt; [28,] -0.867958096</span>
+<span class="co">#&gt; [29,]  1.203623271</span>
+<span class="co">#&gt; [30,]  0.259840751</span>
+<span class="co">#&gt; [31,]  0.467215220</span>
+<span class="co">#&gt; [32,] -0.136092388</span>
+<span class="co">#&gt; [33,] -1.331228712</span>
+<span class="co">#&gt; [34,] -0.141128855</span>
+<span class="co">#&gt; [35,] -0.295501502</span>
+<span class="co">#&gt; [36,]  0.059302169</span>
+<span class="co">#&gt; [37,]  0.648970712</span>
+<span class="co">#&gt; [38,]  0.346844567</span>
+<span class="co">#&gt; [39,] -0.133802008</span>
+<span class="co">#&gt; [40,] -0.198684532</span>
 <span class="va">loglik</span><span class="op">$</span><span class="va">gradhyp</span>
 <span class="co">#&gt;      [,1]</span>
 <span class="co">#&gt; [1,]    0</span>
@@ -172,8 +172,8 @@
 <span class="co">#&gt; [5,]    0</span>
 <span class="co">#&gt; [6,]    0</span>
 <span class="va">loglik</span><span class="op">$</span><span class="va">gradpara</span>
-<span class="co">#&gt;         [,1]</span>
-<span class="co">#&gt; [1,] 48.9089</span></code></pre></div>
+<span class="co">#&gt;          [,1]</span>
+<span class="co">#&gt; [1,] 79.19142</span></code></pre></div>
 <div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
 <code class="sourceCode R">
 <span class="va">hyp1</span> <span class="op">=</span> <span class="va">hyp0</span> 
@@ -200,7 +200,7 @@
 <p><img src="learning_files/figure-html/unnamed-chunk-9-1.png" width="700"></p>
 <div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/base/MathFun.html" class="external-link">sqrt</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/mean.html" class="external-link">mean</a></span><span class="op">(</span><span class="op">(</span><span class="va">ytest</span><span class="op">-</span><span class="va">yhat</span><span class="op">)</span><span class="op">^</span><span class="fl">2</span><span class="op">)</span><span class="op">)</span>
-<span class="co">#&gt; [1] 4.798911</span></code></pre></div>
+<span class="co">#&gt; [1] 4.370127</span></code></pre></div>
 <div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">totobj</span> <span class="op">=</span> <span class="kw">function</span><span class="op">(</span><span class="va">hypl</span><span class="op">)</span> <span class="op">{</span> <span class="co">#my optimization function for tuning</span>
   <span class="va">regpara</span> <span class="op">=</span> <span class="va">logpdf</span><span class="op">$</span><span class="fu">paralpdf</span><span class="op">(</span><span class="va">hypl</span><span class="op">$</span><span class="va">para</span><span class="op">)</span>
@@ -220,61 +220,55 @@
 <span class="va">opth</span> <span class="op">=</span> <span class="fu"><a href="../reference/BFGS_std.html">BFGS_std</a></span><span class="op">(</span><span class="va">totobj</span>, <span class="va">hypl</span>, verbose<span class="op">=</span><span class="fl">3</span><span class="op">)</span> <span class="co">#do a quick and dirty optimization first</span>
 <span class="co">#&gt; [1] "doing opt..."</span>
 <span class="co">#&gt; [1] "Wolfe conditions"</span>
-<span class="co">#&gt; [1] -101.2423 -454.3435</span>
-<span class="co">#&gt; [1] 230.3848</span>
+<span class="co">#&gt; [1]  -73.20676 -404.16683</span>
+<span class="co">#&gt; [1] 159.2356</span>
 <span class="co">#&gt; [1] "Wolfe conditions"</span>
-<span class="co">#&gt; [1] -11.104895   3.511084</span>
-<span class="co">#&gt; [1] 208.9298</span>
+<span class="co">#&gt; [1] -6.816200  2.562925</span>
+<span class="co">#&gt; [1] 146.0237</span>
 <span class="co">#&gt; [1] "Wolfe conditions"</span>
-<span class="co">#&gt; [1] -28.48345 -11.07895</span>
-<span class="co">#&gt; [1] 180.4432</span>
+<span class="co">#&gt; [1] -19.824409  -7.838043</span>
+<span class="co">#&gt; [1] 126.1971</span>
 <span class="co">#&gt; [1] "Wolfe conditions"</span>
-<span class="co">#&gt; [1] -26.41924 -10.66752</span>
-<span class="co">#&gt; [1] 154.021</span>
+<span class="co">#&gt; [1] -18.031639  -7.441952</span>
+<span class="co">#&gt; [1] 108.1635</span>
 <span class="co">#&gt; [1] "Wolfe conditions"</span>
-<span class="co">#&gt; [1] -23.91683 -10.40664</span>
-<span class="co">#&gt; [1] 130.1015</span>
+<span class="co">#&gt; [1] -15.925656  -7.067958</span>
+<span class="co">#&gt; [1] 92.23607</span>
 <span class="co">#&gt; [1] "Wolfe conditions"</span>
-<span class="co">#&gt; [1] -20.723051  -9.530594</span>
-<span class="co">#&gt; [1] 109.3762</span>
+<span class="co">#&gt; [1] -13.505174  -6.324651</span>
+<span class="co">#&gt; [1] 78.72939</span>
 <span class="co">#&gt; [1] "Wolfe conditions"</span>
-<span class="co">#&gt; [1] -17.390403  -8.378969</span>
-<span class="co">#&gt; [1] 91.98381</span>
+<span class="co">#&gt; [1] -11.122697  -5.464062</span>
+<span class="co">#&gt; [1] 67.60544</span>
 <span class="co">#&gt; [1] "Wolfe conditions"</span>
-<span class="co">#&gt; [1] -14.201861  -7.133232</span>
-<span class="co">#&gt; [1] 77.78034</span>
+<span class="co">#&gt; [1] -8.919165 -4.574680</span>
+<span class="co">#&gt; [1] 58.68526</span>
 <span class="co">#&gt; [1] "Wolfe conditions"</span>
-<span class="co">#&gt; [1] -11.304717  -5.906469</span>
-<span class="co">#&gt; [1] 66.47433</span>
+<span class="co">#&gt; [1] -6.97720 -3.71965</span>
+<span class="co">#&gt; [1] 51.70727</span>
 <span class="co">#&gt; [1] "Wolfe conditions"</span>
-<span class="co">#&gt; [1] -8.765513 -4.761120</span>
-<span class="co">#&gt; [1] 57.70781</span>
+<span class="co">#&gt; [1] -5.338547 -2.943222</span>
+<span class="co">#&gt; [1] 46.36811</span>
 <span class="co">#&gt; [1] "Wolfe conditions"</span>
-<span class="co">#&gt; [1] -6.609003 -3.732220</span>
-<span class="co">#&gt; [1] 51.09805</span>
+<span class="co">#&gt; [1] -4.012849 -2.273590</span>
+<span class="co">#&gt; [1] 42.35479</span>
 <span class="co">#&gt; [1] "Wolfe conditions"</span>
-<span class="co">#&gt; [1] -4.836447 -2.838949</span>
-<span class="co">#&gt; [1] 46.26104</span>
+<span class="co">#&gt; [1] -2.984341 -1.723774</span>
+<span class="co">#&gt; [1] 39.37011</span>
 <span class="co">#&gt; [1] "Wolfe conditions"</span>
-<span class="co">#&gt; [1] -3.433690 -2.090682</span>
-<span class="co">#&gt; [1] 42.82695</span>
+<span class="co">#&gt; [1] -2.219487 -1.293859</span>
+<span class="co">#&gt; [1] 37.15036</span>
 <span class="co">#&gt; [1] "Wolfe conditions"</span>
-<span class="co">#&gt; [1] -2.373810 -1.490025</span>
-<span class="co">#&gt; [1] 40.45285</span>
+<span class="co">#&gt; [1] -1.674764 -0.974148</span>
+<span class="co">#&gt; [1] 35.4754</span>
 <span class="co">#&gt; [1] "Wolfe conditions"</span>
-<span class="co">#&gt; [1] -1.617404 -1.033080</span>
-<span class="co">#&gt; [1] 38.83526</span>
+<span class="co">#&gt; [1] -4.102778 -2.960755</span>
+<span class="co">#&gt; [1] 31.37213</span>
 <span class="co">#&gt; [1] "Wolfe conditions"</span>
-<span class="co">#&gt; [1] -3.746856 -1.944564</span>
-<span class="co">#&gt; [1] 35.08796</span>
+<span class="co">#&gt; [1] -2.521198 -2.470987</span>
+<span class="co">#&gt; [1] 28.85061</span>
 <span class="co">#&gt; [1] "Wolfe conditions"</span>
-<span class="co">#&gt; [1] -3.413285 -2.670168</span>
-<span class="co">#&gt; [1] 31.67426</span>
-<span class="co">#&gt; [1] "Wolfe conditions"</span>
-<span class="co">#&gt; [1] -1.830783 -1.460274</span>
-<span class="co">#&gt; [1] 29.84325</span>
-<span class="co">#&gt; [1] "Wolfe conditions"</span>
-<span class="co">#&gt; [1] -0.9854214 -0.7629202</span>
+<span class="co">#&gt; [1] -1.1169775 -0.9299833</span>
 <span class="co">#&gt; [1] "finished opt..."</span></code></pre></div>
 <div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">om</span><span class="op">$</span><span class="fu">updatehyp</span><span class="op">(</span><span class="va">opth</span><span class="op">$</span><span class="va">vec</span><span class="op">$</span><span class="va">hyp</span><span class="op">)</span>
@@ -286,61 +280,55 @@
                  verbose <span class="op">=</span> <span class="fl">3</span>, newt<span class="op">=</span> <span class="cn">T</span><span class="op">)</span>  
 <span class="co">#&gt; [1] "doing opt..."</span>
 <span class="co">#&gt; [1] "Wolfe conditions"</span>
-<span class="co">#&gt; [1] -101.2422 -454.4148</span>
-<span class="co">#&gt; [1] 230.3849</span>
+<span class="co">#&gt; [1]  -73.20649 -404.12624</span>
+<span class="co">#&gt; [1] 159.2359</span>
 <span class="co">#&gt; [1] "Wolfe conditions"</span>
-<span class="co">#&gt; [1] -11.100724   3.497675</span>
-<span class="co">#&gt; [1] 208.9363</span>
+<span class="co">#&gt; [1] -6.816368  2.559627</span>
+<span class="co">#&gt; [1] 146.0239</span>
 <span class="co">#&gt; [1] "Wolfe conditions"</span>
-<span class="co">#&gt; [1] -28.53481 -11.13655</span>
-<span class="co">#&gt; [1] 180.3983</span>
+<span class="co">#&gt; [1] -19.827812  -7.843159</span>
+<span class="co">#&gt; [1] 126.1939</span>
 <span class="co">#&gt; [1] "Wolfe conditions"</span>
-<span class="co">#&gt; [1] -26.44597 -10.69795</span>
-<span class="co">#&gt; [1] 153.9494</span>
+<span class="co">#&gt; [1] -18.020324  -7.428989</span>
+<span class="co">#&gt; [1] 108.1716</span>
 <span class="co">#&gt; [1] "Wolfe conditions"</span>
-<span class="co">#&gt; [1] -23.89068 -10.38859</span>
-<span class="co">#&gt; [1] 130.0561</span>
+<span class="co">#&gt; [1] -15.926971  -7.071899</span>
+<span class="co">#&gt; [1] 92.24283</span>
 <span class="co">#&gt; [1] "Wolfe conditions"</span>
-<span class="co">#&gt; [1] -20.690915  -9.504477</span>
-<span class="co">#&gt; [1] 109.3629</span>
+<span class="co">#&gt; [1] -13.501880  -6.324253</span>
+<span class="co">#&gt; [1] 78.73944</span>
 <span class="co">#&gt; [1] "Wolfe conditions"</span>
-<span class="co">#&gt; [1] -17.370714  -8.364112</span>
-<span class="co">#&gt; [1] 91.9902</span>
+<span class="co">#&gt; [1] -11.118589  -5.463831</span>
+<span class="co">#&gt; [1] 67.6196</span>
 <span class="co">#&gt; [1] "Wolfe conditions"</span>
-<span class="co">#&gt; [1] -14.19156  -7.12651</span>
-<span class="co">#&gt; [1] 77.79704</span>
+<span class="co">#&gt; [1] -8.914823 -4.573821</span>
+<span class="co">#&gt; [1] 58.70376</span>
 <span class="co">#&gt; [1] "Wolfe conditions"</span>
-<span class="co">#&gt; [1] -11.299312  -5.902743</span>
-<span class="co">#&gt; [1] 66.49644</span>
+<span class="co">#&gt; [1] -6.971799 -3.716735</span>
+<span class="co">#&gt; [1] 51.73117</span>
 <span class="co">#&gt; [1] "Wolfe conditions"</span>
-<span class="co">#&gt; [1] -8.766072 -4.765629</span>
-<span class="co">#&gt; [1] 57.72936</span>
+<span class="co">#&gt; [1] -5.334335 -2.940698</span>
+<span class="co">#&gt; [1] 46.39622</span>
 <span class="co">#&gt; [1] "Wolfe conditions"</span>
-<span class="co">#&gt; [1] -6.603243 -3.721032</span>
-<span class="co">#&gt; [1] 51.12536</span>
+<span class="co">#&gt; [1] -4.011163 -2.275612</span>
+<span class="co">#&gt; [1] 42.38459</span>
 <span class="co">#&gt; [1] "Wolfe conditions"</span>
-<span class="co">#&gt; [1] -4.838159 -2.847124</span>
-<span class="co">#&gt; [1] 46.28663</span>
+<span class="co">#&gt; [1] -2.980638 -1.716927</span>
+<span class="co">#&gt; [1] 39.40361</span>
 <span class="co">#&gt; [1] "Wolfe conditions"</span>
-<span class="co">#&gt; [1] -3.434858 -2.086399</span>
-<span class="co">#&gt; [1] 42.85137</span>
+<span class="co">#&gt; [1] -2.22385 -1.29841</span>
+<span class="co">#&gt; [1] 37.1795</span>
 <span class="co">#&gt; [1] "Wolfe conditions"</span>
-<span class="co">#&gt; [1] -2.375722 -1.507765</span>
-<span class="co">#&gt; [1] 40.47537</span>
+<span class="co">#&gt; [1] -1.6742460 -0.9733213</span>
+<span class="co">#&gt; [1] 35.50506</span>
 <span class="co">#&gt; [1] "Wolfe conditions"</span>
-<span class="co">#&gt; [1] -1.613049 -1.011347</span>
-<span class="co">#&gt; [1] 38.86213</span>
+<span class="co">#&gt; [1] -4.111090 -2.963511</span>
+<span class="co">#&gt; [1] 31.39347</span>
 <span class="co">#&gt; [1] "Wolfe conditions"</span>
-<span class="co">#&gt; [1] -3.753394 -1.972289</span>
-<span class="co">#&gt; [1] 35.1083</span>
+<span class="co">#&gt; [1] -2.528464 -2.424492</span>
+<span class="co">#&gt; [1] 28.86469</span>
 <span class="co">#&gt; [1] "Wolfe conditions"</span>
-<span class="co">#&gt; [1] -3.448142 -2.799467</span>
-<span class="co">#&gt; [1] 31.65973</span>
-<span class="co">#&gt; [1] "Wolfe conditions"</span>
-<span class="co">#&gt; [1] -1.819808 -1.410149</span>
-<span class="co">#&gt; [1] 29.83969</span>
-<span class="co">#&gt; [1] "Wolfe conditions"</span>
-<span class="co">#&gt; [1] -1.007208 -0.774139</span>
+<span class="co">#&gt; [1] -1.1272034 -0.9510195</span>
 <span class="co">#&gt; [1] "finished opt..."</span></code></pre></div>
 <div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">predtt</span> <span class="op">=</span> <span class="fu">new</span><span class="op">(</span><span class="va">predictor</span>,<span class="va">loglik</span><span class="op">)</span>
@@ -355,7 +343,7 @@
 <p><img src="learning_files/figure-html/unnamed-chunk-13-1.png" width="700"></p>
 <div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/base/MathFun.html" class="external-link">sqrt</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/mean.html" class="external-link">mean</a></span><span class="op">(</span><span class="op">(</span><span class="va">ytest</span><span class="op">-</span><span class="va">yhat</span><span class="op">)</span><span class="op">^</span><span class="fl">2</span><span class="op">)</span><span class="op">)</span>
-<span class="co">#&gt; [1] 2.689874</span></code></pre></div>
+<span class="co">#&gt; [1] 1.469602</span></code></pre></div>
   </main>
 </div>
 

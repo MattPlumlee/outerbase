@@ -88,7 +88,7 @@
     
     
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://mattplumlee.github.io/outerbase/index.html">outerbase</a></span><span class="op">)</span></code></pre></div>
+<code class="sourceCode R"><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://mattplumlee.github.io/outerbase">outerbase</a></span><span class="op">)</span></code></pre></div>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">sampsize</span> <span class="op">=</span> <span class="fl">1000</span>
 <span class="va">d</span> <span class="op">=</span> <span class="fl">8</span>
@@ -122,17 +122,17 @@
 <span class="va">logpdf_fast</span><span class="op">$</span><span class="fu">optcg</span><span class="op">(</span><span class="fl">0.001</span>, <span class="fl">100</span><span class="op">)</span>
 <span class="va">logpdf_fast</span><span class="op">$</span><span class="fu">setnthreads</span><span class="op">(</span><span class="fl">4</span><span class="op">)</span>
 <span class="va">loglik_slow</span><span class="op">$</span><span class="va">val</span>
-<span class="co">#&gt; [1] -5284.963</span>
+<span class="co">#&gt; [1] -5185.849</span>
 <span class="va">loglik_fast</span><span class="op">$</span><span class="va">val</span>
-<span class="co">#&gt; [1] -5284.963</span>
+<span class="co">#&gt; [1] -5185.849</span>
 <span class="va">logpr_slow</span><span class="op">$</span><span class="va">val</span>
-<span class="co">#&gt; [1] 942.4966</span>
+<span class="co">#&gt; [1] 966.8952</span>
 <span class="va">logpr_fast</span><span class="op">$</span><span class="va">val</span>
-<span class="co">#&gt; [1] 942.4966</span>
+<span class="co">#&gt; [1] 966.8952</span>
 <span class="va">logpdf_slow</span><span class="op">$</span><span class="va">val</span>
-<span class="co">#&gt; [1] -5399.835</span>
+<span class="co">#&gt; [1] -5276.182</span>
 <span class="va">logpdf_fast</span><span class="op">$</span><span class="va">val</span>
-<span class="co">#&gt; [1] -5399.835</span>
+<span class="co">#&gt; [1] -5276.182</span>
 
 <span class="va">hyp0_slow</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>para <span class="op">=</span> <span class="fu"><a href="../reference/getpara.html">getpara</a></span><span class="op">(</span><span class="va">logpdf_fast</span><span class="op">)</span>, hyp <span class="op">=</span> <span class="fu"><a href="../reference/gethyp.html">gethyp</a></span><span class="op">(</span><span class="va">om</span><span class="op">)</span><span class="op">)</span>
 <span class="va">hyp0_fast</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>para <span class="op">=</span> <span class="fu"><a href="../reference/getpara.html">getpara</a></span><span class="op">(</span><span class="va">logpdf_fast</span><span class="op">)</span>, hyp <span class="op">=</span> <span class="fu"><a href="../reference/gethyp.html">gethyp</a></span><span class="op">(</span><span class="va">om</span><span class="op">)</span><span class="op">)</span></code></pre></div>
@@ -140,51 +140,61 @@
 <code class="sourceCode R"><span class="va">ptm</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/proc.time.html" class="external-link">proc.time</a></span><span class="op">(</span><span class="op">)</span>
 <span class="va">opth</span> <span class="op">=</span> <span class="fu"><a href="../reference/BFGS_lpdf.html">BFGS_lpdf</a></span><span class="op">(</span><span class="va">om</span>, <span class="va">logpdf_slow</span>, verbose <span class="op">=</span> <span class="fl">1</span>, newt<span class="op">=</span> <span class="cn">T</span><span class="op">)</span>  
 <span class="co">#&gt; [1] "doing opt..."</span>
-<span class="co">#&gt; [1] 4974.501</span>
-<span class="co">#&gt; [1] 4739.258</span>
-<span class="co">#&gt; [1] 4496.643</span>
-<span class="co">#&gt; [1] 4273.948</span>
-<span class="co">#&gt; [1] 4166.55</span>
-<span class="co">#&gt; [1] 4117.059</span>
-<span class="co">#&gt; [1] 4077.296</span>
-<span class="co">#&gt; [1] 4035.722</span>
-<span class="co">#&gt; [1] 3987.447</span>
-<span class="co">#&gt; [1] 3929.553</span>
-<span class="co">#&gt; [1] 3863.054</span>
-<span class="co">#&gt; [1] 3796.651</span>
-<span class="co">#&gt; [1] 3741.017</span>
-<span class="co">#&gt; [1] 3692.295</span>
-<span class="co">#&gt; [1] 3638.605</span>
-<span class="co">#&gt; [1] 3567.492</span>
-<span class="co">#&gt; [1] 3456.302</span>
-<span class="co">#&gt; [1] 3228.989</span>
-<span class="co">#&gt; [1] 2670.622</span>
-<span class="co">#&gt; [1] 2659.372</span>
-<span class="co">#&gt; [1] 2596.715</span>
-<span class="co">#&gt; [1] 2415.55</span>
-<span class="co">#&gt; [1] 2196.381</span>
-<span class="co">#&gt; [1] 2057.322</span>
-<span class="co">#&gt; [1] 1315.415</span>
-<span class="co">#&gt; [1] 631.6953</span>
-<span class="co">#&gt; [1] 631.6951</span>
-<span class="co">#&gt; [1] 314.3306</span>
-<span class="co">#&gt; [1] -51.53052</span>
-<span class="co">#&gt; [1] -295.0271</span>
-<span class="co">#&gt; [1] -635.3165</span>
-<span class="co">#&gt; [1] -696.0181</span>
-<span class="co">#&gt; [1] -713.0577</span>
-<span class="co">#&gt; [1] -737.0324</span>
-<span class="co">#&gt; [1] -749.7067</span>
-<span class="co">#&gt; [1] -757.2347</span>
-<span class="co">#&gt; [1] -762.7051</span>
-<span class="co">#&gt; [1] -766.682</span>
-<span class="co">#&gt; [1] -769.3295</span>
-<span class="co">#&gt; [1] -770.9467</span>
+<span class="co">#&gt; [1] 4901.015</span>
+<span class="co">#&gt; [1] 4709.012</span>
+<span class="co">#&gt; [1] 4521.673</span>
+<span class="co">#&gt; [1] 4350.405</span>
+<span class="co">#&gt; [1] 4245.857</span>
+<span class="co">#&gt; [1] 4198.139</span>
+<span class="co">#&gt; [1] 4165.302</span>
+<span class="co">#&gt; [1] 4133.197</span>
+<span class="co">#&gt; [1] 4096.197</span>
+<span class="co">#&gt; [1] 4050.441</span>
+<span class="co">#&gt; [1] 3994.651</span>
+<span class="co">#&gt; [1] 3934.013</span>
+<span class="co">#&gt; [1] 3879.034</span>
+<span class="co">#&gt; [1] 3830.528</span>
+<span class="co">#&gt; [1] 3777.445</span>
+<span class="co">#&gt; [1] 3705.984</span>
+<span class="co">#&gt; [1] 3592.489</span>
+<span class="co">#&gt; [1] 3362.356</span>
+<span class="co">#&gt; [1] 2844.61</span>
+<span class="co">#&gt; [1] 2826.14</span>
+<span class="co">#&gt; [1] 2344.974</span>
+<span class="co">#&gt; [1] 1547.905</span>
+<span class="co">#&gt; [1] 1196.169</span>
+<span class="co">#&gt; [1] 362.9728</span>
+<span class="co">#&gt; [1] 263.9379</span>
+<span class="co">#&gt; [1] 179.9432</span>
+<span class="co">#&gt; [1] 124.5109</span>
+<span class="co">#&gt; [1] 63.85015</span>
+<span class="co">#&gt; [1] 10.22375</span>
+<span class="co">#&gt; [1] -48.35926</span>
+<span class="co">#&gt; [1] -122.5629</span>
+<span class="co">#&gt; [1] -214.1813</span>
+<span class="co">#&gt; [1] -269.5525</span>
+<span class="co">#&gt; [1] -300.4056</span>
+<span class="co">#&gt; [1] -363.6304</span>
+<span class="co">#&gt; [1] -383.8222</span>
+<span class="co">#&gt; [1] -394.8241</span>
+<span class="co">#&gt; [1] -414.9026</span>
+<span class="co">#&gt; [1] -436.896</span>
+<span class="co">#&gt; [1] -444.0472</span>
+<span class="co">#&gt; [1] -448.4854</span>
+<span class="co">#&gt; [1] -458.603</span>
+<span class="co">#&gt; [1] -470.5167</span>
+<span class="co">#&gt; [1] -483.2229</span>
+<span class="co">#&gt; [1] -491.671</span>
+<span class="co">#&gt; [1] -496.3881</span>
+<span class="co">#&gt; [1] -498.3528</span>
+<span class="co">#&gt; [1] -499.5419</span>
+<span class="co">#&gt; [1] -502.4503</span>
+<span class="co">#&gt; [1] -503.5458</span>
 <span class="co">#&gt; [1] "finished opt..."</span>
 <span class="va">t_slow</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/proc.time.html" class="external-link">proc.time</a></span><span class="op">(</span><span class="op">)</span> <span class="op">-</span> <span class="va">ptm</span>
 <span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">t_slow</span><span class="op">)</span>
 <span class="co">#&gt;    user  system elapsed </span>
-<span class="co">#&gt;  25.025   0.023  23.099</span>
+<span class="co">#&gt;  34.335   0.023  32.218</span>
 <span class="va">pred_slow</span> <span class="op">=</span> <span class="fu">new</span><span class="op">(</span><span class="va">predictor</span>,<span class="va">loglik_slow</span><span class="op">)</span>
 <span class="va">pred_slow</span><span class="op">$</span><span class="fu">update</span><span class="op">(</span><span class="va">xtest</span><span class="op">)</span>
 <span class="va">yhat_slow</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/vector.html" class="external-link">as.vector</a></span><span class="op">(</span><span class="va">pred_slow</span><span class="op">$</span><span class="fu">mean</span><span class="op">(</span><span class="op">)</span><span class="op">)</span></code></pre></div>
@@ -194,70 +204,54 @@
 <span class="va">opth</span> <span class="op">=</span> <span class="fu"><a href="../reference/BFGS_lpdf.html">BFGS_lpdf</a></span><span class="op">(</span>rho<span class="op">=</span><span class="va">hyp0_fast</span>, verbose <span class="op">=</span> <span class="fl">1</span>,
                   <span class="va">om</span>, <span class="va">logpdf_fast</span>,  <span class="cn">F</span><span class="op">)</span>  
 <span class="co">#&gt; [1] "doing opt..."</span>
-<span class="co">#&gt; [1] 4974.501</span>
-<span class="co">#&gt; [1] 4739.258</span>
-<span class="co">#&gt; [1] 4496.644</span>
-<span class="co">#&gt; [1] 4273.95</span>
-<span class="co">#&gt; [1] 4166.552</span>
-<span class="co">#&gt; [1] 4117.062</span>
-<span class="co">#&gt; [1] 4077.299</span>
-<span class="co">#&gt; [1] 4035.727</span>
-<span class="co">#&gt; [1] 3987.454</span>
-<span class="co">#&gt; [1] 3929.565</span>
-<span class="co">#&gt; [1] 3863.075</span>
-<span class="co">#&gt; [1] 3796.686</span>
-<span class="co">#&gt; [1] 3741.063</span>
-<span class="co">#&gt; [1] 3692.347</span>
-<span class="co">#&gt; [1] 3638.661</span>
-<span class="co">#&gt; [1] 3567.546</span>
-<span class="co">#&gt; [1] 3456.335</span>
-<span class="co">#&gt; [1] 3229.016</span>
-<span class="co">#&gt; [1] 2673.202</span>
-<span class="co">#&gt; [1] 2661.723</span>
-<span class="co">#&gt; [1] 2599.661</span>
-<span class="co">#&gt; [1] 2417.066</span>
-<span class="co">#&gt; [1] 2204.135</span>
-<span class="co">#&gt; [1] 2066.397</span>
-<span class="co">#&gt; [1] 1326.233</span>
-<span class="co">#&gt; [1] 867.8588</span>
-<span class="co">#&gt; [1] 675.0057</span>
-<span class="co">#&gt; [1] 469.3042</span>
-<span class="co">#&gt; [1] 321.9327</span>
-<span class="co">#&gt; [1] 227.4312</span>
-<span class="co">#&gt; [1] 100.7931</span>
-<span class="co">#&gt; [1] -7.255342</span>
-<span class="co">#&gt; [1] -82.5002</span>
-<span class="co">#&gt; [1] -136.0183</span>
-<span class="co">#&gt; [1] -177.1061</span>
-<span class="co">#&gt; [1] -210.1696</span>
-<span class="co">#&gt; [1] -238.2631</span>
-<span class="co">#&gt; [1] -265.2491</span>
-<span class="co">#&gt; [1] -295.4544</span>
-<span class="co">#&gt; [1] -333.2137</span>
-<span class="co">#&gt; [1] -379.7962</span>
-<span class="co">#&gt; [1] -410.5652</span>
-<span class="co">#&gt; [1] -438.2329</span>
-<span class="co">#&gt; [1] -475.9757</span>
-<span class="co">#&gt; [1] -491.5367</span>
-<span class="co">#&gt; [1] -500.1748</span>
-<span class="co">#&gt; [1] -515.638</span>
-<span class="co">#&gt; [1] -541.3739</span>
-<span class="co">#&gt; [1] -574.0449</span>
-<span class="co">#&gt; [1] -601.5103</span>
-<span class="co">#&gt; [1] -622.6464</span>
-<span class="co">#&gt; [1] -648.0963</span>
-<span class="co">#&gt; [1] -673.4392</span>
-<span class="co">#&gt; [1] -690.0515</span>
-<span class="co">#&gt; [1] -703.6195</span>
-<span class="co">#&gt; [1] -719.075</span>
-<span class="co">#&gt; [1] -734.177</span>
-<span class="co">#&gt; [1] -749.1535</span>
-<span class="co">#&gt; [1] -762.2864</span>
-<span class="co">#&gt; [1] -768.0154</span>
-<span class="co">#&gt; [1] -769.7956</span>
-<span class="co">#&gt; [1] -771.0002</span>
-<span class="co">#&gt; [1] -776.9065</span>
-<span class="co">#&gt; [1] -781.2701</span>
+<span class="co">#&gt; [1] 4901.015</span>
+<span class="co">#&gt; [1] 4709.013</span>
+<span class="co">#&gt; [1] 4521.673</span>
+<span class="co">#&gt; [1] 4350.407</span>
+<span class="co">#&gt; [1] 4245.859</span>
+<span class="co">#&gt; [1] 4198.141</span>
+<span class="co">#&gt; [1] 4165.305</span>
+<span class="co">#&gt; [1] 4133.2</span>
+<span class="co">#&gt; [1] 4096.201</span>
+<span class="co">#&gt; [1] 4050.448</span>
+<span class="co">#&gt; [1] 3994.663</span>
+<span class="co">#&gt; [1] 3934.034</span>
+<span class="co">#&gt; [1] 3879.063</span>
+<span class="co">#&gt; [1] 3830.562</span>
+<span class="co">#&gt; [1] 3777.481</span>
+<span class="co">#&gt; [1] 3706.016</span>
+<span class="co">#&gt; [1] 3592.499</span>
+<span class="co">#&gt; [1] 3362.379</span>
+<span class="co">#&gt; [1] 2846.716</span>
+<span class="co">#&gt; [1] 2826.574</span>
+<span class="co">#&gt; [1] 2453.72</span>
+<span class="co">#&gt; [1] 1528.91</span>
+<span class="co">#&gt; [1] 1207.244</span>
+<span class="co">#&gt; [1] 451.0496</span>
+<span class="co">#&gt; [1] 335.8346</span>
+<span class="co">#&gt; [1] 223.1434</span>
+<span class="co">#&gt; [1] 148.0843</span>
+<span class="co">#&gt; [1] -8.763643</span>
+<span class="co">#&gt; [1] -37.00351</span>
+<span class="co">#&gt; [1] -136.1184</span>
+<span class="co">#&gt; [1] -209.6734</span>
+<span class="co">#&gt; [1] -302.1821</span>
+<span class="co">#&gt; [1] -372.7435</span>
+<span class="co">#&gt; [1] -389.609</span>
+<span class="co">#&gt; [1] -407.2976</span>
+<span class="co">#&gt; [1] -413.734</span>
+<span class="co">#&gt; [1] -431.7168</span>
+<span class="co">#&gt; [1] -439.0152</span>
+<span class="co">#&gt; [1] -444.7726</span>
+<span class="co">#&gt; [1] -456.3375</span>
+<span class="co">#&gt; [1] -470.4589</span>
+<span class="co">#&gt; [1] -480.4602</span>
+<span class="co">#&gt; [1] -485.2</span>
+<span class="co">#&gt; [1] -488.0241</span>
+<span class="co">#&gt; [1] -489.8738</span>
+<span class="co">#&gt; [1] -493.5892</span>
+<span class="co">#&gt; [1] -494.0201</span>
+<span class="co">#&gt; [1] -495.6092</span>
 <span class="co">#&gt; [1] "finished opt..."</span>
 <span class="va">t_fast</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/proc.time.html" class="external-link">proc.time</a></span><span class="op">(</span><span class="op">)</span> <span class="op">-</span> <span class="va">ptm</span>
 <span class="va">pred_fast</span> <span class="op">=</span> <span class="fu">new</span><span class="op">(</span><span class="va">predictor</span>,<span class="va">loglik_fast</span><span class="op">)</span>
