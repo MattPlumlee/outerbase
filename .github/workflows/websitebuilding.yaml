@@ -30,25 +30,16 @@ jobs:
         with:
           extra-packages: any::rcmdcheck
           needs: check
-          
+
       - name: Install dependencies
         uses: r-lib/actions/setup-r-dependencies@v2
         with:
           extra-packages: any::roxygen2
           needs: roxygen2
-          
+
       - name: Document
         run: roxygen2::roxygenise()
         shell: Rscript {0}
-        
-      - name: Commit and push changes
-        run: |
-          git config --local user.name "$GITHUB_ACTOR"
-          git config --local user.email "$GITHUB_ACTOR@users.noreply.github.com"
-          git add man/\* NAMESPACE
-          git commit -m "Update documentation" || echo "No changes to commit"
-          git pull --ff-only
-          git push origin
 
       - uses: r-lib/actions/check-r-package@v2
 

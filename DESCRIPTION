@@ -9,7 +9,7 @@ Authors@R:
            )
 Description: High-dimensional function approximation using outer product models.
 License: MIT + file LICENSE
-URL: https://mattplumlee.github.io/outerbase/index.html, https://github.com/MattPlumlee/outerbase
+URL: https://mattplumlee.github.io/outerbase, https://github.com/MattPlumlee/outerbase
 BugReports: https://github.com/MattPlumlee/outerbase/issues
 NeedsCompilation: yes
 Imports: methods, Rcpp, utils, stats

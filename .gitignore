@@ -19,6 +19,8 @@ scratch/scratch.R
 
 inst/doc
 
+man/
+
 src-i386/
 docs
 .Rdata
