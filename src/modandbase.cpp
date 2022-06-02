@@ -445,7 +445,11 @@ outerbase::outerbase(const outermod& om_, mat xp_) :
 { 
   dograd = true;
   n_row = xp.n_rows; 
-  nthreads = omp_get_num_procs(); 
+  try {
+    nthreads = omp_get_num_procs(); 
+  } catch (...) {
+    nthreads = 1; 
+  }
   
   outerbase::build();  
 }  
