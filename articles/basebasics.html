@@ -232,11 +232,11 @@
 <span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">terms</span><span class="op">)</span>
 <span class="co">#&gt;      [,1] [,2] [,3]</span>
 <span class="co">#&gt; [1,]    0    0    0</span>
-<span class="co">#&gt; [2,]    0    1    0</span>
-<span class="co">#&gt; [3,]    0    0    1</span>
-<span class="co">#&gt; [4,]    1    0    0</span>
-<span class="co">#&gt; [5,]    0    1    1</span>
-<span class="co">#&gt; [6,]    1    1    0</span></code></pre></div>
+<span class="co">#&gt; [2,]    0    0    1</span>
+<span class="co">#&gt; [3,]    1    0    0</span>
+<span class="co">#&gt; [4,]    0    1    0</span>
+<span class="co">#&gt; [5,]    1    1    0</span>
+<span class="co">#&gt; [6,]    1    0    1</span></code></pre></div>
 <p><code>outermod$getvar</code> will tell us the vector of variances associated with these coefficients at these <code>terms</code>.</p>
 <div class="sourceCode" id="cb20"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">covcoeff</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/vector.html" class="external-link">as.vector</a></span><span class="op">(</span><span class="va">om</span><span class="op">$</span><span class="fu">getvar</span><span class="op">(</span><span class="va">terms</span><span class="op">)</span><span class="op">)</span></code></pre></div>
@@ -250,12 +250,12 @@
   <span class="va">ob</span><span class="op">$</span><span class="fu">getbase</span><span class="op">(</span><span class="fl">3</span><span class="op">)</span><span class="op">[</span>,<span class="va">terms</span><span class="op">[</span><span class="va">termno</span>,<span class="fl">3</span><span class="op">]</span><span class="op">+</span><span class="fl">1</span><span class="op">]</span>
 
 <span class="fu"><a href="https://rdrr.io/r/base/cbind.html" class="external-link">cbind</a></span><span class="op">(</span><span class="va">basevec</span><span class="op">[</span><span class="fl">1</span><span class="op">:</span><span class="fl">5</span><span class="op">]</span>,<span class="va">basismat</span><span class="op">[</span><span class="fl">1</span><span class="op">:</span><span class="fl">5</span>,<span class="fl">5</span><span class="op">]</span><span class="op">)</span> <span class="co">#equal</span>
-<span class="co">#&gt;            [,1]       [,2]</span>
-<span class="co">#&gt; [1,] -0.3904776 -0.3904776</span>
-<span class="co">#&gt; [2,]  1.1182864  1.1182864</span>
-<span class="co">#&gt; [3,]  1.5106317  1.5106317</span>
-<span class="co">#&gt; [4,]  1.5916723  1.5916723</span>
-<span class="co">#&gt; [5,] -1.7484999 -1.7484999</span></code></pre></div>
+<span class="co">#&gt;             [,1]        [,2]</span>
+<span class="co">#&gt; [1,]  1.04581481  1.04581481</span>
+<span class="co">#&gt; [2,]  0.48401755  0.48401755</span>
+<span class="co">#&gt; [3,]  1.26856977  1.26856977</span>
+<span class="co">#&gt; [4,] -0.24727429 -0.24727429</span>
+<span class="co">#&gt; [5,] -0.08951811 -0.08951811</span></code></pre></div>
 </div>
 </div>
 <div class="section level2">
@@ -268,18 +268,18 @@
 
 <span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/Round.html" class="external-link">round</a></span><span class="op">(</span><span class="va">cormattot</span><span class="op">[</span><span class="fl">1</span><span class="op">:</span><span class="fl">5</span>,<span class="fl">1</span><span class="op">:</span><span class="fl">5</span><span class="op">]</span>,<span class="fl">3</span><span class="op">)</span><span class="op">)</span> <span class="co"># typical gp</span>
 <span class="co">#&gt;       [,1]  [,2]  [,3]  [,4]  [,5]</span>
-<span class="co">#&gt; [1,] 1.000 0.575 0.827 0.491 0.411</span>
-<span class="co">#&gt; [2,] 0.575 1.000 0.344 0.928 0.414</span>
-<span class="co">#&gt; [3,] 0.827 0.344 1.000 0.314 0.519</span>
-<span class="co">#&gt; [4,] 0.491 0.928 0.314 1.000 0.513</span>
-<span class="co">#&gt; [5,] 0.411 0.414 0.519 0.513 1.000</span>
+<span class="co">#&gt; [1,] 1.000 0.985 0.531 0.545 0.802</span>
+<span class="co">#&gt; [2,] 0.985 1.000 0.537 0.597 0.860</span>
+<span class="co">#&gt; [3,] 0.531 0.537 1.000 0.875 0.729</span>
+<span class="co">#&gt; [4,] 0.545 0.597 0.875 1.000 0.857</span>
+<span class="co">#&gt; [5,] 0.802 0.860 0.729 0.857 1.000</span>
 <span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/Round.html" class="external-link">round</a></span><span class="op">(</span><span class="va">cormatob</span><span class="op">[</span><span class="fl">1</span><span class="op">:</span><span class="fl">5</span>,<span class="fl">1</span><span class="op">:</span><span class="fl">5</span><span class="op">]</span>,<span class="fl">3</span><span class="op">)</span><span class="op">)</span> <span class="co"># outerbase</span>
 <span class="co">#&gt;       [,1]  [,2]  [,3]  [,4]  [,5]</span>
-<span class="co">#&gt; [1,] 1.000 0.575 0.827 0.491 0.411</span>
-<span class="co">#&gt; [2,] 0.575 0.999 0.344 0.928 0.414</span>
-<span class="co">#&gt; [3,] 0.827 0.344 1.000 0.314 0.519</span>
-<span class="co">#&gt; [4,] 0.491 0.928 0.314 1.000 0.513</span>
-<span class="co">#&gt; [5,] 0.411 0.414 0.519 0.513 0.999</span></code></pre></div>
+<span class="co">#&gt; [1,] 1.000 0.985 0.530 0.545 0.802</span>
+<span class="co">#&gt; [2,] 0.985 1.000 0.537 0.597 0.860</span>
+<span class="co">#&gt; [3,] 0.530 0.537 0.999 0.875 0.729</span>
+<span class="co">#&gt; [4,] 0.545 0.597 0.875 1.000 0.857</span>
+<span class="co">#&gt; [5,] 0.802 0.860 0.729 0.857 1.000</span></code></pre></div>
 <p>They means that we can leverage <a href="https://en.wikipedia.org/wiki/Bayesian_linear_regression" class="external-link">Bayesian linear regression</a> to do prediction. This will require assuming that there is some <code>noisevar</code>, which is also called the nugget in the Gaussian process literature.</p>
 <div class="sourceCode" id="cb23"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">noisevar</span> <span class="op">=</span> <span class="fl">10</span><span class="op">^</span><span class="op">(</span><span class="op">-</span><span class="fl">4</span><span class="op">)</span>
