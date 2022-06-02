@@ -114,6 +114,7 @@ t_slow = proc.time() - ptm
 pred_slow = new(predictor,loglik_slow)
 pred_slow$update(xtest)
 yhat_slow = as.vector(pred_slow$mean())
+print(t_slow)
 ```
 
 
@@ -125,6 +126,7 @@ t_fast = proc.time() - ptm
 pred_fast = new(predictor,loglik_fast)
 pred_fast$update(xtest)
 yhat_fast = as.vector(pred_fast$mean())
+print(t_fast)
 ```
 ## Comparison of results
 
