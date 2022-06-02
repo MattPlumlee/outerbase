@@ -14,114 +14,146 @@ knitr::opts_chunk$set(
 )
 ```
 
+This page is designed to explain how `?outermod` and `?outerbase` are designed to function for learning.
 ```{r setup}
 library(outerbase)
 ```
-
-## Covariance functions
+A three dimensional case study is sufficient for understanding what `outermod` and `outerbase` are and how to manipulate them.
 
 ```{r}
-sampsize = 20
+sampsize = 30
 d = 3
 design1d = seq(1/(2*sampsize),1-1/(2*sampsize),1/sampsize)
 x = cbind(design1d,sample(design1d),sample(design1d))
 y = obtest_borehole3d(x)
 ```
 
-```{r}
-testsampsize = 100
-xtest = matrix(runif(testsampsize*d),ncol=d) #prediction points
-ytest = obtest_borehole3d(xtest)
-```
+## Covariance functions
+Covariance functions are an important building block of Gaussian process inference.  In this package, they flexible classes.  See `?covf` for more information on the base class.
 
+Creating instances is done through the `?methods::new` call with the class name listed inside.
 ```{r}
-corf1 = new(covf_mat25)
+corf = new(covf_mat25)
 ?covf_mat25
 ```
 
+The `cov` method is what builds covariances matrices.  Below the covariance between the first columns first 5 elements is ploted.  Note that these are designed to be single demensional covariance functions.
 ```{r}
-cormat1 = corf1$cov(x[,1],x[,1])
-print(cormat1[1:5,1:5])
+xred = x[1:5,1]
+print(corf$cov(xred,xred),3)
+```
+Hyperparameters are important to almost all covariance functions. They control the general shape of the predictive surface.  They are stored in the `covf` class in the (editable) field `hyp`.
+```{r}
+corf$hyp
 ```
 
+You can see the effect of alternating `hyp` below on this correlation function.
 ```{r}
-corf1$hyp
-```
-
-```{r}
-par(mfrow = c(1, 2))
-plot(x[,1],corf1$cov(x[,1],0.5), type='l')
-corf1$hyp = c(-0.5)
-plot(x[,1],corf1$cov(x[,1],0.5), type='l')
+corf$hyp = c(-0.5)
+plot(x[,1],corf$cov(x[,1],0.5), type='l',
+     ylab='correlation with 0.5', xlab='input')
+corf$hyp = c(-0.25)
+lines(x[,1],corf$cov(x[,1],0.5), type='l')
+corf$hyp = c(0)
+lines(x[,1],corf$cov(x[,1],0.5), type='l')
 ```
 
 ## Gaussian processes
 
+Gaussian processes have long been shown to be top performers for near interpolation.  For more information on general Gaussian processes, see the textbooks [Gaussian Processes for Machine Learning](https://gaussianprocess.org/gpml/) or [Surrogates](https://bobby.gramacy.com/surrogates/), among others.
+
+The idea is to represent a surface as a realization of a Gaussian process controlled by a covariance function. An outer product of covariance functions can do this job in three dimensions.  This means we need to first build correlation functions.
 ```{r}
+corf1 = new(covf_mat25)
 corf2 = new(covf_mat25)
 corf3 = new(covf_mat25)
-corf2$hyp = c(-0.5)
+corf1$hyp = c(-0.5) # just setting them all to the same 
+corf2$hyp = c(-0.5) # hyperparameter for now
 corf3$hyp = c(-0.5)
+```
 
+And then multiply them to calculate covariances.
+```{r}
 covftot = function(x1,x2){
   corf1$cov(x1[,1],x2[,1])*
   corf2$cov(x1[,2],x2[,2])*
   corf3$cov(x1[,3],x2[,3])
 }
-
-cormattot = covftot(x,x)
+cormattot = covftot(x,x) #total correlation matrix
 ```
 
+The goal is to predict at some number of points, say `1000` points.
+```{r}
+testsampsize = 1000
+xtest = matrix(runif(testsampsize*d),ncol=d)
+```
+
+Then we built the predictor (assuming y is zero mean) using typical formulas.
 ```{r}
 yhat = covftot(xtest,x) %*% solve(cormattot,y)
-plot(yhat,ytest)
-hist((ytest-yhat), main="test residuals",
+```
+
+This gives prediction accuracy that can be summarized below.
+```{r}
+par(mfrow=c(1,2))
+ytest = obtest_borehole3d(xtest)
+plot(yhat, ytest, ylab="actual", xlab="prediction") 
+hist(ytest-yhat, main="test residuals",
      xlab = "test residuals")
 ```
 
+We can also use this framework to get predictive variances.  These equations will not be explained in this documentation for brevity.  One point here is that is does pretty well!  The plot below looks standard Normal enough.
 ```{r}
-sigma2hat = as.double( t(y) %*% solve(cormattot,y) / length(y))
+sigma2hat = as.double(t(y)%*% solve(cormattot,y)/length(y))
 
-varpred = sigma2hat * (covftot(xtest,xtest) - t(covftot(x,xtest)) %*% 
+varpred = sigma2hat*(covftot(xtest,xtest)-t(covftot(x,xtest))%*%
   solve(cormattot,covftot(x,xtest)))
-hist((ytest-yhat)/sqrt(diag(varpred)), main="standarized test residuals",
+hist((ytest-yhat)/sqrt(diag(varpred)),
+     main="standarized test residuals",
      xlab = "standarized test residuals")
 ```
 
 
-## mod and base
+## outermod and outerbase
+
+The core classes in this package are `?outermod` and `?outerbase`. An `outermod` instance contains all the information to build an `outerbase` instance, but does not build the objects corresponding to a specific `x`.  An `outerbase` instance is used build inference at a specific `x`.
 
 ### outermod
-
+An `outermod` instance is created using `new` command.
 ```{r}
 om = new(outermod)
 ```
-
+The first step is to set the covariances and the knots.  To set the vector of `covfs`, use `?setcovfs` alongside a vector strings of covariances in the package. The list can be found at `listcov()`. 
 ```{r}
 setcovfs(om, rep("mat25",3))
+```
+This fixes the dimension of the `outermod` instance `om` to `3`.
 
+Then we need to give it a set of knot points for each dimension.  The choice of these is still being researched, but choosing points that are spread out in each dimension that look like our actual responses is currently recommended.  You will need to invert a matrix of the size of these knot points, so it is recommended to keep it small, `<50` in general.  The function `?setknot` should be used.
+```{r}
 knotlist = list(seq(0,1,by=0.025),
                 seq(0,1,by=0.025),
                 seq(0,1,by=0.025))
 setknot(om, knotlist)
 ```
 
+We can get an set our hyperparameters to align with our general Gaussian processes inference.
 ```{r}
 gethyp(om)
-om$updatehyp(rep(-0.5,3))
+om$updatehyp(c(-0.5,-0.5,-0.5))
 gethyp(om)
 ```
 
 ### outerbase
-
-`outerbase` is the equivalent of a basis matrix with 
-fast computation built in
+An `outerbase` is the equivalent of a basis matrix with 
+fast computation methods included.
 ```{r}
 ob = new(outerbase, 
          om, #give it the outermod (reference)
           x) #give it the input matrix
 ```
 
+This basically just builds a set of basis functions for each dimension, which sometimes just look like polynomials.  They are not quite polynomials, and some `covf`s give different shapes.  The call `outermod$getbase` will allow you to access the basis functions for each dimension.
 ```{r}
 basis_func = ob$getbase(1)
 matplot(x[,1],basis_func[,1:4], 
@@ -129,87 +161,92 @@ matplot(x[,1],basis_func[,1:4],
 ```
 
 ### outermod and outerbase
-
+`outermod` and `outerbase` are meant to be used in conjunction with each other.  One key ingredient is the `outermod$selecterms` function, which allows you to pick products of basis functions that best represent the current `outermod` response.  
 ```{r}
 p = 60
-terms = om$selectterms(p)
-print(terms)
+terms = om$selectterms(p) # 60 by 3 matrix
+head(terms)
 ```
-
-
-```{r}
-basismat = ob$getmat(terms)
-
-
-basevec = ob$getbase(1)[,terms[5,1]+1]*
-  ob$getbase(2)[,terms[5,2]+1]*
-  ob$getbase(3)[,terms[5,3]+1]
-cbind(basevec[1:5],basismat[1:5,5])
-```
-
+`outermod$getvar` will tell us the vector of variances associated with these coefficients at these `terms`.
 ```{r}
 covcoeff = as.vector(om$getvar(terms))
 ```
 
-## outerbase inference
+The specific basis matrix can be formed by getting the basis matrix at these selected `terms`.
+```{r}
+basismat = ob$getmat(terms)
 
+termno = 5
+basevec = ob$getbase(1)[,terms[termno,1]+1]*
+  ob$getbase(2)[,terms[termno,2]+1]*
+  ob$getbase(3)[,terms[termno,3]+1]
+
+cbind(basevec[1:5],basismat[1:5,5]) #equal
+```
+
+## Feature space approximation
+
+This package leverages the insight that Gaussian processes are no more than linear combinations of basis functions with random coefficients.  This viewpoint is often called the _feature space_ view of Gaussian processes.
+
+To understand why this is valuable, we first show that if you take the `covcoeff` and `basismat` together, the correlation function is very well approximated through the following manipulation.
 ```{r}
 cormatob = basismat %*% diag(covcoeff ) %*% t(basismat)
 
-print(round(cormatob[1:5,1:5],4))
-print(round(cormattot[1:5,1:5],4))
+print(round(cormattot[1:5,1:5],3)) # typical gp
+print(round(cormatob[1:5,1:5],3)) # outerbase
 ```
 
-
+They means that we can leverage [Bayesian linear regression](https://en.wikipedia.org/wiki/Bayesian_linear_regression) to do prediction.  This will require assuming that there is some `noisevar`, which is also called the nugget in the Gaussian process literature.
 ```{r}
-cormatob = basismat %*% diag(covcoeff) %*% t(basismat)
-
-paraep = 10^(-2)
-postcov = solve(1/paraep * t(basismat) %*% basismat + 
+noisevar = 10^(-4)
+#posterior precision matrix of coefficients
+postcov = solve(1/noisevar*t(basismat)%*%basismat+ 
                   1/sigma2hat*diag(1/covcoeff))
-coeffest = postcov %*% (1/paraep * t(basismat) %*% y)
+#posterior mean of coefficients
+coeffest = postcov%*%(1/noisevar*t(basismat)%*%y)
 ```
 
 
-```{r}
-paraep = 10^(-2)
-postcov = solve(1/paraep * t(basismat) %*% basismat + 
-                  1/sigma2hat*diag(1/covcoeff))
-coeffest = postcov %*% (1/paraep * t(basismat) %*% y)
-
-```
 
 ## Predictions and comparison
 
+Consider predicting at some new `xtest` to examine if the inference works the same between the traditional Gaussian process and the feature space approximation.
 ```{r}
 obtest = new(outerbase, 
-         om, #give it the outermod (reference)
+         om, #same outermod 
           xtest) #give it the input matrix
 
 basistest = obtest$getmat(terms)
 ```
 
+The predictions are nearly equivalent.
 ```{r}
-yhatob = basistest %*% coeffest
+yhatob = basistest%*%coeffest
 par(mfrow=c(1,2))
-plot(yhat,ytest, main = "typical gp")
-plot(yhatob,ytest, main = "outerbase equiv.")
+plot(yhat, ytest, main="typical gp",
+     xlab="prediction", ylab="actual")
+plot(yhatob, ytest, main = "outerbase equiv.",
+     xlab="prediction", ylab="actual")
 ```
 
+
+The histograms of residuals show similar matching.
 ```{r}
 par(mfrow=c(1,2))
 hist(ytest-yhat, main="typical gp",
-     xlab = "test residuals")
+     xlab="test residuals")
 hist(ytest-yhatob, main="outerbase equiv.",
-     xlab = "test residuals")
+     xlab="test residuals")
 ```
 
+
+The standardized residuals, which account for the variance, also show similar matching.
 ```{r}
-varpredob = basistest %*% postcov %*% t(basistest) 
+varpredob = basistest%*%postcov%*%t(basistest) 
 par(mfrow=c(1,2))
 hist((ytest-yhat)/sqrt(diag(varpred)), main="typical gp",
-     xlab = "standarized test residuals")
+     xlab="standarized test residuals")
 hist((ytest-yhatob)/sqrt(diag(varpredob)), main="outerbase equiv.",
-     xlab = "standarized test residuals")
+     xlab="standarized test residuals")
 ```
 

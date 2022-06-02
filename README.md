@@ -6,9 +6,9 @@
 
 # outerbase
 
-The `outebase` package creates high-dimensional approximations using the
-outer product basis function structure. It can be used to construct
-predictors for high-dimensional inputs that
+The `outerbase` package creates high-dimensional approximations
+(near-interpolaters) using the outer product basis function structure.
+It can be used to construct predictors for high-dimensional inputs that
 
 -   is stable and consistent
 
@@ -18,11 +18,14 @@ predictors for high-dimensional inputs that
 
 -   accommodates flexible data generation
 
+A `CRAN` package is on the way, but `Github` will be a reliable way to
+check in on the project:
+
 <div class=".outerbase-devel">
 
 ``` r
 # Install development version from GitHub
-#devtools::install_github("mattplumlee/outerbase")
+devtools::install_github("mattplumlee/outerbase")
 ```
 
 </div>

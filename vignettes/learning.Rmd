@@ -14,116 +14,181 @@ knitr::opts_chunk$set(
 )
 ```
 
+This page is designed to explain how `?lpdf` objects can be used for automated learning of hyperparameters and general fitting of predictors.
 ```{r setup}
 library(outerbase)
 ```
 
+Let's set things up for a 3 dimensional example.
 ```{r}
-sampsize = 20
+om = new(outermod)
+setcovfs(om, rep("mat25pow",3))
+knotlist = list(seq(0.01,0.99,by=0.02),
+                seq(0.01,0.99,by=0.02),
+                seq(0.01,0.99,by=0.02))
+setknot(om, knotlist)
+```
+
+## Hyperparameter impact 
+
+The values of hyperparameters are extremely important for successful near-interpolation of surfaces.  This impact is felt in `outerbase` and this section is designed to illustrate that.
+
+Let's take a look at the projected basis functions.
+```{r}
+sampsize = 100
+design1d = seq(1/(2*sampsize),1-1/(2*sampsize),1/sampsize)
+x = cbind(design1d,sample(design1d),sample(design1d))
+ob = new(outerbase, om, x)
+basis_func0 = ob$getbase(1)
+matplot(x[,1],basis_func0[,1:4], 
+        type='l', ylab="func", xlab="first dim")
+```
+
+The hyperparameters will now be changed in a way that I know will change these basis functions.  Note that `ob$build` is required after updating the hyperparameters for it to take effect.
+```{r}
+hyp0 = gethyp(om)
+hyp0[2] = 3 #changing the power on first parameter
+om$updatehyp(hyp0)
+ob$build() #rebuild after updatehyp
+```
+
+This leads to an asymmetric basis function set for this first dimension because of the power transform in `?covf_mat25pow`.
+```{r}
+basis_func1 = ob$getbase(1)
+par(mfrow=c(1,2))
+matplot(x[,1],basis_func0[,1:4], 
+        type='l', ylab="func", xlab="first dim",
+        main="original hyperparameters")
+matplot(x[,1],basis_func1[,1:4], 
+        type='l', ylab="func", xlab="first dim",
+        main="new hyperparameters")
+```
+
+## lpdf for learning
+
+The core building block for outerbase learning is the base class `?lpdf`, log probability density functions.  This base class forms the backbone behind many possible statistical models. Instances of this class allow us to optimize coefficients, infer on uncertainty and learn hyperparmeters of covariance functions. 
+
+A small dataset can illustrate (almost) all core concepts related to `lpdf`.
+```{r}
+sampsize = 30
 d = 3
-x = matrix(runif(sampsize*d),ncol=d)
+design1d = seq(1/(2*sampsize),1-1/(2*sampsize),1/sampsize)
+x = cbind(design1d,sample(design1d),sample(design1d))
 y = obtest_borehole3d(x)
 ```
 
+We can reset our our hyperparameters here, which is 2 dimensions for each covariance function for a total of 6 hyperparameters.
 ```{r}
-xtest = matrix(runif(100*d),ncol=d) #prediction points
-ytest = obtest_borehole3d(xtest)
-```
-
-
-```{r}
-om = new(outermod)
-```
-
-```{r}
-setcovfs(om, rep("mat25pow",3))
-knotlist = list(seq(0.01,1,by=0.01),
-                seq(0.01,1,by=0.01),
-                seq(0.01,1,by=0.01))
-setknot(om, knotlist) #40 knot point for each dim
-```
-
-```{r}
-hyp0 = gethyp(om)
 hyp0 = c(-0.5,0,-0.5,0,-0.5,0)
 om$updatehyp(hyp0)
 hyp0 = gethyp(om)
 ```
-
+We will use `60` terms here to build our approximation.
 ```{r}
-p = 40
+p = 60
 terms = om$selectterms(p)
 ```
 
+
+The idea is to build a `loglik` object that represent that log likelihood of our data given the model and coefficients.  We will begin with `?loglik_std`, although this model is not recommended for speed reasons.  We can initialize it and check that we can get gradients with respect to coefficients, covariance hyperparameters, and parameters of the `lpdf` object itself.
 ```{r}
 loglik = new(loglik_std, om, terms, y, x) 
 coeffhere = rep(0,loglik$nterms)
-loglik$compute_gradhyp = T
-loglik$compute_gradpara = T
-loglik$update(coeffhere)
+loglik$update(coeffhere) # update it to get gradients
 loglik$val
-loglik$grad
-loglik$gradhyp
-loglik$gradpara
+head(loglik$grad) # dim 60 for number of coeffients
 ```
 
+A reasonable predictor also needs prior on the coefficients.  This tells us what distribution we expect on the coefficients.
 ```{r}
-
-hyp1 = hyp0 
-hyp1[2] = hyp1[2] + 10^(-4)
-
 logpr = new(logpr_gauss, om, terms)
+```
+
+ To make the handling of these two objects `loglik` and `logpr` easier, the `?lpdfvec` class is helpful to tie the object together.  It will share the hyperparameter vector between them, so they need to be based on the same `outermod` object.  But it will concatenate the parameters.
+```{r}
 logpdf = new(lpdfvec, loglik, logpr)
-logpdf$updatepara(c(0,2))
-#loglik$updatepara(-2)
-#logpdf$fullhess = T
-logpdf$domarg = T
-logpdf$compute_gradhyp = T
-logpdf$compute_gradpara = T
+para0 = getpara(logpdf)
+para0[2] = 4
+logpdf$updatepara(para0)
+getpara(logpdf)
+```
+ 
+The coefficients `coeff` are considered ancillary parameters that need to be optimized out (or something more sophisticated, hint on current research). For this class, it is easiest to do this via `lpdf$optnewton`, which takes a single Newton step to optimize the coefficients.
+```{r}
 logpdf$optnewton()
+```
+
+Some test data will help illustrate prediction.
+
+```{r}
+testsampsize = 1000
+xtest = matrix(runif(testsampsize*d),ncol=d)
+ytest = obtest_borehole3d(xtest)
+```
+
+We can see the predictive accuracy using the `?predictor` class which automatically pulls correct information out of `loglik` to design predictions.
+
+```{r}
 predt = new(predictor,loglik)
 predt$update(xtest)
 yhat = as.vector(predt$mean())
 varpred = as.vector(predt$var())
 
 par(mfrow=c(1,2))
-plot(ytest,yhat)
-hist((ytest-yhat)/sqrt(varpred), main="standarized test residuals",
+plot(yhat,ytest, xlab="prediction", ylab="actual")
+hist((ytest-yhat)/sqrt(varpred),
+     main="standarized test residuals",
      xlab = "standarized test residuals")
-sqrt(mean((ytest-yhat)^2))
 ```
 
+## lpdf and hyperparameters
+
+The main value in this approach is the automated pulling of important gradients related to covariance hyperparameters and model parameters.
+```{r}
+logpdf$optnewton()
+logpdf$gradhyp    # dim 6 for all hyperparameter
+logpdf$gradpara   # dim 2 since 2 parameters
+```
+
+This allows us to use custom functions to learn these hyperparameters to give maximum predictive power.  The goal right now is a single point estimate of these hyperparameters. One has to be very careful to keep these in good ranges, and the call below will make sure to return `-inf` if there is a problem with the chosen hyperparameters.
 ```{r}
 totobj = function(hypl) { #my optimization function for tuning
-  regpara = logpdf$paralpdf(hypl$para)
-  reghyp = om$hyplpdf(hypl$hyp)
-  if(is.finite(regpara) && is.finite(reghyp)) { #if outside prior, ignore
-    om$updatehyp(hypl$hyp)
-    logpdf$updateom()
-    logpdf$updatepara(hypl$para)
-    logpdf$optnewton()
+  regpara = logpdf$paralpdf(hypl$para) # get regularization for lpdf
+  reghyp = om$hyplpdf(hypl$hyp) # get regularization for om
+  if(is.finite(regpara) && is.finite(reghyp)) { # if they pass
+    om$updatehyp(hypl$hyp)        # update hyperparameters
+    logpdf$updateom()             # update the outerbase inside
+    logpdf$updatepara(hypl$para)  # update parameter
+    logpdf$optnewton()            # do opt
     
     gval = hypl #match structure
     gval$hyp = -logpdf$gradhyp-om$hyplpdf_grad(hypl$hyp)
-    gval$para = -logpdf$gradpara-logpdf$paralpdf_grad(hypl$para)#
-    list(val = -logpdf$val-reghyp-regpara, gval = gval)#
+    gval$para = -logpdf$gradpara-logpdf$paralpdf_grad(hypl$para)
+    list(val = -logpdf$val-reghyp-regpara, gval = gval)
   } else list(val = Inf, gval = hypl) }
-hypl = list(para = getpara(logpdf), hyp = gethyp(om))
-opth = BFGS_std(totobj, hypl, verbose=3) #do a quick and dirty optimization first
 ```
 
+This works by pulling the right information and checking to make sure the objects themselves thing the parameters are reasonable. This package provides a custom deployment of `BFGS` in `?BFGS_std` to optimize functions like this.
+```{r}
+hypl = list(para = getpara(logpdf), hyp = gethyp(om))
+totobj(hypl)
+opth = BFGS_std(totobj, hypl, verbose=3) #
+```
+
+Then we just have to update out parameters and re-optimize.
 ```{r}
 om$updatehyp(opth$vec$hyp)
 logpdf$updatepara(opth$vec$para)
 logpdf$optnewton()
 ```
 
+These steps can all be nicely wrapped up in another function `?BFGS_lpdf`, which is a simpler call with the same result.  Note because of some things not fully understood, these numbers will not match _exactly_ above, but will be quite close and functionally the same.
 ```{r}
 opth = BFGS_lpdf(om, logpdf, 
                  rho=hypl, 
                  verbose = 3, newt= T)  
 ```
-
+The revised predictions are then built after hyperparameter optimization where we find improved predictive accuracy in nearly every category.
 ```{r}
 predtt = new(predictor,loglik)
 predtt$update(xtest)
@@ -134,8 +199,4 @@ par(mfrow=c(1,2))
 plot(ytest,yhat)
 hist((ytest-yhat)/sqrt(varpred), main="standarized test residuals",
      xlab = "standarized test residuals")
-sqrt(mean((ytest-yhat)^2))
-
 ```
-
-

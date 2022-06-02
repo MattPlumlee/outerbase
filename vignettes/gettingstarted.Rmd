@@ -15,69 +15,98 @@ knitr::opts_chunk$set(
 )
 ```
 
+## Overview
+
+The goal of `outerbase` is to make the production of near-interpolators easy, stable, and scalable.  It is based on a `C++` backend, powered specifically by `{Rcpp}`.  Specifically, it leverages unique, fast linear algebra using `{RcppArmadillo}` ([Armadillo](http://arma.sourceforge.net)) and `omp`.  The overall structure is designed to be interacted with in an object-oriented manner using `Rcpp` modules.  
+
+There are ways to interact with `outerbase` for those who are uncomfortable with (or just actively detest) object oriented programming.
+
+To begin, load the package.
 ```{r setup}
 library(outerbase)
 ```
+Note that if you built this package from source, make sure you use a compiler that can process `omp` commands to access the entire speed benefits.
 
+## Simple prediction
 
+To understand how to get started with using the package, we will try to predict using data from a function with an eight dimensional input commonly known as the Borehole function.  First we will generate `1000` points using a test function built into the package `?obtest_borehole8d`.
 ```{r}
-sampsize = 1000
+sampsize = 400
 d = 8
-x = matrix(runif(sampsize*d),ncol=d)
+x = matrix(runif(sampsize*d),ncol=d) #uniform samples
 y = obtest_borehole8d(x) + 0.5*rnorm(sampsize)
 ```
+Our goal will be to design a predictor for `y` given `x` that is a near-interpolator.  
 
-```{r}
-xtest = matrix(runif(1000*d),ncol=d) #prediction points
-ytest =  obtest_borehole8d(xtest) + 0.5*rnorm(sampsize)
-```
-## Covariance functions
-Type `listcov` to discover what covariance functions are deployed.
+
+The simplest way to interact with this package is using `?obfit` (fitting outerbase). The function requires `x`, `y` and two other objects.  
+
+The value of `numb` is the number of basis functions you want to use.  The choice of `numb` is still under research, but generally you want it to be large-ish.  Play around! 
+
+The underlying concepts of this approach come from Gaussian processes.  Thus the core building block of predictors will be covariances functions.  The choice of the covariances needed for `obfit` is a list of strings the corresponding to each columns in `x`.  Type `listcov()` to discover what covariance functions are are currently deployed.
 ```{r}
 listcov()
 ```
-If you are curious about any of them, `?covf_covname`.  Note that there are some checks to make sure you do not mess up this entry point, examples are below.
+If you are curious about any of them, type, e.g. `?covf_mat25pow`. 
+
+Note `obfit` has some checks in place to prevent serious damage.  They are not foolproof.
 ```{r, error=TRUE}
-gpm = fitob(x, y, numb = 250, covnames=rep("elephant",5))
-gpm = fitob(x, y, numb = 250, covnames=rep("elephant",8))
-gpm = fitob(100*x, y, numb = 250, covnames=rep("mat25pow",8))
-gpm = fitob(0.001*x, y, numb = 250, covnames=rep("mat25pow",8))
+obmodel = obfit(x, y, covnames=rep("elephant",8))
+obmodel = obfit(x, y[1:200], covnames=rep("mat25pow",5))
+obmodel = obfit(x[1:2,], y[1:2], covnames=rep("mat25pow",8))
+obmodel = obfit(x, y, numb = 2, covnames=rep("mat25pow",8))
+obmodel = obfit(100*x, y, covnames=rep("mat25pow",8))
+obmodel = obfit(0.001*x, y, covnames=rep("mat25pow",8))
 ```
 
-## Building
+Here is one correct deployment, where `mat25pow` is used for all dimensions. 
 ```{r}
-# gpm = fitob(x, y, numb = 250) does same thing
-gpm = fitob(x, y, numb = 250, covnames=rep("mat25pow",8))
+obmodel = obfit(x, y, numb = 300, covnames=rep("mat25pow",8))
 ```
 
-## Prediction
 
+We can then predict using `obpred`.  Consider predicting at our training points, we can see that while it is not an interpolator, it is close.
 ```{r}
-predtr = predob(gpm, x)
+predtr = obpred(obmodel, x)
 rmsetr = sqrt(mean((y-predtr$mean)^2))
-plot(predtr$mean, y, main= paste("training \n RMSE = ", 
-                                    round(rmsetr,3)),
-     xlab = "prediction", ylab = "actual")
+plot(predtr$mean, y,
+     main=paste("training \n RMSE = ", round(rmsetr,3)),
+     xlab="prediction", ylab = "actual")
 ```
 
+The fact that we generated this data means we can show that `outerbase` can reasonably predict ground truth, meaning overfitting is not an issue.
 ```{r}
 ytrue = obtest_borehole8d(x)
 rmsetr = sqrt(mean((ytrue-predtr$mean)^2))
-plot(predtr$mean, ytrue, main= paste("oracle \n RMSE = ", 
-                                    round(rmsetr,3)),
-     xlab = "prediction", ylab = "actual")
+plot(predtr$mean, ytrue,
+     main=paste("oracle \n RMSE = ", round(rmsetr,3)),
+     xlab="prediction", ylab="actual")
 ```
 
+`1000` test points generated the same way as our original data can also serve as a verification process.
 ```{r}
-predtest = predob(gpm, xtest)
-
-rmsetr = sqrt(mean((ytest-predtest$mean)^2))
-plot(predtest$mean, ytest, main= paste("testing \n RMSE = ", 
-                                    round(rmsetr,3)),
-     xlab = "prediction", ylab = "actual")
-
-hist((ytest-predtest$mean),main="testing \n  residuals",xlab="residuals")
-hist((ytest-predtest$mean)/sqrt(predtest$var),
-     main="testing \n standarized residuals",xlab="standarized residuals")
+xtest = matrix(runif(1000*d),ncol=d) #prediction points
+ytest = obtest_borehole8d(xtest) + 0.5*rnorm(1000)
 ```
+
+
+The predictions that we get are also outstanding here at these new points.  Not quite as good as the residuals on the test set, but we are extrapolating here. 
+```{r}
+predtest = obpred(obmodel, xtest)
+
+rmsetst = sqrt(mean((ytest-predtest$mean)^2))
+plot(predtest$mean, ytest, 
+     main=paste("testing \n RMSE = ", round(rmsetst,3)),
+     xlab="prediction", ylab="actual")
+```
+
+This package also produces variances on the predictions which we can use to test reasonableness.  The fact that the second histogram looks like a standard Normal is promising that the predictions are reasonable.
+```{r}
+hist((ytest-predtest$mean),
+     main="testing \n  residuals", xlab="residuals")
+hist((ytest-predtest$mean)/sqrt(predtest$var),
+     main="testing \n standarized residuals",
+     xlab="standarized residuals")
+```
+
 
