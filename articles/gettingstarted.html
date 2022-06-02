@@ -41,8 +41,8 @@
   <a class="nav-link" href="../articles/gettingstarted.html">Get Started</a>
 </li>
 <li class="nav-item dropdown">
-  <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown" role="button" aria-expanded="false" aria-haspopup="true" id="dropdown-basics">Basics</a>
-  <div class="dropdown-menu" aria-labelledby="dropdown-basics">
+  <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown" role="button" aria-expanded="false" aria-haspopup="true" id="dropdown-elements">Elements</a>
+  <div class="dropdown-menu" aria-labelledby="dropdown-elements">
     <a class="dropdown-item" href="../articles/basebasics.html">Models and Bases</a>
     <a class="dropdown-item" href="../articles/learning.html">Learning</a>
     <a class="dropdown-item" href="../articles/speed.html">Speed</a>
@@ -87,82 +87,99 @@
 
     
     
+<div class="section level2">
+<h2 id="overview">Overview<a class="anchor" aria-label="anchor" href="#overview"></a>
+</h2>
+<p>The goal of <code>outerbase</code> is to make the production of near-interpolators easy, stable, and scalable. It is based on a <code>C++</code> backend, powered specifically by <a href="http://www.rcpp.org" class="external-link">Rcpp</a>. Specifically, it leverages unique, fast linear algebra using <a href="https://github.com/RcppCore/RcppArmadillo" class="external-link">RcppArmadillo</a> (<a href="http://arma.sourceforge.net" class="external-link">Armadillo</a>) and <code>omp</code>. The overall structure is designed to be interacted with in an object-oriented manner using <code>Rcpp</code> modules.</p>
+<p>There are ways to interact with <code>outerbase</code> for those who are uncomfortable with (or just actively detest) object oriented programming.</p>
+<p>To begin, load the package.</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://mattplumlee.github.io/outerbase">outerbase</a></span><span class="op">)</span></code></pre></div>
-<div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">sampsize</span> <span class="op">=</span> <span class="fl">1000</span>
-<span class="va">d</span> <span class="op">=</span> <span class="fl">8</span>
-<span class="va">x</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/matrix.html" class="external-link">matrix</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/stats/Uniform.html" class="external-link">runif</a></span><span class="op">(</span><span class="va">sampsize</span><span class="op">*</span><span class="va">d</span><span class="op">)</span>,ncol<span class="op">=</span><span class="va">d</span><span class="op">)</span>
-<span class="va">y</span> <span class="op">=</span> <span class="fu"><a href="../reference/obtest_borehole8d.html">obtest_borehole8d</a></span><span class="op">(</span><span class="va">x</span><span class="op">)</span> <span class="op">+</span> <span class="fl">0.5</span><span class="op">*</span><span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">rnorm</a></span><span class="op">(</span><span class="va">sampsize</span><span class="op">)</span></code></pre></div>
-<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">xtest</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/matrix.html" class="external-link">matrix</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/stats/Uniform.html" class="external-link">runif</a></span><span class="op">(</span><span class="fl">1000</span><span class="op">*</span><span class="va">d</span><span class="op">)</span>,ncol<span class="op">=</span><span class="va">d</span><span class="op">)</span> <span class="co">#prediction points</span>
-<span class="va">ytest</span> <span class="op">=</span>  <span class="fu"><a href="../reference/obtest_borehole8d.html">obtest_borehole8d</a></span><span class="op">(</span><span class="va">xtest</span><span class="op">)</span> <span class="op">+</span> <span class="fl">0.5</span><span class="op">*</span><span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">rnorm</a></span><span class="op">(</span><span class="va">sampsize</span><span class="op">)</span></code></pre></div>
+<p>Note that if you built this package from source, make sure you use a compiler that can process <code>omp</code> commands to access the entire speed benefits.</p>
+</div>
 <div class="section level2">
-<h2 id="covariance-functions">Covariance functions<a class="anchor" aria-label="anchor" href="#covariance-functions"></a>
+<h2 id="simple-prediction">Simple prediction<a class="anchor" aria-label="anchor" href="#simple-prediction"></a>
 </h2>
-<p>Type <code>listcov</code> to discover what covariance functions are deployed.</p>
-<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
+<p>To understand how to get started with using the package, we will try to predict using data from a function with an eight dimensional input commonly known as the Borehole function. First we will generate <code>1000</code> points using a test function built into the package <code><a href="../reference/obtest_borehole8d.html">?obtest_borehole8d</a></code>.</p>
+<div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="va">sampsize</span> <span class="op">=</span> <span class="fl">400</span>
+<span class="va">d</span> <span class="op">=</span> <span class="fl">8</span>
+<span class="va">x</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/matrix.html" class="external-link">matrix</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/stats/Uniform.html" class="external-link">runif</a></span><span class="op">(</span><span class="va">sampsize</span><span class="op">*</span><span class="va">d</span><span class="op">)</span>,ncol<span class="op">=</span><span class="va">d</span><span class="op">)</span> <span class="co">#uniform samples</span>
+<span class="va">y</span> <span class="op">=</span> <span class="fu"><a href="../reference/obtest_borehole8d.html">obtest_borehole8d</a></span><span class="op">(</span><span class="va">x</span><span class="op">)</span> <span class="op">+</span> <span class="fl">0.5</span><span class="op">*</span><span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">rnorm</a></span><span class="op">(</span><span class="va">sampsize</span><span class="op">)</span></code></pre></div>
+<p>Our goal will be to design a predictor for <code>y</code> given <code>x</code> that is a near-interpolator.</p>
+<p>The simplest way to interact with this package is using <code><a href="../reference/obfit.html">?obfit</a></code> (fitting outerbase). The function requires <code>x</code>, <code>y</code> and two other objects.</p>
+<p>The value of <code>numb</code> is the number of basis functions you want to use. The choice of <code>numb</code> is still under research, but generally you want it to be large-ish. Play around!</p>
+<p>The underlying concepts of this approach come from Gaussian processes. Thus the core building block of predictors will be covariances functions. The choice of the covariances needed for <code>obfit</code> is a list of strings the corresponding to each columns in <code>x</code>. Type <code><a href="../reference/listcov.html">listcov()</a></code> to discover what covariance functions are are currently deployed.</p>
+<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="../reference/listcov.html">listcov</a></span><span class="op">(</span><span class="op">)</span>
 <span class="co">#&gt; [1] "mat25pow" "mat25"    "mat25ang"</span></code></pre></div>
-<p>If you are curious about any of them, <code>?covf_covname</code>. Note that there are some checks to make sure you do not mess up this entry point, examples are below.</p>
-<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">gpm</span> <span class="op">=</span> <span class="fu"><a href="../reference/fitob.html">fitob</a></span><span class="op">(</span><span class="va">x</span>, <span class="va">y</span>, numb <span class="op">=</span> <span class="fl">250</span>, covnames<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="st">"elephant"</span>,<span class="fl">5</span><span class="op">)</span><span class="op">)</span>
-<span class="co">#&gt; Error in fitob(x, y, numb = 250, covnames = rep("elephant", 5)): </span>
-<span class="co">#&gt;  cov names must be same size as columns in x</span>
-<span class="va">gpm</span> <span class="op">=</span> <span class="fu"><a href="../reference/fitob.html">fitob</a></span><span class="op">(</span><span class="va">x</span>, <span class="va">y</span>, numb <span class="op">=</span> <span class="fl">250</span>, covnames<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="st">"elephant"</span>,<span class="fl">8</span><span class="op">)</span><span class="op">)</span>
+<p>If you are curious about any of them, type, e.g. <code><a href="../reference/covf_mat25pow.html">?covf_mat25pow</a></code>.</p>
+<p>Note <code>obfit</code> has some checks in place to prevent serious damage. They are not foolproof.</p>
+<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="va">obmodel</span> <span class="op">=</span> <span class="fu"><a href="../reference/obfit.html">obfit</a></span><span class="op">(</span><span class="va">x</span>, <span class="va">y</span>, covnames<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="st">"elephant"</span>,<span class="fl">8</span><span class="op">)</span><span class="op">)</span>
 <span class="co">#&gt; Error in .checkcov(covnames[k], x[, k]): </span>
 <span class="co">#&gt;  covariances must be from listcov()</span>
-<span class="va">gpm</span> <span class="op">=</span> <span class="fu"><a href="../reference/fitob.html">fitob</a></span><span class="op">(</span><span class="fl">100</span><span class="op">*</span><span class="va">x</span>, <span class="va">y</span>, numb <span class="op">=</span> <span class="fl">250</span>, covnames<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="st">"mat25pow"</span>,<span class="fl">8</span><span class="op">)</span><span class="op">)</span>
+<span class="va">obmodel</span> <span class="op">=</span> <span class="fu"><a href="../reference/obfit.html">obfit</a></span><span class="op">(</span><span class="va">x</span>, <span class="va">y</span><span class="op">[</span><span class="fl">1</span><span class="op">:</span><span class="fl">200</span><span class="op">]</span>, covnames<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="st">"mat25pow"</span>,<span class="fl">5</span><span class="op">)</span><span class="op">)</span>
+<span class="co">#&gt; Error in obfit(x, y[1:200], covnames = rep("mat25pow", 5)): </span>
+<span class="co">#&gt;  x and y dims do not align</span>
+<span class="va">obmodel</span> <span class="op">=</span> <span class="fu"><a href="../reference/obfit.html">obfit</a></span><span class="op">(</span><span class="va">x</span><span class="op">[</span><span class="fl">1</span><span class="op">:</span><span class="fl">2</span>,<span class="op">]</span>, <span class="va">y</span><span class="op">[</span><span class="fl">1</span><span class="op">:</span><span class="fl">2</span><span class="op">]</span>, covnames<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="st">"mat25pow"</span>,<span class="fl">8</span><span class="op">)</span><span class="op">)</span>
+<span class="co">#&gt; Error in obfit(x[1:2, ], y[1:2], covnames = rep("mat25pow", 8)): </span>
+<span class="co">#&gt;  dimension larger than sample size has not been tested</span>
+<span class="va">obmodel</span> <span class="op">=</span> <span class="fu"><a href="../reference/obfit.html">obfit</a></span><span class="op">(</span><span class="va">x</span>, <span class="va">y</span>, numb <span class="op">=</span> <span class="fl">2</span>, covnames<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="st">"mat25pow"</span>,<span class="fl">8</span><span class="op">)</span><span class="op">)</span>
+<span class="co">#&gt; Error in obfit(x, y, numb = 2, covnames = rep("mat25pow", 8)): </span>
+<span class="co">#&gt;  number of basis functions should be over twice the dimension</span>
+<span class="va">obmodel</span> <span class="op">=</span> <span class="fu"><a href="../reference/obfit.html">obfit</a></span><span class="op">(</span><span class="fl">100</span><span class="op">*</span><span class="va">x</span>, <span class="va">y</span>, covnames<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="st">"mat25pow"</span>,<span class="fl">8</span><span class="op">)</span><span class="op">)</span>
 <span class="co">#&gt; Error in .checkcov(covnames[k], x[, k]): </span>
 <span class="co">#&gt;  x ranges exceed limits of covariance functions </span>
 <span class="co">#&gt;  the limits are between 0 and 1  </span>
 <span class="co">#&gt;  try rescaling</span>
-<span class="va">gpm</span> <span class="op">=</span> <span class="fu"><a href="../reference/fitob.html">fitob</a></span><span class="op">(</span><span class="fl">0.001</span><span class="op">*</span><span class="va">x</span>, <span class="va">y</span>, numb <span class="op">=</span> <span class="fl">250</span>, covnames<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="st">"mat25pow"</span>,<span class="fl">8</span><span class="op">)</span><span class="op">)</span>
+<span class="va">obmodel</span> <span class="op">=</span> <span class="fu"><a href="../reference/obfit.html">obfit</a></span><span class="op">(</span><span class="fl">0.001</span><span class="op">*</span><span class="va">x</span>, <span class="va">y</span>, covnames<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="st">"mat25pow"</span>,<span class="fl">8</span><span class="op">)</span><span class="op">)</span>
 <span class="co">#&gt; Error in .checkcov(covnames[k], x[, k]): </span>
 <span class="co">#&gt;  x are too small for ranges</span>
 <span class="co">#&gt;  the limits are between 0 and 1  </span>
 <span class="co">#&gt;  try rescaling</span></code></pre></div>
-</div>
-<div class="section level2">
-<h2 id="building">Building<a class="anchor" aria-label="anchor" href="#building"></a>
-</h2>
+<p>Here is one correct deployment, where <code>mat25pow</code> is used for all dimensions.</p>
+<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="va">obmodel</span> <span class="op">=</span> <span class="fu"><a href="../reference/obfit.html">obfit</a></span><span class="op">(</span><span class="va">x</span>, <span class="va">y</span>, numb <span class="op">=</span> <span class="fl">300</span>, covnames<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="st">"mat25pow"</span>,<span class="fl">8</span><span class="op">)</span><span class="op">)</span></code></pre></div>
+<p>We can then predict using <code>obpred</code>. Consider predicting at our training points, we can see that while it is not an interpolator, it is close.</p>
 <div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="co"># gpm = fitob(x, y, numb = 250) does same thing</span>
-<span class="va">gpm</span> <span class="op">=</span> <span class="fu"><a href="../reference/fitob.html">fitob</a></span><span class="op">(</span><span class="va">x</span>, <span class="va">y</span>, numb <span class="op">=</span> <span class="fl">250</span>, covnames<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="st">"mat25pow"</span>,<span class="fl">8</span><span class="op">)</span><span class="op">)</span></code></pre></div>
-</div>
-<div class="section level2">
-<h2 id="prediction">Prediction<a class="anchor" aria-label="anchor" href="#prediction"></a>
-</h2>
-<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">predtr</span> <span class="op">=</span> <span class="fu"><a href="../reference/predob.html">predob</a></span><span class="op">(</span><span class="va">gpm</span>, <span class="va">x</span><span class="op">)</span>
+<code class="sourceCode R"><span class="va">predtr</span> <span class="op">=</span> <span class="fu"><a href="../reference/obpred.html">obpred</a></span><span class="op">(</span><span class="va">obmodel</span>, <span class="va">x</span><span class="op">)</span>
 <span class="va">rmsetr</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/MathFun.html" class="external-link">sqrt</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/mean.html" class="external-link">mean</a></span><span class="op">(</span><span class="op">(</span><span class="va">y</span><span class="op">-</span><span class="va">predtr</span><span class="op">$</span><span class="va">mean</span><span class="op">)</span><span class="op">^</span><span class="fl">2</span><span class="op">)</span><span class="op">)</span>
-<span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">predtr</span><span class="op">$</span><span class="va">mean</span>, <span class="va">y</span>, main<span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste</a></span><span class="op">(</span><span class="st">"training \n RMSE = "</span>, 
-                                    <span class="fu"><a href="https://rdrr.io/r/base/Round.html" class="external-link">round</a></span><span class="op">(</span><span class="va">rmsetr</span>,<span class="fl">3</span><span class="op">)</span><span class="op">)</span>,
-     xlab <span class="op">=</span> <span class="st">"prediction"</span>, ylab <span class="op">=</span> <span class="st">"actual"</span><span class="op">)</span></code></pre></div>
-<p><img src="gettingstarted_files/figure-html/unnamed-chunk-7-1.png" width="700"></p>
-<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
+<span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">predtr</span><span class="op">$</span><span class="va">mean</span>, <span class="va">y</span>,
+     main<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste</a></span><span class="op">(</span><span class="st">"training \n RMSE = "</span>, <span class="fu"><a href="https://rdrr.io/r/base/Round.html" class="external-link">round</a></span><span class="op">(</span><span class="va">rmsetr</span>,<span class="fl">3</span><span class="op">)</span><span class="op">)</span>,
+     xlab<span class="op">=</span><span class="st">"prediction"</span>, ylab <span class="op">=</span> <span class="st">"actual"</span><span class="op">)</span></code></pre></div>
+<p><img src="gettingstarted_files/figure-html/unnamed-chunk-6-1.png" width="700"></p>
+<p>The fact that we generated this data means we can show that <code>outerbase</code> can reasonably predict ground truth, meaning overfitting is not an issue.</p>
+<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">ytrue</span> <span class="op">=</span> <span class="fu"><a href="../reference/obtest_borehole8d.html">obtest_borehole8d</a></span><span class="op">(</span><span class="va">x</span><span class="op">)</span>
 <span class="va">rmsetr</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/MathFun.html" class="external-link">sqrt</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/mean.html" class="external-link">mean</a></span><span class="op">(</span><span class="op">(</span><span class="va">ytrue</span><span class="op">-</span><span class="va">predtr</span><span class="op">$</span><span class="va">mean</span><span class="op">)</span><span class="op">^</span><span class="fl">2</span><span class="op">)</span><span class="op">)</span>
-<span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">predtr</span><span class="op">$</span><span class="va">mean</span>, <span class="va">ytrue</span>, main<span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste</a></span><span class="op">(</span><span class="st">"oracle \n RMSE = "</span>, 
-                                    <span class="fu"><a href="https://rdrr.io/r/base/Round.html" class="external-link">round</a></span><span class="op">(</span><span class="va">rmsetr</span>,<span class="fl">3</span><span class="op">)</span><span class="op">)</span>,
-     xlab <span class="op">=</span> <span class="st">"prediction"</span>, ylab <span class="op">=</span> <span class="st">"actual"</span><span class="op">)</span></code></pre></div>
-<p><img src="gettingstarted_files/figure-html/unnamed-chunk-8-1.png" width="700"></p>
+<span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">predtr</span><span class="op">$</span><span class="va">mean</span>, <span class="va">ytrue</span>,
+     main<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste</a></span><span class="op">(</span><span class="st">"oracle \n RMSE = "</span>, <span class="fu"><a href="https://rdrr.io/r/base/Round.html" class="external-link">round</a></span><span class="op">(</span><span class="va">rmsetr</span>,<span class="fl">3</span><span class="op">)</span><span class="op">)</span>,
+     xlab<span class="op">=</span><span class="st">"prediction"</span>, ylab<span class="op">=</span><span class="st">"actual"</span><span class="op">)</span></code></pre></div>
+<p><img src="gettingstarted_files/figure-html/unnamed-chunk-7-1.png" width="700"></p>
+<p><code>1000</code> test points generated the same way as our original data can also serve as a verification process.</p>
+<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="va">xtest</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/matrix.html" class="external-link">matrix</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/stats/Uniform.html" class="external-link">runif</a></span><span class="op">(</span><span class="fl">1000</span><span class="op">*</span><span class="va">d</span><span class="op">)</span>,ncol<span class="op">=</span><span class="va">d</span><span class="op">)</span> <span class="co">#prediction points</span>
+<span class="va">ytest</span> <span class="op">=</span> <span class="fu"><a href="../reference/obtest_borehole8d.html">obtest_borehole8d</a></span><span class="op">(</span><span class="va">xtest</span><span class="op">)</span> <span class="op">+</span> <span class="fl">0.5</span><span class="op">*</span><span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">rnorm</a></span><span class="op">(</span><span class="fl">1000</span><span class="op">)</span></code></pre></div>
+<p>The predictions that we get are also outstanding here at these new points. Not quite as good as the residuals on the test set, but we are extrapolating here.</p>
 <div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">predtest</span> <span class="op">=</span> <span class="fu"><a href="../reference/predob.html">predob</a></span><span class="op">(</span><span class="va">gpm</span>, <span class="va">xtest</span><span class="op">)</span>
+<code class="sourceCode R"><span class="va">predtest</span> <span class="op">=</span> <span class="fu"><a href="../reference/obpred.html">obpred</a></span><span class="op">(</span><span class="va">obmodel</span>, <span class="va">xtest</span><span class="op">)</span>
 
-<span class="va">rmsetr</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/MathFun.html" class="external-link">sqrt</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/mean.html" class="external-link">mean</a></span><span class="op">(</span><span class="op">(</span><span class="va">ytest</span><span class="op">-</span><span class="va">predtest</span><span class="op">$</span><span class="va">mean</span><span class="op">)</span><span class="op">^</span><span class="fl">2</span><span class="op">)</span><span class="op">)</span>
-<span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">predtest</span><span class="op">$</span><span class="va">mean</span>, <span class="va">ytest</span>, main<span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste</a></span><span class="op">(</span><span class="st">"testing \n RMSE = "</span>, 
-                                    <span class="fu"><a href="https://rdrr.io/r/base/Round.html" class="external-link">round</a></span><span class="op">(</span><span class="va">rmsetr</span>,<span class="fl">3</span><span class="op">)</span><span class="op">)</span>,
-     xlab <span class="op">=</span> <span class="st">"prediction"</span>, ylab <span class="op">=</span> <span class="st">"actual"</span><span class="op">)</span></code></pre></div>
+<span class="va">rmsetst</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/MathFun.html" class="external-link">sqrt</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/mean.html" class="external-link">mean</a></span><span class="op">(</span><span class="op">(</span><span class="va">ytest</span><span class="op">-</span><span class="va">predtest</span><span class="op">$</span><span class="va">mean</span><span class="op">)</span><span class="op">^</span><span class="fl">2</span><span class="op">)</span><span class="op">)</span>
+<span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">predtest</span><span class="op">$</span><span class="va">mean</span>, <span class="va">ytest</span>, 
+     main<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste</a></span><span class="op">(</span><span class="st">"testing \n RMSE = "</span>, <span class="fu"><a href="https://rdrr.io/r/base/Round.html" class="external-link">round</a></span><span class="op">(</span><span class="va">rmsetst</span>,<span class="fl">3</span><span class="op">)</span><span class="op">)</span>,
+     xlab<span class="op">=</span><span class="st">"prediction"</span>, ylab<span class="op">=</span><span class="st">"actual"</span><span class="op">)</span></code></pre></div>
 <p><img src="gettingstarted_files/figure-html/unnamed-chunk-9-1.png" width="700"></p>
+<p>This package also produces variances on the predictions which we can use to test reasonableness. The fact that the second histogram looks like a standard Normal is promising that the predictions are reasonable.</p>
 <div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
-<code class="sourceCode R">
-<span class="fu"><a href="https://rdrr.io/r/graphics/hist.html" class="external-link">hist</a></span><span class="op">(</span><span class="op">(</span><span class="va">ytest</span><span class="op">-</span><span class="va">predtest</span><span class="op">$</span><span class="va">mean</span><span class="op">)</span>,main<span class="op">=</span><span class="st">"testing \n  residuals"</span>,xlab<span class="op">=</span><span class="st">"residuals"</span><span class="op">)</span></code></pre></div>
-<p><img src="gettingstarted_files/figure-html/unnamed-chunk-9-2.png" width="700"></p>
+<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/graphics/hist.html" class="external-link">hist</a></span><span class="op">(</span><span class="op">(</span><span class="va">ytest</span><span class="op">-</span><span class="va">predtest</span><span class="op">$</span><span class="va">mean</span><span class="op">)</span>,
+     main<span class="op">=</span><span class="st">"testing \n  residuals"</span>, xlab<span class="op">=</span><span class="st">"residuals"</span><span class="op">)</span></code></pre></div>
+<p><img src="gettingstarted_files/figure-html/unnamed-chunk-10-1.png" width="700"></p>
 <div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/graphics/hist.html" class="external-link">hist</a></span><span class="op">(</span><span class="op">(</span><span class="va">ytest</span><span class="op">-</span><span class="va">predtest</span><span class="op">$</span><span class="va">mean</span><span class="op">)</span><span class="op">/</span><span class="fu"><a href="https://rdrr.io/r/base/MathFun.html" class="external-link">sqrt</a></span><span class="op">(</span><span class="va">predtest</span><span class="op">$</span><span class="va">var</span><span class="op">)</span>,
-     main<span class="op">=</span><span class="st">"testing \n standarized residuals"</span>,xlab<span class="op">=</span><span class="st">"standarized residuals"</span><span class="op">)</span></code></pre></div>
-<p><img src="gettingstarted_files/figure-html/unnamed-chunk-9-3.png" width="700"></p>
+     main<span class="op">=</span><span class="st">"testing \n standarized residuals"</span>,
+     xlab<span class="op">=</span><span class="st">"standarized residuals"</span><span class="op">)</span></code></pre></div>
+<p><img src="gettingstarted_files/figure-html/unnamed-chunk-10-2.png" width="700"></p>
 </div>
   </main><aside class="col-md-3"><nav id="toc"><h2>On this page</h2>
     </nav></aside>

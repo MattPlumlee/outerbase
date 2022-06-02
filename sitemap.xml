@@ -49,9 +49,6 @@
     <loc>https://mattplumlee.github.io/outerbase/reference/covf_mat25pow.html</loc>
   </url>
   <url>
-    <loc>https://mattplumlee.github.io/outerbase/reference/fitob.html</loc>
-  </url>
-  <url>
     <loc>https://mattplumlee.github.io/outerbase/reference/gethyp.html</loc>
   </url>
   <url>
@@ -86,6 +83,12 @@
   </url>
   <url>
     <loc>https://mattplumlee.github.io/outerbase/reference/lpdfvec.html</loc>
+  </url>
+  <url>
+    <loc>https://mattplumlee.github.io/outerbase/reference/obfit.html</loc>
+  </url>
+  <url>
+    <loc>https://mattplumlee.github.io/outerbase/reference/obpred.html</loc>
   </url>
   <url>
     <loc>https://mattplumlee.github.io/outerbase/reference/obtest_borehole3d.html</loc>
@@ -128,9 +131,6 @@
   </url>
   <url>
     <loc>https://mattplumlee.github.io/outerbase/reference/predictor.html</loc>
-  </url>
-  <url>
-    <loc>https://mattplumlee.github.io/outerbase/reference/predob.html</loc>
   </url>
   <url>
     <loc>https://mattplumlee.github.io/outerbase/reference/setcovfs.html</loc>

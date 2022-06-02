@@ -41,8 +41,8 @@
   <a class="nav-link" href="../articles/gettingstarted.html">Get Started</a>
 </li>
 <li class="active nav-item dropdown">
-  <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown" role="button" aria-expanded="false" aria-haspopup="true" id="dropdown-basics">Basics</a>
-  <div class="dropdown-menu" aria-labelledby="dropdown-basics">
+  <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown" role="button" aria-expanded="false" aria-haspopup="true" id="dropdown-elements">Elements</a>
+  <div class="dropdown-menu" aria-labelledby="dropdown-elements">
     <a class="dropdown-item" href="../articles/basebasics.html">Models and Bases</a>
     <a class="dropdown-item" href="../articles/learning.html">Learning</a>
     <a class="dropdown-item" href="../articles/speed.html">Speed</a>
@@ -87,250 +87,245 @@
 
     
     
+<p>This page is designed to explain how <code><a href="../reference/lpdf.html">?lpdf</a></code> objects can be used for automated learning of hyperparameters and general fitting of predictors.</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://mattplumlee.github.io/outerbase">outerbase</a></span><span class="op">)</span></code></pre></div>
+<p>Let’s set things up for a 3 dimensional example.</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">sampsize</span> <span class="op">=</span> <span class="fl">20</span>
-<span class="va">d</span> <span class="op">=</span> <span class="fl">3</span>
-<span class="va">x</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/matrix.html" class="external-link">matrix</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/stats/Uniform.html" class="external-link">runif</a></span><span class="op">(</span><span class="va">sampsize</span><span class="op">*</span><span class="va">d</span><span class="op">)</span>,ncol<span class="op">=</span><span class="va">d</span><span class="op">)</span>
-<span class="va">y</span> <span class="op">=</span> <span class="fu"><a href="../reference/obtest_borehole3d.html">obtest_borehole3d</a></span><span class="op">(</span><span class="va">x</span><span class="op">)</span></code></pre></div>
+<code class="sourceCode R"><span class="va">om</span> <span class="op">=</span> <span class="fu">new</span><span class="op">(</span><span class="va">outermod</span><span class="op">)</span>
+<span class="fu"><a href="../reference/setcovfs.html">setcovfs</a></span><span class="op">(</span><span class="va">om</span>, <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="st">"mat25pow"</span>,<span class="fl">3</span><span class="op">)</span><span class="op">)</span>
+<span class="va">knotlist</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq</a></span><span class="op">(</span><span class="fl">0.01</span>,<span class="fl">0.99</span>,by<span class="op">=</span><span class="fl">0.02</span><span class="op">)</span>,
+                <span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq</a></span><span class="op">(</span><span class="fl">0.01</span>,<span class="fl">0.99</span>,by<span class="op">=</span><span class="fl">0.02</span><span class="op">)</span>,
+                <span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq</a></span><span class="op">(</span><span class="fl">0.01</span>,<span class="fl">0.99</span>,by<span class="op">=</span><span class="fl">0.02</span><span class="op">)</span><span class="op">)</span>
+<span class="fu"><a href="../reference/setknot.html">setknot</a></span><span class="op">(</span><span class="va">om</span>, <span class="va">knotlist</span><span class="op">)</span></code></pre></div>
+<div class="section level2">
+<h2 id="hyperparameter-impact">Hyperparameter impact<a class="anchor" aria-label="anchor" href="#hyperparameter-impact"></a>
+</h2>
+<p>The values of hyperparameters are extremely important for successful near-interpolation of surfaces. This impact is felt in <code>outerbase</code> and this section is designed to illustrate that.</p>
+<p>Let’s take a look at the projected basis functions.</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">xtest</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/matrix.html" class="external-link">matrix</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/stats/Uniform.html" class="external-link">runif</a></span><span class="op">(</span><span class="fl">100</span><span class="op">*</span><span class="va">d</span><span class="op">)</span>,ncol<span class="op">=</span><span class="va">d</span><span class="op">)</span> <span class="co">#prediction points</span>
-<span class="va">ytest</span> <span class="op">=</span> <span class="fu"><a href="../reference/obtest_borehole3d.html">obtest_borehole3d</a></span><span class="op">(</span><span class="va">xtest</span><span class="op">)</span></code></pre></div>
+<code class="sourceCode R"><span class="va">sampsize</span> <span class="op">=</span> <span class="fl">100</span>
+<span class="va">design1d</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq</a></span><span class="op">(</span><span class="fl">1</span><span class="op">/</span><span class="op">(</span><span class="fl">2</span><span class="op">*</span><span class="va">sampsize</span><span class="op">)</span>,<span class="fl">1</span><span class="op">-</span><span class="fl">1</span><span class="op">/</span><span class="op">(</span><span class="fl">2</span><span class="op">*</span><span class="va">sampsize</span><span class="op">)</span>,<span class="fl">1</span><span class="op">/</span><span class="va">sampsize</span><span class="op">)</span>
+<span class="va">x</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/cbind.html" class="external-link">cbind</a></span><span class="op">(</span><span class="va">design1d</span>,<span class="fu"><a href="https://rdrr.io/r/base/sample.html" class="external-link">sample</a></span><span class="op">(</span><span class="va">design1d</span><span class="op">)</span>,<span class="fu"><a href="https://rdrr.io/r/base/sample.html" class="external-link">sample</a></span><span class="op">(</span><span class="va">design1d</span><span class="op">)</span><span class="op">)</span>
+<span class="va">ob</span> <span class="op">=</span> <span class="fu">new</span><span class="op">(</span><span class="va">outerbase</span>, <span class="va">om</span>, <span class="va">x</span><span class="op">)</span>
+<span class="va">basis_func0</span> <span class="op">=</span> <span class="va">ob</span><span class="op">$</span><span class="fu">getbase</span><span class="op">(</span><span class="fl">1</span><span class="op">)</span>
+<span class="fu"><a href="https://rdrr.io/r/graphics/matplot.html" class="external-link">matplot</a></span><span class="op">(</span><span class="va">x</span><span class="op">[</span>,<span class="fl">1</span><span class="op">]</span>,<span class="va">basis_func0</span><span class="op">[</span>,<span class="fl">1</span><span class="op">:</span><span class="fl">4</span><span class="op">]</span>, 
+        type<span class="op">=</span><span class="st">'l'</span>, ylab<span class="op">=</span><span class="st">"func"</span>, xlab<span class="op">=</span><span class="st">"first dim"</span><span class="op">)</span></code></pre></div>
+<p><img src="learning_files/figure-html/unnamed-chunk-3-1.png" width="700"></p>
+<p>The hyperparameters will now be changed in a way that I know will change these basis functions. Note that <code>ob$build</code> is required after updating the hyperparameters for it to take effect.</p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">om</span> <span class="op">=</span> <span class="fu">new</span><span class="op">(</span><span class="va">outermod</span><span class="op">)</span></code></pre></div>
-<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="fu"><a href="../reference/setcovfs.html">setcovfs</a></span><span class="op">(</span><span class="va">om</span>, <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="st">"mat25pow"</span>,<span class="fl">3</span><span class="op">)</span><span class="op">)</span>
-<span class="va">knotlist</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq</a></span><span class="op">(</span><span class="fl">0.01</span>,<span class="fl">1</span>,by<span class="op">=</span><span class="fl">0.01</span><span class="op">)</span>,
-                <span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq</a></span><span class="op">(</span><span class="fl">0.01</span>,<span class="fl">1</span>,by<span class="op">=</span><span class="fl">0.01</span><span class="op">)</span>,
-                <span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq</a></span><span class="op">(</span><span class="fl">0.01</span>,<span class="fl">1</span>,by<span class="op">=</span><span class="fl">0.01</span><span class="op">)</span><span class="op">)</span>
-<span class="fu"><a href="../reference/setknot.html">setknot</a></span><span class="op">(</span><span class="va">om</span>, <span class="va">knotlist</span><span class="op">)</span> <span class="co">#40 knot point for each dim</span></code></pre></div>
-<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">hyp0</span> <span class="op">=</span> <span class="fu"><a href="../reference/gethyp.html">gethyp</a></span><span class="op">(</span><span class="va">om</span><span class="op">)</span>
-<span class="va">hyp0</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="op">-</span><span class="fl">0.5</span>,<span class="fl">0</span>,<span class="op">-</span><span class="fl">0.5</span>,<span class="fl">0</span>,<span class="op">-</span><span class="fl">0.5</span>,<span class="fl">0</span><span class="op">)</span>
+<span class="va">hyp0</span><span class="op">[</span><span class="fl">2</span><span class="op">]</span> <span class="op">=</span> <span class="fl">3</span> <span class="co">#changing the power on first parameter</span>
+<span class="va">om</span><span class="op">$</span><span class="fu">updatehyp</span><span class="op">(</span><span class="va">hyp0</span><span class="op">)</span>
+<span class="va">ob</span><span class="op">$</span><span class="fu">build</span><span class="op">(</span><span class="op">)</span> <span class="co">#rebuild after updatehyp</span></code></pre></div>
+<p>This leads to an asymmetric basis function set for this first dimension because of the power transform in <code><a href="../reference/covf_mat25pow.html">?covf_mat25pow</a></code>.</p>
+<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="va">basis_func1</span> <span class="op">=</span> <span class="va">ob</span><span class="op">$</span><span class="fu">getbase</span><span class="op">(</span><span class="fl">1</span><span class="op">)</span>
+<span class="fu"><a href="https://rdrr.io/r/graphics/par.html" class="external-link">par</a></span><span class="op">(</span>mfrow<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>,<span class="fl">2</span><span class="op">)</span><span class="op">)</span>
+<span class="fu"><a href="https://rdrr.io/r/graphics/matplot.html" class="external-link">matplot</a></span><span class="op">(</span><span class="va">x</span><span class="op">[</span>,<span class="fl">1</span><span class="op">]</span>,<span class="va">basis_func0</span><span class="op">[</span>,<span class="fl">1</span><span class="op">:</span><span class="fl">4</span><span class="op">]</span>, 
+        type<span class="op">=</span><span class="st">'l'</span>, ylab<span class="op">=</span><span class="st">"func"</span>, xlab<span class="op">=</span><span class="st">"first dim"</span>,
+        main<span class="op">=</span><span class="st">"original hyperparameters"</span><span class="op">)</span>
+<span class="fu"><a href="https://rdrr.io/r/graphics/matplot.html" class="external-link">matplot</a></span><span class="op">(</span><span class="va">x</span><span class="op">[</span>,<span class="fl">1</span><span class="op">]</span>,<span class="va">basis_func1</span><span class="op">[</span>,<span class="fl">1</span><span class="op">:</span><span class="fl">4</span><span class="op">]</span>, 
+        type<span class="op">=</span><span class="st">'l'</span>, ylab<span class="op">=</span><span class="st">"func"</span>, xlab<span class="op">=</span><span class="st">"first dim"</span>,
+        main<span class="op">=</span><span class="st">"new hyperparameters"</span><span class="op">)</span></code></pre></div>
+<p><img src="learning_files/figure-html/unnamed-chunk-5-1.png" width="700"></p>
+</div>
+<div class="section level2">
+<h2 id="lpdf-for-learning">lpdf for learning<a class="anchor" aria-label="anchor" href="#lpdf-for-learning"></a>
+</h2>
+<p>The core building block for outerbase learning is the base class <code><a href="../reference/lpdf.html">?lpdf</a></code>, log probability density functions. This base class forms the backbone behind many possible statistical models. Instances of this class allow us to optimize coefficients, infer on uncertainty and learn hyperparmeters of covariance functions.</p>
+<p>A small dataset can illustrate (almost) all core concepts related to <code>lpdf</code>.</p>
+<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="va">sampsize</span> <span class="op">=</span> <span class="fl">30</span>
+<span class="va">d</span> <span class="op">=</span> <span class="fl">3</span>
+<span class="va">design1d</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq</a></span><span class="op">(</span><span class="fl">1</span><span class="op">/</span><span class="op">(</span><span class="fl">2</span><span class="op">*</span><span class="va">sampsize</span><span class="op">)</span>,<span class="fl">1</span><span class="op">-</span><span class="fl">1</span><span class="op">/</span><span class="op">(</span><span class="fl">2</span><span class="op">*</span><span class="va">sampsize</span><span class="op">)</span>,<span class="fl">1</span><span class="op">/</span><span class="va">sampsize</span><span class="op">)</span>
+<span class="va">x</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/cbind.html" class="external-link">cbind</a></span><span class="op">(</span><span class="va">design1d</span>,<span class="fu"><a href="https://rdrr.io/r/base/sample.html" class="external-link">sample</a></span><span class="op">(</span><span class="va">design1d</span><span class="op">)</span>,<span class="fu"><a href="https://rdrr.io/r/base/sample.html" class="external-link">sample</a></span><span class="op">(</span><span class="va">design1d</span><span class="op">)</span><span class="op">)</span>
+<span class="va">y</span> <span class="op">=</span> <span class="fu"><a href="../reference/obtest_borehole3d.html">obtest_borehole3d</a></span><span class="op">(</span><span class="va">x</span><span class="op">)</span></code></pre></div>
+<p>We can reset our our hyperparameters here, which is 2 dimensions for each covariance function for a total of 6 hyperparameters.</p>
+<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="va">hyp0</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="op">-</span><span class="fl">0.5</span>,<span class="fl">0</span>,<span class="op">-</span><span class="fl">0.5</span>,<span class="fl">0</span>,<span class="op">-</span><span class="fl">0.5</span>,<span class="fl">0</span><span class="op">)</span>
 <span class="va">om</span><span class="op">$</span><span class="fu">updatehyp</span><span class="op">(</span><span class="va">hyp0</span><span class="op">)</span>
 <span class="va">hyp0</span> <span class="op">=</span> <span class="fu"><a href="../reference/gethyp.html">gethyp</a></span><span class="op">(</span><span class="va">om</span><span class="op">)</span></code></pre></div>
-<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">p</span> <span class="op">=</span> <span class="fl">40</span>
-<span class="va">terms</span> <span class="op">=</span> <span class="va">om</span><span class="op">$</span><span class="fu">selectterms</span><span class="op">(</span><span class="va">p</span><span class="op">)</span></code></pre></div>
+<p>We will use <code>60</code> terms here to build our approximation.</p>
 <div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="va">p</span> <span class="op">=</span> <span class="fl">60</span>
+<span class="va">terms</span> <span class="op">=</span> <span class="va">om</span><span class="op">$</span><span class="fu">selectterms</span><span class="op">(</span><span class="va">p</span><span class="op">)</span></code></pre></div>
+<p>The idea is to build a <code>loglik</code> object that represent that log likelihood of our data given the model and coefficients. We will begin with <code><a href="../reference/loglik_std.html">?loglik_std</a></code>, although this model is not recommended for speed reasons. We can initialize it and check that we can get gradients with respect to coefficients, covariance hyperparameters, and parameters of the <code>lpdf</code> object itself.</p>
+<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">loglik</span> <span class="op">=</span> <span class="fu">new</span><span class="op">(</span><span class="va">loglik_std</span>, <span class="va">om</span>, <span class="va">terms</span>, <span class="va">y</span>, <span class="va">x</span><span class="op">)</span> 
 <span class="va">coeffhere</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="fl">0</span>,<span class="va">loglik</span><span class="op">$</span><span class="va">nterms</span><span class="op">)</span>
-<span class="va">loglik</span><span class="op">$</span><span class="va">compute_gradhyp</span> <span class="op">=</span> <span class="cn">T</span>
-<span class="va">loglik</span><span class="op">$</span><span class="va">compute_gradpara</span> <span class="op">=</span> <span class="cn">T</span>
-<span class="va">loglik</span><span class="op">$</span><span class="fu">update</span><span class="op">(</span><span class="va">coeffhere</span><span class="op">)</span>
+<span class="va">loglik</span><span class="op">$</span><span class="fu">update</span><span class="op">(</span><span class="va">coeffhere</span><span class="op">)</span> <span class="co"># update it to get gradients</span>
 <span class="va">loglik</span><span class="op">$</span><span class="va">val</span>
-<span class="co">#&gt; [1] -127.1025</span>
-<span class="va">loglik</span><span class="op">$</span><span class="va">grad</span>
-<span class="co">#&gt;              [,1]</span>
-<span class="co">#&gt;  [1,]  0.06842237</span>
-<span class="co">#&gt;  [2,]  0.16974625</span>
-<span class="co">#&gt;  [3,]  3.86069934</span>
-<span class="co">#&gt;  [4,] -1.40813338</span>
-<span class="co">#&gt;  [5,]  0.45521823</span>
-<span class="co">#&gt;  [6,] -0.09346106</span>
-<span class="co">#&gt;  [7,] -1.08185482</span>
-<span class="co">#&gt;  [8,] -0.42087164</span>
-<span class="co">#&gt;  [9,]  1.30646668</span>
-<span class="co">#&gt; [10,] -0.59436999</span>
-<span class="co">#&gt; [11,] -0.17785587</span>
-<span class="co">#&gt; [12,]  0.96208757</span>
-<span class="co">#&gt; [13,]  1.67137696</span>
-<span class="co">#&gt; [14,] -1.30805171</span>
-<span class="co">#&gt; [15,]  0.42300298</span>
-<span class="co">#&gt; [16,]  0.19587343</span>
-<span class="co">#&gt; [17,] -0.73618949</span>
-<span class="co">#&gt; [18,] -0.66486612</span>
-<span class="co">#&gt; [19,]  1.50592916</span>
-<span class="co">#&gt; [20,]  0.95452051</span>
-<span class="co">#&gt; [21,] -1.30116892</span>
-<span class="co">#&gt; [22,] -1.03106598</span>
-<span class="co">#&gt; [23,]  1.72630360</span>
-<span class="co">#&gt; [24,]  0.54977739</span>
-<span class="co">#&gt; [25,] -1.03673168</span>
-<span class="co">#&gt; [26,]  0.65257778</span>
-<span class="co">#&gt; [27,] -0.89111278</span>
-<span class="co">#&gt; [28,] -1.38260802</span>
-<span class="co">#&gt; [29,]  0.05197633</span>
-<span class="co">#&gt; [30,]  0.55837783</span>
-<span class="co">#&gt; [31,] -0.57131111</span>
-<span class="co">#&gt; [32,] -1.16590182</span>
-<span class="co">#&gt; [33,] -0.39299977</span>
-<span class="co">#&gt; [34,]  1.15073950</span>
-<span class="co">#&gt; [35,] -1.24460600</span>
-<span class="co">#&gt; [36,]  0.57041246</span>
-<span class="co">#&gt; [37,] -0.97641537</span>
-<span class="co">#&gt; [38,] -1.52210977</span>
-<span class="co">#&gt; [39,] -1.16267062</span>
-<span class="co">#&gt; [40,] -1.05803705</span>
-<span class="va">loglik</span><span class="op">$</span><span class="va">gradhyp</span>
-<span class="co">#&gt;      [,1]</span>
-<span class="co">#&gt; [1,]    0</span>
-<span class="co">#&gt; [2,]    0</span>
-<span class="co">#&gt; [3,]    0</span>
-<span class="co">#&gt; [4,]    0</span>
-<span class="co">#&gt; [5,]    0</span>
-<span class="co">#&gt; [6,]    0</span>
-<span class="va">loglik</span><span class="op">$</span><span class="va">gradpara</span>
-<span class="co">#&gt;          [,1]</span>
-<span class="co">#&gt; [1,] 133.5867</span></code></pre></div>
-<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
-<code class="sourceCode R">
-<span class="va">hyp1</span> <span class="op">=</span> <span class="va">hyp0</span> 
-<span class="va">hyp1</span><span class="op">[</span><span class="fl">2</span><span class="op">]</span> <span class="op">=</span> <span class="va">hyp1</span><span class="op">[</span><span class="fl">2</span><span class="op">]</span> <span class="op">+</span> <span class="fl">10</span><span class="op">^</span><span class="op">(</span><span class="op">-</span><span class="fl">4</span><span class="op">)</span>
-
-<span class="va">logpr</span> <span class="op">=</span> <span class="fu">new</span><span class="op">(</span><span class="va">logpr_gauss</span>, <span class="va">om</span>, <span class="va">terms</span><span class="op">)</span>
-<span class="va">logpdf</span> <span class="op">=</span> <span class="fu">new</span><span class="op">(</span><span class="va">lpdfvec</span>, <span class="va">loglik</span>, <span class="va">logpr</span><span class="op">)</span>
-<span class="va">logpdf</span><span class="op">$</span><span class="fu">updatepara</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0</span>,<span class="fl">2</span><span class="op">)</span><span class="op">)</span>
-<span class="co">#loglik$updatepara(-2)</span>
-<span class="co">#logpdf$fullhess = T</span>
-<span class="va">logpdf</span><span class="op">$</span><span class="va">domarg</span> <span class="op">=</span> <span class="cn">T</span>
-<span class="va">logpdf</span><span class="op">$</span><span class="va">compute_gradhyp</span> <span class="op">=</span> <span class="cn">T</span>
-<span class="va">logpdf</span><span class="op">$</span><span class="va">compute_gradpara</span> <span class="op">=</span> <span class="cn">T</span>
-<span class="va">logpdf</span><span class="op">$</span><span class="fu">optnewton</span><span class="op">(</span><span class="op">)</span>
-<span class="va">predt</span> <span class="op">=</span> <span class="fu">new</span><span class="op">(</span><span class="va">predictor</span>,<span class="va">loglik</span><span class="op">)</span>
+<span class="co">#&gt; [1] -157.2298</span>
+<span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">loglik</span><span class="op">$</span><span class="va">grad</span><span class="op">)</span> <span class="co"># dim 60 for number of coeffients</span>
+<span class="co">#&gt;             [,1]</span>
+<span class="co">#&gt; [1,]  0.06132942</span>
+<span class="co">#&gt; [2,]  2.45174651</span>
+<span class="co">#&gt; [3,] -1.05830556</span>
+<span class="co">#&gt; [4,] -0.59334205</span>
+<span class="co">#&gt; [5,] -0.06994568</span>
+<span class="co">#&gt; [6,] -0.07238581</span></code></pre></div>
+<p>A reasonable predictor also needs prior on the coefficients. This tells us what distribution we expect on the coefficients.</p>
+<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="va">logpr</span> <span class="op">=</span> <span class="fu">new</span><span class="op">(</span><span class="va">logpr_gauss</span>, <span class="va">om</span>, <span class="va">terms</span><span class="op">)</span></code></pre></div>
+<p>To make the handling of these two objects <code>loglik</code> and <code>logpr</code> easier, the <code><a href="../reference/lpdfvec.html">?lpdfvec</a></code> class is helpful to tie the object together. It will share the hyperparameter vector between them, so they need to be based on the same <code>outermod</code> object. But it will concatenate the parameters.</p>
+<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="va">logpdf</span> <span class="op">=</span> <span class="fu">new</span><span class="op">(</span><span class="va">lpdfvec</span>, <span class="va">loglik</span>, <span class="va">logpr</span><span class="op">)</span>
+<span class="va">para0</span> <span class="op">=</span> <span class="fu"><a href="../reference/getpara.html">getpara</a></span><span class="op">(</span><span class="va">logpdf</span><span class="op">)</span>
+<span class="va">para0</span><span class="op">[</span><span class="fl">2</span><span class="op">]</span> <span class="op">=</span> <span class="fl">4</span>
+<span class="va">logpdf</span><span class="op">$</span><span class="fu">updatepara</span><span class="op">(</span><span class="va">para0</span><span class="op">)</span>
+<span class="fu"><a href="../reference/getpara.html">getpara</a></span><span class="op">(</span><span class="va">logpdf</span><span class="op">)</span>
+<span class="co">#&gt; noisescale coeffscale </span>
+<span class="co">#&gt;   3.135555   4.000000</span></code></pre></div>
+<p>The coefficients <code>coeff</code> are considered ancillary parameters that need to be optimized out (or something more sophisticated, hint on current research). For this class, it is easiest to do this via <code>lpdf$optnewton</code>, which takes a single Newton step to optimize the coefficients.</p>
+<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="va">logpdf</span><span class="op">$</span><span class="fu">optnewton</span><span class="op">(</span><span class="op">)</span></code></pre></div>
+<p>Some test data will help illustrate prediction.</p>
+<div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="va">testsampsize</span> <span class="op">=</span> <span class="fl">1000</span>
+<span class="va">xtest</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/matrix.html" class="external-link">matrix</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/stats/Uniform.html" class="external-link">runif</a></span><span class="op">(</span><span class="va">testsampsize</span><span class="op">*</span><span class="va">d</span><span class="op">)</span>,ncol<span class="op">=</span><span class="va">d</span><span class="op">)</span>
+<span class="va">ytest</span> <span class="op">=</span> <span class="fu"><a href="../reference/obtest_borehole3d.html">obtest_borehole3d</a></span><span class="op">(</span><span class="va">xtest</span><span class="op">)</span></code></pre></div>
+<p>We can see the predictive accuracy using the <code><a href="../reference/predictor.html">?predictor</a></code> class which automatically pulls correct information out of <code>loglik</code> to design predictions.</p>
+<div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="va">predt</span> <span class="op">=</span> <span class="fu">new</span><span class="op">(</span><span class="va">predictor</span>,<span class="va">loglik</span><span class="op">)</span>
 <span class="va">predt</span><span class="op">$</span><span class="fu">update</span><span class="op">(</span><span class="va">xtest</span><span class="op">)</span>
 <span class="va">yhat</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/vector.html" class="external-link">as.vector</a></span><span class="op">(</span><span class="va">predt</span><span class="op">$</span><span class="fu">mean</span><span class="op">(</span><span class="op">)</span><span class="op">)</span>
 <span class="va">varpred</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/vector.html" class="external-link">as.vector</a></span><span class="op">(</span><span class="va">predt</span><span class="op">$</span><span class="fu">var</span><span class="op">(</span><span class="op">)</span><span class="op">)</span>
 
 <span class="fu"><a href="https://rdrr.io/r/graphics/par.html" class="external-link">par</a></span><span class="op">(</span>mfrow<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>,<span class="fl">2</span><span class="op">)</span><span class="op">)</span>
-<span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">ytest</span>,<span class="va">yhat</span><span class="op">)</span>
-<span class="fu"><a href="https://rdrr.io/r/graphics/hist.html" class="external-link">hist</a></span><span class="op">(</span><span class="op">(</span><span class="va">ytest</span><span class="op">-</span><span class="va">yhat</span><span class="op">)</span><span class="op">/</span><span class="fu"><a href="https://rdrr.io/r/base/MathFun.html" class="external-link">sqrt</a></span><span class="op">(</span><span class="va">varpred</span><span class="op">)</span>, main<span class="op">=</span><span class="st">"standarized test residuals"</span>,
+<span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">yhat</span>,<span class="va">ytest</span>, xlab<span class="op">=</span><span class="st">"prediction"</span>, ylab<span class="op">=</span><span class="st">"actual"</span><span class="op">)</span>
+<span class="fu"><a href="https://rdrr.io/r/graphics/hist.html" class="external-link">hist</a></span><span class="op">(</span><span class="op">(</span><span class="va">ytest</span><span class="op">-</span><span class="va">yhat</span><span class="op">)</span><span class="op">/</span><span class="fu"><a href="https://rdrr.io/r/base/MathFun.html" class="external-link">sqrt</a></span><span class="op">(</span><span class="va">varpred</span><span class="op">)</span>,
+     main<span class="op">=</span><span class="st">"standarized test residuals"</span>,
      xlab <span class="op">=</span> <span class="st">"standarized test residuals"</span><span class="op">)</span></code></pre></div>
-<p><img src="learning_files/figure-html/unnamed-chunk-9-1.png" width="700"></p>
-<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/base/MathFun.html" class="external-link">sqrt</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/mean.html" class="external-link">mean</a></span><span class="op">(</span><span class="op">(</span><span class="va">ytest</span><span class="op">-</span><span class="va">yhat</span><span class="op">)</span><span class="op">^</span><span class="fl">2</span><span class="op">)</span><span class="op">)</span>
-<span class="co">#&gt; [1] 10.2968</span></code></pre></div>
-<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
+<p><img src="learning_files/figure-html/unnamed-chunk-14-1.png" width="700"></p>
+</div>
+<div class="section level2">
+<h2 id="lpdf-and-hyperparameters">lpdf and hyperparameters<a class="anchor" aria-label="anchor" href="#lpdf-and-hyperparameters"></a>
+</h2>
+<p>The main value in this approach is the automated pulling of important gradients related to covariance hyperparameters and model parameters.</p>
+<div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="va">logpdf</span><span class="op">$</span><span class="fu">optnewton</span><span class="op">(</span><span class="op">)</span>
+<span class="va">logpdf</span><span class="op">$</span><span class="va">gradhyp</span>    <span class="co"># dim 6 for all hyperparameter</span>
+<span class="co">#&gt;            [,1]</span>
+<span class="co">#&gt; [1,] -1.8646843</span>
+<span class="co">#&gt; [2,]  0.1367914</span>
+<span class="co">#&gt; [3,]  7.7118090</span>
+<span class="co">#&gt; [4,]  0.8386114</span>
+<span class="co">#&gt; [5,]  6.4551161</span>
+<span class="co">#&gt; [6,]  0.6441583</span>
+<span class="va">logpdf</span><span class="op">$</span><span class="va">gradpara</span>   <span class="co"># dim 2 since 2 parameters</span>
+<span class="co">#&gt;            [,1]</span>
+<span class="co">#&gt; [1,] -18.571921</span>
+<span class="co">#&gt; [2,]  -1.800939</span></code></pre></div>
+<p>This allows us to use custom functions to learn these hyperparameters to give maximum predictive power. The goal right now is a single point estimate of these hyperparameters. One has to be very careful to keep these in good ranges, and the call below will make sure to return <code>-inf</code> if there is a problem with the chosen hyperparameters.</p>
+<div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">totobj</span> <span class="op">=</span> <span class="kw">function</span><span class="op">(</span><span class="va">hypl</span><span class="op">)</span> <span class="op">{</span> <span class="co">#my optimization function for tuning</span>
-  <span class="va">regpara</span> <span class="op">=</span> <span class="va">logpdf</span><span class="op">$</span><span class="fu">paralpdf</span><span class="op">(</span><span class="va">hypl</span><span class="op">$</span><span class="va">para</span><span class="op">)</span>
-  <span class="va">reghyp</span> <span class="op">=</span> <span class="va">om</span><span class="op">$</span><span class="fu">hyplpdf</span><span class="op">(</span><span class="va">hypl</span><span class="op">$</span><span class="va">hyp</span><span class="op">)</span>
-  <span class="kw">if</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/is.finite.html" class="external-link">is.finite</a></span><span class="op">(</span><span class="va">regpara</span><span class="op">)</span> <span class="op">&amp;&amp;</span> <span class="fu"><a href="https://rdrr.io/r/base/is.finite.html" class="external-link">is.finite</a></span><span class="op">(</span><span class="va">reghyp</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span> <span class="co">#if outside prior, ignore</span>
-    <span class="va">om</span><span class="op">$</span><span class="fu">updatehyp</span><span class="op">(</span><span class="va">hypl</span><span class="op">$</span><span class="va">hyp</span><span class="op">)</span>
-    <span class="va">logpdf</span><span class="op">$</span><span class="fu">updateom</span><span class="op">(</span><span class="op">)</span>
-    <span class="va">logpdf</span><span class="op">$</span><span class="fu">updatepara</span><span class="op">(</span><span class="va">hypl</span><span class="op">$</span><span class="va">para</span><span class="op">)</span>
-    <span class="va">logpdf</span><span class="op">$</span><span class="fu">optnewton</span><span class="op">(</span><span class="op">)</span>
+  <span class="va">regpara</span> <span class="op">=</span> <span class="va">logpdf</span><span class="op">$</span><span class="fu">paralpdf</span><span class="op">(</span><span class="va">hypl</span><span class="op">$</span><span class="va">para</span><span class="op">)</span> <span class="co"># get regularization for lpdf</span>
+  <span class="va">reghyp</span> <span class="op">=</span> <span class="va">om</span><span class="op">$</span><span class="fu">hyplpdf</span><span class="op">(</span><span class="va">hypl</span><span class="op">$</span><span class="va">hyp</span><span class="op">)</span> <span class="co"># get regularization for om</span>
+  <span class="kw">if</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/is.finite.html" class="external-link">is.finite</a></span><span class="op">(</span><span class="va">regpara</span><span class="op">)</span> <span class="op">&amp;&amp;</span> <span class="fu"><a href="https://rdrr.io/r/base/is.finite.html" class="external-link">is.finite</a></span><span class="op">(</span><span class="va">reghyp</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span> <span class="co"># if they pass</span>
+    <span class="va">om</span><span class="op">$</span><span class="fu">updatehyp</span><span class="op">(</span><span class="va">hypl</span><span class="op">$</span><span class="va">hyp</span><span class="op">)</span>        <span class="co"># update hyperparameters</span>
+    <span class="va">logpdf</span><span class="op">$</span><span class="fu">updateom</span><span class="op">(</span><span class="op">)</span>             <span class="co"># update the outerbase inside</span>
+    <span class="va">logpdf</span><span class="op">$</span><span class="fu">updatepara</span><span class="op">(</span><span class="va">hypl</span><span class="op">$</span><span class="va">para</span><span class="op">)</span>  <span class="co"># update parameter</span>
+    <span class="va">logpdf</span><span class="op">$</span><span class="fu">optnewton</span><span class="op">(</span><span class="op">)</span>            <span class="co"># do opt</span>
     
     <span class="va">gval</span> <span class="op">=</span> <span class="va">hypl</span> <span class="co">#match structure</span>
     <span class="va">gval</span><span class="op">$</span><span class="va">hyp</span> <span class="op">=</span> <span class="op">-</span><span class="va">logpdf</span><span class="op">$</span><span class="va">gradhyp</span><span class="op">-</span><span class="va">om</span><span class="op">$</span><span class="fu">hyplpdf_grad</span><span class="op">(</span><span class="va">hypl</span><span class="op">$</span><span class="va">hyp</span><span class="op">)</span>
-    <span class="va">gval</span><span class="op">$</span><span class="va">para</span> <span class="op">=</span> <span class="op">-</span><span class="va">logpdf</span><span class="op">$</span><span class="va">gradpara</span><span class="op">-</span><span class="va">logpdf</span><span class="op">$</span><span class="fu">paralpdf_grad</span><span class="op">(</span><span class="va">hypl</span><span class="op">$</span><span class="va">para</span><span class="op">)</span><span class="co">#</span>
-    <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>val <span class="op">=</span> <span class="op">-</span><span class="va">logpdf</span><span class="op">$</span><span class="va">val</span><span class="op">-</span><span class="va">reghyp</span><span class="op">-</span><span class="va">regpara</span>, gval <span class="op">=</span> <span class="va">gval</span><span class="op">)</span><span class="co">#</span>
-  <span class="op">}</span> <span class="kw">else</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>val <span class="op">=</span> <span class="cn">Inf</span>, gval <span class="op">=</span> <span class="va">hypl</span><span class="op">)</span> <span class="op">}</span>
-<span class="va">hypl</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>para <span class="op">=</span> <span class="fu"><a href="../reference/getpara.html">getpara</a></span><span class="op">(</span><span class="va">logpdf</span><span class="op">)</span>, hyp <span class="op">=</span> <span class="fu"><a href="../reference/gethyp.html">gethyp</a></span><span class="op">(</span><span class="va">om</span><span class="op">)</span><span class="op">)</span>
-<span class="va">opth</span> <span class="op">=</span> <span class="fu"><a href="../reference/BFGS_std.html">BFGS_std</a></span><span class="op">(</span><span class="va">totobj</span>, <span class="va">hypl</span>, verbose<span class="op">=</span><span class="fl">3</span><span class="op">)</span> <span class="co">#do a quick and dirty optimization first</span>
+    <span class="va">gval</span><span class="op">$</span><span class="va">para</span> <span class="op">=</span> <span class="op">-</span><span class="va">logpdf</span><span class="op">$</span><span class="va">gradpara</span><span class="op">-</span><span class="va">logpdf</span><span class="op">$</span><span class="fu">paralpdf_grad</span><span class="op">(</span><span class="va">hypl</span><span class="op">$</span><span class="va">para</span><span class="op">)</span>
+    <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>val <span class="op">=</span> <span class="op">-</span><span class="va">logpdf</span><span class="op">$</span><span class="va">val</span><span class="op">-</span><span class="va">reghyp</span><span class="op">-</span><span class="va">regpara</span>, gval <span class="op">=</span> <span class="va">gval</span><span class="op">)</span>
+  <span class="op">}</span> <span class="kw">else</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>val <span class="op">=</span> <span class="cn">Inf</span>, gval <span class="op">=</span> <span class="va">hypl</span><span class="op">)</span> <span class="op">}</span></code></pre></div>
+<p>This works by pulling the right information and checking to make sure the objects themselves thing the parameters are reasonable. This package provides a custom deployment of <code>BFGS</code> in <code><a href="../reference/BFGS_std.html">?BFGS_std</a></code> to optimize functions like this.</p>
+<div class="sourceCode" id="cb17"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="va">hypl</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>para <span class="op">=</span> <span class="fu"><a href="../reference/getpara.html">getpara</a></span><span class="op">(</span><span class="va">logpdf</span><span class="op">)</span>, hyp <span class="op">=</span> <span class="fu"><a href="../reference/gethyp.html">gethyp</a></span><span class="op">(</span><span class="va">om</span><span class="op">)</span><span class="op">)</span>
+<span class="fu">totobj</span><span class="op">(</span><span class="va">hypl</span><span class="op">)</span>
+<span class="co">#&gt; $val</span>
+<span class="co">#&gt; [1] 88.35303</span>
+<span class="co">#&gt; </span>
+<span class="co">#&gt; $gval</span>
+<span class="co">#&gt; $gval$para</span>
+<span class="co">#&gt;           [,1]</span>
+<span class="co">#&gt; [1,] 18.571921</span>
+<span class="co">#&gt; [2,]  1.300939</span>
+<span class="co">#&gt; </span>
+<span class="co">#&gt; $gval$hyp</span>
+<span class="co">#&gt;             [,1]</span>
+<span class="co">#&gt; [1,]  -3.4924586</span>
+<span class="co">#&gt; [2,]  -0.1367914</span>
+<span class="co">#&gt; [3,] -13.0689519</span>
+<span class="co">#&gt; [4,]  -0.8386114</span>
+<span class="co">#&gt; [5,] -11.8122590</span>
+<span class="co">#&gt; [6,]  -0.6441583</span>
+<span class="va">opth</span> <span class="op">=</span> <span class="fu"><a href="../reference/BFGS_std.html">BFGS_std</a></span><span class="op">(</span><span class="va">totobj</span>, <span class="va">hypl</span>, verbose<span class="op">=</span><span class="fl">3</span><span class="op">)</span> <span class="co">#</span>
 <span class="co">#&gt; [1] "doing opt..."</span>
 <span class="co">#&gt; [1] "Wolfe conditions"</span>
-<span class="co">#&gt; [1]  -61.29212 -354.74692</span>
-<span class="co">#&gt; [1] 129.8955</span>
+<span class="co">#&gt; [1]  -2.547346 -44.730643</span>
+<span class="co">#&gt; [1] 85.80519</span>
 <span class="co">#&gt; [1] "Wolfe conditions"</span>
-<span class="co">#&gt; [1] -5.067363  1.899309</span>
-<span class="co">#&gt; [1] 120.0737</span>
+<span class="co">#&gt; [1] -1.0413926  0.7758913</span>
+<span class="co">#&gt; [1] 78.20374</span>
 <span class="co">#&gt; [1] "Wolfe conditions"</span>
-<span class="co">#&gt; [1] -15.135898  -5.652084</span>
-<span class="co">#&gt; [1] 104.9362</span>
+<span class="co">#&gt; [1] -11.12319 -66.97596</span>
+<span class="co">#&gt; [1] 67.0771</span>
 <span class="co">#&gt; [1] "Wolfe conditions"</span>
-<span class="co">#&gt; [1] -14.367408  -5.747007</span>
-<span class="co">#&gt; [1] 90.56717</span>
+<span class="co">#&gt; [1]  -9.64457 -25.53975</span>
+<span class="co">#&gt; [1] 57.43011</span>
 <span class="co">#&gt; [1] "Wolfe conditions"</span>
-<span class="co">#&gt; [1] -12.965528  -5.662715</span>
-<span class="co">#&gt; [1] 77.6002</span>
+<span class="co">#&gt; [1] -6.9248556 -0.6495823</span>
+<span class="co">#&gt; [1] 50.50449</span>
 <span class="co">#&gt; [1] "Wolfe conditions"</span>
-<span class="co">#&gt; [1] -11.1165  -5.1704</span>
-<span class="co">#&gt; [1] 66.48246</span>
+<span class="co">#&gt; [1] -17.03187 -36.15836</span>
+<span class="co">#&gt; [1] 33.46899</span>
 <span class="co">#&gt; [1] "Wolfe conditions"</span>
-<span class="co">#&gt; [1] -9.202195 -4.519628</span>
-<span class="co">#&gt; [1] 57.27922</span>
+<span class="co">#&gt; [1]  0.1494127 -7.0986601</span>
+<span class="co">#&gt; [1] 32.55157</span>
 <span class="co">#&gt; [1] "Wolfe conditions"</span>
-<span class="co">#&gt; [1] -7.383803 -3.807871</span>
-<span class="co">#&gt; [1] 49.89458</span>
+<span class="co">#&gt; [1] -0.1449747 -0.1837861</span>
+<span class="co">#&gt; [1] 32.40658</span>
 <span class="co">#&gt; [1] "Wolfe conditions"</span>
-<span class="co">#&gt; [1] -5.754814 -3.100592</span>
-<span class="co">#&gt; [1] 44.13911</span>
-<span class="co">#&gt; [1] "Wolfe conditions"</span>
-<span class="co">#&gt; [1] -4.36763 -2.44470</span>
-<span class="co">#&gt; [1] 39.77098</span>
-<span class="co">#&gt; [1] "Wolfe conditions"</span>
-<span class="co">#&gt; [1] -3.242606 -1.872615</span>
-<span class="co">#&gt; [1] 36.528</span>
-<span class="co">#&gt; [1] "Wolfe conditions"</span>
-<span class="co">#&gt; [1] -2.372899 -1.401686</span>
-<span class="co">#&gt; [1] 34.15483</span>
-<span class="co">#&gt; [1] "Wolfe conditions"</span>
-<span class="co">#&gt; [1] -1.731518 -1.035065</span>
-<span class="co">#&gt; [1] 32.4231</span>
-<span class="co">#&gt; [1] "Wolfe conditions"</span>
-<span class="co">#&gt; [1] -1.2800767 -0.7648728</span>
-<span class="co">#&gt; [1] 31.14288</span>
-<span class="co">#&gt; [1] "Wolfe conditions"</span>
-<span class="co">#&gt; [1] -3.440032 -2.224310</span>
-<span class="co">#&gt; [1] 27.70244</span>
-<span class="co">#&gt; [1] "Wolfe conditions"</span>
-<span class="co">#&gt; [1] -2.413491 -2.151262</span>
-<span class="co">#&gt; [1] 25.28864</span>
-<span class="co">#&gt; [1] "Wolfe conditions"</span>
-<span class="co">#&gt; [1] -1.1957736 -0.9429533</span>
+<span class="co">#&gt; [1] -0.03382053 -0.03293540</span>
 <span class="co">#&gt; [1] "finished opt..."</span></code></pre></div>
-<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
+<p>Then we just have to update out parameters and re-optimize.</p>
+<div class="sourceCode" id="cb18"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">om</span><span class="op">$</span><span class="fu">updatehyp</span><span class="op">(</span><span class="va">opth</span><span class="op">$</span><span class="va">vec</span><span class="op">$</span><span class="va">hyp</span><span class="op">)</span>
 <span class="va">logpdf</span><span class="op">$</span><span class="fu">updatepara</span><span class="op">(</span><span class="va">opth</span><span class="op">$</span><span class="va">vec</span><span class="op">$</span><span class="va">para</span><span class="op">)</span>
 <span class="va">logpdf</span><span class="op">$</span><span class="fu">optnewton</span><span class="op">(</span><span class="op">)</span></code></pre></div>
-<div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
+<p>These steps can all be nicely wrapped up in another function <code><a href="../reference/BFGS_lpdf.html">?BFGS_lpdf</a></code>, which is a simpler call with the same result. Note because of some things not fully understood, these numbers will not match <em>exactly</em> above, but will be quite close and functionally the same.</p>
+<div class="sourceCode" id="cb19"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">opth</span> <span class="op">=</span> <span class="fu"><a href="../reference/BFGS_lpdf.html">BFGS_lpdf</a></span><span class="op">(</span><span class="va">om</span>, <span class="va">logpdf</span>, 
                  rho<span class="op">=</span><span class="va">hypl</span>, 
                  verbose <span class="op">=</span> <span class="fl">3</span>, newt<span class="op">=</span> <span class="cn">T</span><span class="op">)</span>  
 <span class="co">#&gt; [1] "doing opt..."</span>
 <span class="co">#&gt; [1] "Wolfe conditions"</span>
-<span class="co">#&gt; [1]  -61.29168 -354.53658</span>
-<span class="co">#&gt; [1] 129.896</span>
+<span class="co">#&gt; [1]  -2.547346 -44.730643</span>
+<span class="co">#&gt; [1] 85.80519</span>
 <span class="co">#&gt; [1] "Wolfe conditions"</span>
-<span class="co">#&gt; [1] -5.074105  1.875243</span>
-<span class="co">#&gt; [1] 120.0616</span>
+<span class="co">#&gt; [1] -1.0413926  0.7758913</span>
+<span class="co">#&gt; [1] 78.20374</span>
 <span class="co">#&gt; [1] "Wolfe conditions"</span>
-<span class="co">#&gt; [1] -15.101422  -5.595156</span>
-<span class="co">#&gt; [1] 104.9585</span>
+<span class="co">#&gt; [1] -11.12319 -66.97596</span>
+<span class="co">#&gt; [1] 67.0771</span>
 <span class="co">#&gt; [1] "Wolfe conditions"</span>
-<span class="co">#&gt; [1] -14.38308  -5.75157</span>
-<span class="co">#&gt; [1] 90.57385</span>
+<span class="co">#&gt; [1]  -9.64457 -25.53975</span>
+<span class="co">#&gt; [1] 57.43011</span>
 <span class="co">#&gt; [1] "Wolfe conditions"</span>
-<span class="co">#&gt; [1] -12.980279  -5.671326</span>
-<span class="co">#&gt; [1] 77.59213</span>
+<span class="co">#&gt; [1] -6.9248556 -0.6495823</span>
+<span class="co">#&gt; [1] 50.50449</span>
 <span class="co">#&gt; [1] "Wolfe conditions"</span>
-<span class="co">#&gt; [1] -11.126018  -5.174849</span>
-<span class="co">#&gt; [1] 66.46486</span>
+<span class="co">#&gt; [1] -17.03187 -36.15836</span>
+<span class="co">#&gt; [1] 33.46899</span>
 <span class="co">#&gt; [1] "Wolfe conditions"</span>
-<span class="co">#&gt; [1] -9.209243 -4.521351</span>
-<span class="co">#&gt; [1] 57.25458</span>
+<span class="co">#&gt; [1]  0.1494127 -7.0986601</span>
+<span class="co">#&gt; [1] 30.90201</span>
 <span class="co">#&gt; [1] "Wolfe conditions"</span>
-<span class="co">#&gt; [1] -7.390230 -3.811196</span>
-<span class="co">#&gt; [1] 49.86352</span>
+<span class="co">#&gt; [1]  1.4977785 -0.6609533</span>
+<span class="co">#&gt; [1] 32.55157</span>
 <span class="co">#&gt; [1] "Wolfe conditions"</span>
-<span class="co">#&gt; [1] -5.758584 -3.101917</span>
-<span class="co">#&gt; [1] 44.10427</span>
+<span class="co">#&gt; [1]   614.3913 -3656.5915</span>
+<span class="co">#&gt; [1] 32.45716</span>
 <span class="co">#&gt; [1] "Wolfe conditions"</span>
-<span class="co">#&gt; [1] -4.369218 -2.448145</span>
-<span class="co">#&gt; [1] 39.73455</span>
-<span class="co">#&gt; [1] "Wolfe conditions"</span>
-<span class="co">#&gt; [1] -3.246999 -1.872343</span>
-<span class="co">#&gt; [1] 36.48718</span>
-<span class="co">#&gt; [1] "Wolfe conditions"</span>
-<span class="co">#&gt; [1] -2.374468 -1.403868</span>
-<span class="co">#&gt; [1] 34.11244</span>
-<span class="co">#&gt; [1] "Wolfe conditions"</span>
-<span class="co">#&gt; [1] -1.725401 -1.029901</span>
-<span class="co">#&gt; [1] 32.38683</span>
-<span class="co">#&gt; [1] "Wolfe conditions"</span>
-<span class="co">#&gt; [1] -1.2778199 -0.7643405</span>
-<span class="co">#&gt; [1] 31.10886</span>
-<span class="co">#&gt; [1] "Wolfe conditions"</span>
-<span class="co">#&gt; [1] -3.406161 -2.132708</span>
-<span class="co">#&gt; [1] 27.7023</span>
-<span class="co">#&gt; [1] "Wolfe conditions"</span>
-<span class="co">#&gt; [1] -2.466164 -2.317313</span>
-<span class="co">#&gt; [1] 25.23583</span>
-<span class="co">#&gt; [1] "Wolfe conditions"</span>
-<span class="co">#&gt; [1] -1.1602327 -0.8937595</span>
+<span class="co">#&gt; [1] -0.001331536  0.006470923</span>
 <span class="co">#&gt; [1] "finished opt..."</span></code></pre></div>
-<div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
+<p>The revised predictions are then built after hyperparameter optimization where we find improved predictive accuracy in nearly every category.</p>
+<div class="sourceCode" id="cb20"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">predtt</span> <span class="op">=</span> <span class="fu">new</span><span class="op">(</span><span class="va">predictor</span>,<span class="va">loglik</span><span class="op">)</span>
 <span class="va">predtt</span><span class="op">$</span><span class="fu">update</span><span class="op">(</span><span class="va">xtest</span><span class="op">)</span>
 <span class="va">yhat</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/vector.html" class="external-link">as.vector</a></span><span class="op">(</span><span class="va">predtt</span><span class="op">$</span><span class="fu">mean</span><span class="op">(</span><span class="op">)</span><span class="op">)</span>
@@ -340,11 +335,10 @@
 <span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">ytest</span>,<span class="va">yhat</span><span class="op">)</span>
 <span class="fu"><a href="https://rdrr.io/r/graphics/hist.html" class="external-link">hist</a></span><span class="op">(</span><span class="op">(</span><span class="va">ytest</span><span class="op">-</span><span class="va">yhat</span><span class="op">)</span><span class="op">/</span><span class="fu"><a href="https://rdrr.io/r/base/MathFun.html" class="external-link">sqrt</a></span><span class="op">(</span><span class="va">varpred</span><span class="op">)</span>, main<span class="op">=</span><span class="st">"standarized test residuals"</span>,
      xlab <span class="op">=</span> <span class="st">"standarized test residuals"</span><span class="op">)</span></code></pre></div>
-<p><img src="learning_files/figure-html/unnamed-chunk-13-1.png" width="700"></p>
-<div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/base/MathFun.html" class="external-link">sqrt</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/mean.html" class="external-link">mean</a></span><span class="op">(</span><span class="op">(</span><span class="va">ytest</span><span class="op">-</span><span class="va">yhat</span><span class="op">)</span><span class="op">^</span><span class="fl">2</span><span class="op">)</span><span class="op">)</span>
-<span class="co">#&gt; [1] 4.693964</span></code></pre></div>
-  </main>
+<p><img src="learning_files/figure-html/unnamed-chunk-20-1.png" width="700"></p>
+</div>
+  </main><aside class="col-md-3"><nav id="toc"><h2>On this page</h2>
+    </nav></aside>
 </div>
 
 

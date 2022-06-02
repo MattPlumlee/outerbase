@@ -41,8 +41,8 @@
   <a class="nav-link" href="../articles/gettingstarted.html">Get Started</a>
 </li>
 <li class="active nav-item dropdown">
-  <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown" role="button" aria-expanded="false" aria-haspopup="true" id="dropdown-basics">Basics</a>
-  <div class="dropdown-menu" aria-labelledby="dropdown-basics">
+  <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown" role="button" aria-expanded="false" aria-haspopup="true" id="dropdown-elements">Elements</a>
+  <div class="dropdown-menu" aria-labelledby="dropdown-elements">
     <a class="dropdown-item" href="../articles/basebasics.html">Models and Bases</a>
     <a class="dropdown-item" href="../articles/learning.html">Learning</a>
     <a class="dropdown-item" href="../articles/speed.html">Speed</a>
@@ -87,205 +87,102 @@
 
     
     
+<p>This page is designed to explain how <code>outerbase</code> can facilitate fast inference with smart modeling choices.</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://mattplumlee.github.io/outerbase">outerbase</a></span><span class="op">)</span></code></pre></div>
+<p>This is important as the sample size grows, so we will use <code>500</code> datapoints.</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">sampsize</span> <span class="op">=</span> <span class="fl">1000</span>
+<code class="sourceCode R"><span class="va">sampsize</span> <span class="op">=</span> <span class="fl">500</span>
 <span class="va">d</span> <span class="op">=</span> <span class="fl">8</span>
 <span class="va">x</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/matrix.html" class="external-link">matrix</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/stats/Uniform.html" class="external-link">runif</a></span><span class="op">(</span><span class="va">sampsize</span><span class="op">*</span><span class="va">d</span><span class="op">)</span>,ncol<span class="op">=</span><span class="va">d</span><span class="op">)</span>
 <span class="va">y</span> <span class="op">=</span> <span class="fu"><a href="../reference/obtest_borehole8d.html">obtest_borehole8d</a></span><span class="op">(</span><span class="va">x</span><span class="op">)</span></code></pre></div>
+<p>The differences get more dramatic with larger sample sizes, however in the spirit of running quickly we will use this sample size.</p>
+<p>First setup an <code>outermod</code> object.</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">xtest</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/matrix.html" class="external-link">matrix</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/stats/Uniform.html" class="external-link">runif</a></span><span class="op">(</span><span class="fl">1000</span><span class="op">*</span><span class="va">d</span><span class="op">)</span>,ncol<span class="op">=</span><span class="va">d</span><span class="op">)</span> <span class="co">#prediction points</span>
-<span class="va">ytest</span> <span class="op">=</span>  <span class="fu"><a href="../reference/obtest_borehole8d.html">obtest_borehole8d</a></span><span class="op">(</span><span class="va">xtest</span><span class="op">)</span></code></pre></div>
-<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">om</span> <span class="op">=</span> <span class="fu">new</span><span class="op">(</span><span class="va">outermod</span><span class="op">)</span></code></pre></div>
-<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="fu"><a href="../reference/setcovfs.html">setcovfs</a></span><span class="op">(</span><span class="va">om</span>, <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="st">"mat25"</span>,<span class="fl">8</span><span class="op">)</span><span class="op">)</span>
+<code class="sourceCode R"><span class="va">om</span> <span class="op">=</span> <span class="fu">new</span><span class="op">(</span><span class="va">outermod</span><span class="op">)</span>
+<span class="fu"><a href="../reference/setcovfs.html">setcovfs</a></span><span class="op">(</span><span class="va">om</span>, <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="st">"mat25pow"</span>,<span class="fl">8</span><span class="op">)</span><span class="op">)</span>
 <span class="va">knotlist</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="op">)</span>;
 <span class="kw">for</span><span class="op">(</span><span class="va">k</span> <span class="kw">in</span> <span class="fl">1</span><span class="op">:</span><span class="va">d</span><span class="op">)</span> <span class="va">knotlist</span><span class="op">[[</span><span class="va">k</span><span class="op">]</span><span class="op">]</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq</a></span><span class="op">(</span><span class="fl">0.01</span>,<span class="fl">1</span>,by<span class="op">=</span><span class="fl">0.025</span><span class="op">)</span>
-
 <span class="fu"><a href="../reference/setknot.html">setknot</a></span><span class="op">(</span><span class="va">om</span>, <span class="va">knotlist</span><span class="op">)</span> <span class="co">#40 knot point for each dim</span></code></pre></div>
-<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">p</span> <span class="op">=</span> <span class="fl">200</span>
+<p>More data should mean more basis functions.</p>
+<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="va">p</span> <span class="op">=</span> <span class="fl">250</span>
 <span class="va">terms</span> <span class="op">=</span> <span class="va">om</span><span class="op">$</span><span class="fu">selectterms</span><span class="op">(</span><span class="va">p</span><span class="op">)</span></code></pre></div>
-<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
+<div class="section level2">
+<h2 id="different-models">Different models<a class="anchor" aria-label="anchor" href="#different-models"></a>
+</h2>
+<p>To begin, lets use <code><a href="../reference/loglik_std.html">?loglik_std</a></code> to represent our slow approach.</p>
+<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">loglik_slow</span> <span class="op">=</span> <span class="fu">new</span><span class="op">(</span><span class="va">loglik_std</span>, <span class="va">om</span>, <span class="va">terms</span>, <span class="va">y</span>, <span class="va">x</span><span class="op">)</span> 
 <span class="va">logpr_slow</span> <span class="op">=</span> <span class="fu">new</span><span class="op">(</span><span class="va">logpr_gauss</span>, <span class="va">om</span>, <span class="va">terms</span><span class="op">)</span>
-<span class="va">logpdf_slow</span> <span class="op">=</span> <span class="fu">new</span><span class="op">(</span><span class="va">lpdfvec</span>, <span class="va">loglik_slow</span>, <span class="va">logpr_slow</span><span class="op">)</span>
-<span class="va">logpdf_slow</span><span class="op">$</span><span class="va">domarg</span> <span class="op">=</span> <span class="cn">T</span>
-<span class="va">logpdf_slow</span><span class="op">$</span><span class="fu">optnewton</span><span class="op">(</span><span class="op">)</span></code></pre></div>
-<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
+<span class="va">logpdf_slow</span> <span class="op">=</span> <span class="fu">new</span><span class="op">(</span><span class="va">lpdfvec</span>, <span class="va">loglik_slow</span>, <span class="va">logpr_slow</span><span class="op">)</span></code></pre></div>
+<p><code>logpdf_slow</code> can be optimized using <code>lpdf$optnewton</code>.</p>
+<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="va">logpdf_slow</span><span class="op">$</span><span class="fu">optnewton</span><span class="op">(</span><span class="op">)</span></code></pre></div>
+<p>Newton’s method involves solving a linear system, thus it takes one step, but is expensive.</p>
+<p><code><a href="../reference/loglik_gauss.html">?loglik_gauss</a></code> is a <code>lpdf</code> model designed for speed. It is a nice comparison because <code>loglik_gauss</code> uses the same model as <code>loglik_std</code>, with a few approximations for speed.</p>
+<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">loglik_fast</span> <span class="op">=</span> <span class="fu">new</span><span class="op">(</span><span class="va">loglik_gauss</span>, <span class="va">om</span>, <span class="va">terms</span>, <span class="va">y</span>, <span class="va">x</span><span class="op">)</span> 
 <span class="va">logpr_fast</span> <span class="op">=</span> <span class="fu">new</span><span class="op">(</span><span class="va">logpr_gauss</span>, <span class="va">om</span>, <span class="va">terms</span><span class="op">)</span>
-<span class="va">logpdf_fast</span> <span class="op">=</span> <span class="fu">new</span><span class="op">(</span><span class="va">lpdfvec</span>, <span class="va">loglik_fast</span>, <span class="va">logpr_fast</span><span class="op">)</span>
-<span class="va">logpdf_fast</span><span class="op">$</span><span class="va">domarg</span> <span class="op">=</span> <span class="cn">T</span>
-<span class="va">logpdf_fast</span><span class="op">$</span><span class="fu">optcg</span><span class="op">(</span><span class="fl">0.001</span>, <span class="fl">100</span><span class="op">)</span>
-<span class="va">logpdf_fast</span><span class="op">$</span><span class="fu">setnthreads</span><span class="op">(</span><span class="fl">4</span><span class="op">)</span>
-<span class="va">loglik_slow</span><span class="op">$</span><span class="va">val</span>
-<span class="co">#&gt; [1] -5259.481</span>
-<span class="va">loglik_fast</span><span class="op">$</span><span class="va">val</span>
-<span class="co">#&gt; [1] -5259.481</span>
-<span class="va">logpr_slow</span><span class="op">$</span><span class="va">val</span>
-<span class="co">#&gt; [1] 947.5928</span>
-<span class="va">logpr_fast</span><span class="op">$</span><span class="va">val</span>
-<span class="co">#&gt; [1] 947.5928</span>
-<span class="va">logpdf_slow</span><span class="op">$</span><span class="va">val</span>
-<span class="co">#&gt; [1] -5369.227</span>
-<span class="va">logpdf_fast</span><span class="op">$</span><span class="va">val</span>
-<span class="co">#&gt; [1] -5369.227</span>
-
-<span class="va">hyp0_slow</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>para <span class="op">=</span> <span class="fu"><a href="../reference/getpara.html">getpara</a></span><span class="op">(</span><span class="va">logpdf_fast</span><span class="op">)</span>, hyp <span class="op">=</span> <span class="fu"><a href="../reference/gethyp.html">gethyp</a></span><span class="op">(</span><span class="va">om</span><span class="op">)</span><span class="op">)</span>
-<span class="va">hyp0_fast</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>para <span class="op">=</span> <span class="fu"><a href="../reference/getpara.html">getpara</a></span><span class="op">(</span><span class="va">logpdf_fast</span><span class="op">)</span>, hyp <span class="op">=</span> <span class="fu"><a href="../reference/gethyp.html">gethyp</a></span><span class="op">(</span><span class="va">om</span><span class="op">)</span><span class="op">)</span></code></pre></div>
+<span class="va">logpdf_fast</span> <span class="op">=</span> <span class="fu">new</span><span class="op">(</span><span class="va">lpdfvec</span>, <span class="va">loglik_fast</span>, <span class="va">logpr_fast</span><span class="op">)</span></code></pre></div>
+<p><code>logpdf_fast</code> will through an error if you try to use <code>optnewton</code>. This is because it is written so that it never builds a <code>hess</code> matrix.</p>
+<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="va">logpdf_fast</span><span class="op">$</span><span class="fu">optnewton</span><span class="op">(</span><span class="op">)</span>
+<span class="co">#&gt; Error in logpdf_fast$optnewton(): addition: incompatible matrix dimensions: 0x0 and 250x250</span></code></pre></div>
+<p>It is suggested to use <code>lpdf$optcg</code> (conjugate gradient) to optimize the coefficients in the fast version.</p>
 <div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="va">logpdf_fast</span><span class="op">$</span><span class="fu">optcg</span><span class="op">(</span><span class="fl">0.001</span>, <span class="fl">100</span><span class="op">)</span></code></pre></div>
+<p>As an aside, <code>omp</code> speed ups are possible, but you need to have correctly compiled with <code>omp</code>. One check is to call the following.</p>
+<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="va">ob</span> <span class="op">=</span> <span class="fu">new</span><span class="op">(</span><span class="va">outerbase</span>, <span class="va">om</span>, <span class="va">x</span><span class="op">)</span> 
+<span class="va">ob</span><span class="op">$</span><span class="va">nthreads</span>
+<span class="co">#&gt; [1] 2</span></code></pre></div>
+<p>If the answer is <code>1</code> but you have a multi-threaded processor (most modern processors), things are likely mis-aligned.</p>
+<p>You can manually set the number of threads for <code>lpdf</code> objects.</p>
+<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="va">logpdf_slow</span><span class="op">$</span><span class="fu">setnthreads</span><span class="op">(</span><span class="fl">4</span><span class="op">)</span>
+<span class="va">logpdf_fast</span><span class="op">$</span><span class="fu">setnthreads</span><span class="op">(</span><span class="fl">4</span><span class="op">)</span></code></pre></div>
+</div>
+<div class="section level2">
+<h2 id="timing">Timing<a class="anchor" aria-label="anchor" href="#timing"></a>
+</h2>
+<p>The main cost with models like these is hyperparameter optimization. Thus will we show the difference in time to build hyperparameters. Let’s save starting points (since they share <code>om</code>) for fairness.</p>
+<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="va">hyp0_slow</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>para <span class="op">=</span> <span class="fu"><a href="../reference/getpara.html">getpara</a></span><span class="op">(</span><span class="va">logpdf_slow</span><span class="op">)</span>, hyp <span class="op">=</span> <span class="fu"><a href="../reference/gethyp.html">gethyp</a></span><span class="op">(</span><span class="va">om</span><span class="op">)</span><span class="op">)</span>
+<span class="va">hyp0_fast</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>para <span class="op">=</span> <span class="fu"><a href="../reference/getpara.html">getpara</a></span><span class="op">(</span><span class="va">logpdf_fast</span><span class="op">)</span>, hyp <span class="op">=</span> <span class="fu"><a href="../reference/gethyp.html">gethyp</a></span><span class="op">(</span><span class="va">om</span><span class="op">)</span><span class="op">)</span></code></pre></div>
+<p>Test points will verify the predictions are equally good with either model, the only difference is speed.</p>
+<div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="va">xtest</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/matrix.html" class="external-link">matrix</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/stats/Uniform.html" class="external-link">runif</a></span><span class="op">(</span><span class="fl">1000</span><span class="op">*</span><span class="va">d</span><span class="op">)</span>,ncol<span class="op">=</span><span class="va">d</span><span class="op">)</span> <span class="co">#prediction points</span>
+<span class="va">ytest</span> <span class="op">=</span>  <span class="fu"><a href="../reference/obtest_borehole8d.html">obtest_borehole8d</a></span><span class="op">(</span><span class="va">xtest</span><span class="op">)</span></code></pre></div>
+<p>We will use the unsophisticated <code>proc.time</code> to do some quick timing comparisons.</p>
+<div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">ptm</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/proc.time.html" class="external-link">proc.time</a></span><span class="op">(</span><span class="op">)</span>
-<span class="va">opth</span> <span class="op">=</span> <span class="fu"><a href="../reference/BFGS_lpdf.html">BFGS_lpdf</a></span><span class="op">(</span><span class="va">om</span>, <span class="va">logpdf_slow</span>, verbose <span class="op">=</span> <span class="fl">1</span>, newt<span class="op">=</span> <span class="cn">T</span><span class="op">)</span>  
-<span class="co">#&gt; [1] "doing opt..."</span>
-<span class="co">#&gt; [1] 4956.028</span>
-<span class="co">#&gt; [1] 4730.749</span>
-<span class="co">#&gt; [1] 4500.258</span>
-<span class="co">#&gt; [1] 4287.035</span>
-<span class="co">#&gt; [1] 4179.995</span>
-<span class="co">#&gt; [1] 4131.676</span>
-<span class="co">#&gt; [1] 4093.749</span>
-<span class="co">#&gt; [1] 4054.175</span>
-<span class="co">#&gt; [1] 4007.847</span>
-<span class="co">#&gt; [1] 3951.548</span>
-<span class="co">#&gt; [1] 3885.862</span>
-<span class="co">#&gt; [1] 3818.375</span>
-<span class="co">#&gt; [1] 3758.711</span>
-<span class="co">#&gt; [1] 3705.938</span>
-<span class="co">#&gt; [1] 3651.535</span>
-<span class="co">#&gt; [1] 3583.651</span>
-<span class="co">#&gt; [1] 3481.609</span>
-<span class="co">#&gt; [1] 3292.313</span>
-<span class="co">#&gt; [1] 2899.208</span>
-<span class="co">#&gt; [1] 2746.634</span>
-<span class="co">#&gt; [1] 2724.292</span>
-<span class="co">#&gt; [1] 2609.96</span>
-<span class="co">#&gt; [1] 2548.588</span>
-<span class="co">#&gt; [1] 2462.031</span>
-<span class="co">#&gt; [1] 2345.408</span>
-<span class="co">#&gt; [1] 2219.871</span>
-<span class="co">#&gt; [1] 2132.56</span>
-<span class="co">#&gt; [1] 1992.313</span>
-<span class="co">#&gt; [1] 1413.943</span>
-<span class="co">#&gt; [1] 1196.84</span>
-<span class="co">#&gt; [1] 334.4428</span>
-<span class="co">#&gt; [1] -112.8334</span>
-<span class="co">#&gt; [1] -126.3911</span>
-<span class="co">#&gt; [1] -184.7046</span>
-<span class="co">#&gt; [1] -255.5496</span>
-<span class="co">#&gt; [1] -398.7772</span>
-<span class="co">#&gt; [1] -437.8379</span>
-<span class="co">#&gt; [1] -473.4271</span>
-<span class="co">#&gt; [1] -496.7895</span>
-<span class="co">#&gt; [1] -511.8998</span>
-<span class="co">#&gt; [1] -528.1285</span>
-<span class="co">#&gt; [1] -544.0973</span>
-<span class="co">#&gt; [1] -562.2824</span>
-<span class="co">#&gt; [1] -588.3683</span>
-<span class="co">#&gt; [1] -626.0105</span>
-<span class="co">#&gt; [1] -663.0617</span>
-<span class="co">#&gt; [1] -680.5571</span>
-<span class="co">#&gt; [1] -688.7813</span>
-<span class="co">#&gt; [1] -695.6137</span>
-<span class="co">#&gt; [1] -703.0426</span>
-<span class="co">#&gt; [1] -710.952</span>
-<span class="co">#&gt; [1] -718.1832</span>
-<span class="co">#&gt; [1] -724.3923</span>
-<span class="co">#&gt; [1] -730.4829</span>
-<span class="co">#&gt; [1] -736.844</span>
-<span class="co">#&gt; [1] -742.4149</span>
-<span class="co">#&gt; [1] -745.9562</span>
-<span class="co">#&gt; [1] -747.7122</span>
-<span class="co">#&gt; [1] -748.48</span>
-<span class="co">#&gt; [1] "finished opt..."</span>
+<span class="va">opth</span> <span class="op">=</span> <span class="fu"><a href="../reference/BFGS_lpdf.html">BFGS_lpdf</a></span><span class="op">(</span><span class="va">om</span>, <span class="va">logpdf_slow</span>, 
+                 rho<span class="op">=</span><span class="va">hyp0_slow</span>, newt<span class="op">=</span><span class="cn">T</span><span class="op">)</span>  
 <span class="va">t_slow</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/proc.time.html" class="external-link">proc.time</a></span><span class="op">(</span><span class="op">)</span> <span class="op">-</span> <span class="va">ptm</span>
-<span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">t_slow</span><span class="op">)</span>
-<span class="co">#&gt;    user  system elapsed </span>
-<span class="co">#&gt;  39.386   0.037  36.992</span>
 <span class="va">pred_slow</span> <span class="op">=</span> <span class="fu">new</span><span class="op">(</span><span class="va">predictor</span>,<span class="va">loglik_slow</span><span class="op">)</span>
 <span class="va">pred_slow</span><span class="op">$</span><span class="fu">update</span><span class="op">(</span><span class="va">xtest</span><span class="op">)</span>
-<span class="va">yhat_slow</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/vector.html" class="external-link">as.vector</a></span><span class="op">(</span><span class="va">pred_slow</span><span class="op">$</span><span class="fu">mean</span><span class="op">(</span><span class="op">)</span><span class="op">)</span></code></pre></div>
-<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
+<span class="va">yhat_slow</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/vector.html" class="external-link">as.vector</a></span><span class="op">(</span><span class="va">pred_slow</span><span class="op">$</span><span class="fu">mean</span><span class="op">(</span><span class="op">)</span><span class="op">)</span>
+<span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">t_slow</span><span class="op">)</span>
+<span class="co">#&gt;    user  system elapsed </span>
+<span class="co">#&gt;  24.968   0.020  24.096</span></code></pre></div>
+<div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">ptm</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/proc.time.html" class="external-link">proc.time</a></span><span class="op">(</span><span class="op">)</span>
-<span class="va">ptm</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/proc.time.html" class="external-link">proc.time</a></span><span class="op">(</span><span class="op">)</span>
-<span class="va">opth</span> <span class="op">=</span> <span class="fu"><a href="../reference/BFGS_lpdf.html">BFGS_lpdf</a></span><span class="op">(</span>rho<span class="op">=</span><span class="va">hyp0_fast</span>, verbose <span class="op">=</span> <span class="fl">1</span>,
-                  <span class="va">om</span>, <span class="va">logpdf_fast</span>,  <span class="cn">F</span><span class="op">)</span>  
-<span class="co">#&gt; [1] "doing opt..."</span>
-<span class="co">#&gt; [1] 4956.028</span>
-<span class="co">#&gt; [1] 4730.749</span>
-<span class="co">#&gt; [1] 4500.259</span>
-<span class="co">#&gt; [1] 4287.036</span>
-<span class="co">#&gt; [1] 4179.996</span>
-<span class="co">#&gt; [1] 4131.678</span>
-<span class="co">#&gt; [1] 4093.751</span>
-<span class="co">#&gt; [1] 4054.178</span>
-<span class="co">#&gt; [1] 4007.851</span>
-<span class="co">#&gt; [1] 3951.556</span>
-<span class="co">#&gt; [1] 3885.876</span>
-<span class="co">#&gt; [1] 3818.4</span>
-<span class="co">#&gt; [1] 3758.747</span>
-<span class="co">#&gt; [1] 3705.979</span>
-<span class="co">#&gt; [1] 3651.575</span>
-<span class="co">#&gt; [1] 3583.684</span>
-<span class="co">#&gt; [1] 3481.626</span>
-<span class="co">#&gt; [1] 3292.349</span>
-<span class="co">#&gt; [1] 2900.103</span>
-<span class="co">#&gt; [1] 2748.505</span>
-<span class="co">#&gt; [1] 2725.897</span>
-<span class="co">#&gt; [1] 2626.023</span>
-<span class="co">#&gt; [1] 2590.136</span>
-<span class="co">#&gt; [1] 2537.95</span>
-<span class="co">#&gt; [1] 2465.808</span>
-<span class="co">#&gt; [1] 2370.396</span>
-<span class="co">#&gt; [1] 2253.645</span>
-<span class="co">#&gt; [1] 2146.062</span>
-<span class="co">#&gt; [1] 2068.203</span>
-<span class="co">#&gt; [1] 1985.022</span>
-<span class="co">#&gt; [1] 1864.708</span>
-<span class="co">#&gt; [1] 1247.782</span>
-<span class="co">#&gt; [1] 995.2453</span>
-<span class="co">#&gt; [1] 376.2225</span>
-<span class="co">#&gt; [1] 171.8584</span>
-<span class="co">#&gt; [1] 67.62458</span>
-<span class="co">#&gt; [1] 6.231653</span>
-<span class="co">#&gt; [1] -241.3474</span>
-<span class="co">#&gt; [1] -275.7963</span>
-<span class="co">#&gt; [1] -294.0134</span>
-<span class="co">#&gt; [1] -323.7098</span>
-<span class="co">#&gt; [1] -425.6818</span>
-<span class="co">#&gt; [1] -523.7115</span>
-<span class="co">#&gt; [1] -576.4805</span>
-<span class="co">#&gt; [1] -578.2618</span>
-<span class="co">#&gt; [1] -616.2015</span>
-<span class="co">#&gt; [1] -622.0209</span>
-<span class="co">#&gt; [1] -629.5891</span>
-<span class="co">#&gt; [1] -643.2199</span>
-<span class="co">#&gt; [1] -654.3053</span>
-<span class="co">#&gt; [1] -663.095</span>
-<span class="co">#&gt; [1] -670.7461</span>
-<span class="co">#&gt; [1] -679.3173</span>
-<span class="co">#&gt; [1] -691.1703</span>
-<span class="co">#&gt; [1] -706.7434</span>
-<span class="co">#&gt; [1] -719.0211</span>
-<span class="co">#&gt; [1] -724.2137</span>
-<span class="co">#&gt; [1] -727.5434</span>
-<span class="co">#&gt; [1] -729.7904</span>
-<span class="co">#&gt; [1] -731.8009</span>
-<span class="co">#&gt; [1] -734.877</span>
-<span class="co">#&gt; [1] -737.6836</span>
-<span class="co">#&gt; [1] -738.9805</span>
-<span class="co">#&gt; [1] -742.3971</span>
-<span class="co">#&gt; [1] "finished opt..."</span>
+<span class="va">opth</span> <span class="op">=</span> <span class="fu"><a href="../reference/BFGS_lpdf.html">BFGS_lpdf</a></span><span class="op">(</span><span class="va">om</span>, <span class="va">logpdf_fast</span>, 
+                 rho<span class="op">=</span><span class="va">hyp0_fast</span>, newt<span class="op">=</span><span class="cn">F</span><span class="op">)</span>  
 <span class="va">t_fast</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/proc.time.html" class="external-link">proc.time</a></span><span class="op">(</span><span class="op">)</span> <span class="op">-</span> <span class="va">ptm</span>
 <span class="va">pred_fast</span> <span class="op">=</span> <span class="fu">new</span><span class="op">(</span><span class="va">predictor</span>,<span class="va">loglik_fast</span><span class="op">)</span>
 <span class="va">pred_fast</span><span class="op">$</span><span class="fu">update</span><span class="op">(</span><span class="va">xtest</span><span class="op">)</span>
-<span class="va">yhat_fast</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/vector.html" class="external-link">as.vector</a></span><span class="op">(</span><span class="va">pred_fast</span><span class="op">$</span><span class="fu">mean</span><span class="op">(</span><span class="op">)</span><span class="op">)</span></code></pre></div>
+<span class="va">yhat_fast</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/vector.html" class="external-link">as.vector</a></span><span class="op">(</span><span class="va">pred_fast</span><span class="op">$</span><span class="fu">mean</span><span class="op">(</span><span class="op">)</span><span class="op">)</span>
+<span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">t_fast</span><span class="op">)</span>
+<span class="co">#&gt;    user  system elapsed </span>
+<span class="co">#&gt;   1.594   0.048   0.993</span></code></pre></div>
+</div>
 <div class="section level2">
 <h2 id="comparison-of-results">Comparison of results<a class="anchor" aria-label="anchor" href="#comparison-of-results"></a>
 </h2>
-<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
+<p>And simply plotting the results tells the story: faster inference with no discernible dropoff in quality.</p>
+<div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/graphics/par.html" class="external-link">par</a></span><span class="op">(</span>mfrow<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>,<span class="fl">2</span><span class="op">)</span><span class="op">)</span>
 <span class="va">rmse_slow</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/MathFun.html" class="external-link">sqrt</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/mean.html" class="external-link">mean</a></span><span class="op">(</span><span class="op">(</span><span class="va">ytest</span><span class="op">-</span><span class="va">yhat_slow</span><span class="op">)</span><span class="op">^</span><span class="fl">2</span><span class="op">)</span><span class="op">)</span>
 <span class="fu"><a href="https://rdrr.io/r/graphics/hist.html" class="external-link">hist</a></span><span class="op">(</span><span class="op">(</span><span class="va">ytest</span><span class="op">-</span><span class="va">yhat_slow</span><span class="op">)</span>, main<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste</a></span><span class="op">(</span><span class="st">"slow method \n rmse:"</span>, 
@@ -299,9 +196,10 @@
                                    <span class="st">", time:"</span>,
                                    <span class="fu"><a href="https://rdrr.io/r/base/Round.html" class="external-link">round</a></span><span class="op">(</span><span class="va">t_fast</span><span class="op">[</span><span class="fl">3</span><span class="op">]</span>,<span class="fl">2</span><span class="op">)</span>,<span class="st">'s'</span><span class="op">)</span>, 
      xlab <span class="op">=</span> <span class="st">"prediction residuals"</span><span class="op">)</span></code></pre></div>
-<p><img src="speed_files/figure-html/unnamed-chunk-11-1.png" width="700"></p>
+<p><img src="speed_files/figure-html/unnamed-chunk-16-1.png" width="700"></p>
 </div>
-  </main>
+  </main><aside class="col-md-3"><nav id="toc"><h2>On this page</h2>
+    </nav></aside>
 </div>
 
 
