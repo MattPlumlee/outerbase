@@ -40,6 +40,7 @@
   #define omp_get_num_procs()    1
   #define omp_set_nested(a)   // empty statement to remove the call
   #define omp_get_wtime()        0
+  #define omp_in_parallel()      true
 #endif
 
 using namespace arma;  
