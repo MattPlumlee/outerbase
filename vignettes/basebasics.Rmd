@@ -21,7 +21,7 @@ library(outerbase)
 A three dimensional case study is sufficient for understanding what `?outermod` and `?outerbase` are and how to manipulate them.
 
 ```{r}
-sampsize = 20
+sampsize = 30
 d = 3
 design1d = seq(1/(2*sampsize),1-1/(2*sampsize),1/sampsize)
 x = cbind(design1d,sample(design1d),sample(design1d))
@@ -33,61 +33,74 @@ Covariance functions are an important building block of Gaussian process inferen
 
 Creating instances is done through the `new` call with the class name listed inside.
 ```{r}
-corf1 = new(covf_mat25)
+corf = new(covf_mat25)
 ?covf_mat25
 ```
 
 The `cov` method is what builds covariances matrices.  Below the covariance between the first columns first 5 elements is ploted.  Note that these are designed to be single demensional covariance functions.
 ```{r}
 xred = x[1:5,1]
-print(corf1$cov(xred,xred),3)
+print(corf$cov(xred,xred),3)
 ```
 Hyperparameters are important to almost all covariance functions. They control the general shape of the predictive surface.  They are stored in the `covf` class in the (editable) field `hyp`.
 ```{r}
-corf1$hyp
+corf$hyp
 ```
 
 You can see the effect of alternating `hyp` below on this correlation function.
 ```{r}
-corf1$hyp = c(-0.5)
-plot(x[,1],corf1$cov(x[,1],0.5), type='l',
+corf$hyp = c(-0.5)
+plot(x[,1],corf$cov(x[,1],0.5), type='l',
      ylab='correlation with 0.5', xlab='input')
-corf1$hyp = c(-0.25)
-lines(x[,1],corf1$cov(x[,1],0.5), type='l')
-corf1$hyp = c(0)
-lines(x[,1],corf1$cov(x[,1],0.5), type='l')
+corf$hyp = c(-0.25)
+lines(x[,1],corf$cov(x[,1],0.5), type='l')
+corf$hyp = c(0)
+lines(x[,1],corf$cov(x[,1],0.5), type='l')
 ```
 
 ## Gaussian processes
 
+Gaussian processes have long been shown to be top performers for near interpolation.  For more information on general Gaussian processes, see the textbooks [Gaussian Processes for Machine Learning](https://gaussianprocess.org/gpml/) or [Surrogates](https://bobby.gramacy.com/surrogates/), among others.
+
+The idea is to represent a surface as a realization of a Gaussian process.  To do these in three dimensions, one of the optimal ways is through an outer product of covariance functions.  This means we need to first build correlation functions.
 ```{r}
+corf1 = new(covf_mat25)
 corf2 = new(covf_mat25)
 corf3 = new(covf_mat25)
-corf2$hyp = c(-0.5)
+corf1$hyp = c(-0.5) # just setting them all to the same 
+corf2$hyp = c(-0.5) # hyperparameter for now
 corf3$hyp = c(-0.5)
+```
 
+And then multiply them to calculate covariances.
+```{r}
 covftot = function(x1,x2){
   corf1$cov(x1[,1],x2[,1])*
   corf2$cov(x1[,2],x2[,2])*
   corf3$cov(x1[,3],x2[,3])
 }
-
-cormattot = covftot(x,x)
+cormattot = covftot(x,x) #total correlation matrix
 ```
 
+If we want to predict at some set of points, say `1000` points.
 ```{r}
-testsampsize = 100
-xtest = matrix(runif(testsampsize*d),ncol=d) #prediction points
-ytest = obtest_borehole3d(xtest)
+testsampsize = 1000
+xtest = matrix(runif(testsampsize*d),ncol=d)
 ```
 
+Then we built the predictor (assuming y is zero mean) as
 ```{r}
 yhat = covftot(xtest,x) %*% solve(cormattot,y)
-plot(yhat,ytest)
-hist((ytest-yhat), main="test residuals",
-     xlab = "test residuals")
 ```
 
+This gives prediction accuracy that can be summarized below.
+```{r}
+ytest = obtest_borehole3d(xtest)
+plot(ytest,yhat, xlab="actual", ylab="prediction") 
+hist(ytest-yhat, main="test residuals",
+     xlab = "test residuals")
+```
+We can also use this framework to get predictive variances.  These equations will not be explained in this documentation for brevity.  One point here is that is does pretty well!  The second plot looks standard Normal enough.
 ```{r}
 sigma2hat = as.double( t(y) %*% solve(cormattot,y) / length(y))
 
