@@ -15,22 +15,30 @@ listcov = function() {
 #' @param covnames a d length vector of covariance names
 #' @return Saving important model information
 #' @export
-fitob = function(x, y, numb=100, covnames=NULL) {
+obfit = function(x, y, numb=100, covnames=NULL) {
   if(dim(x)[1] != length(y)) stop("\n x and y dims do not align")
   if(dim(x)[1] < dim(x)[2]) 
-    stop('dimension larger than sample size has not been tested')
+    stop('\n dimension larger than sample size has not been tested')
   if(dim(x)[1] > 10^6) 
-    stop('sample size should be less than 1000000')
+    stop('\n sample size should be less than 1000000')
   if(dim(x)[2] > 200) 
-    stop('dimension should be less than 200')
+    stop('\n dimension should be less than 200')
   if(dim(x)[1] > 10^5) 
-    warning('sample size is larger than has been tested')
+    warning('\n sample size is larger than has been tested')
   if(dim(x)[2] > 20) 
-    warning('more than 20 dimensions has not been tested')
+    warning('\n more than 20 dimensions has not been tested')
   if(dim(x)[2] == 1) 
-    stop('dimension must be larger than 1')
+    stop('\n dimension must be larger than 1')
   if(dim(x)[2] == 2) 
-    stop('dimension 2 has not been tested')
+    stop('\n dimension 2 has not been tested')
+  if(numb < 2*dim(x)[2]) 
+    stop('\n number of basis functions should be over twice the dimension')
+  if(numb > 2000) 
+    warning('\nnumber of basis functions is large')
+  if(numb > 10000) 
+    stop('\n number of basis functions is beyond testing')
+  if(numb > dim(x)[1]) 
+    warning('\n number of basis functions larger than sample size, not tested')
   
   d = dim(x)[2]
   
@@ -83,7 +91,7 @@ fitob = function(x, y, numb=100, covnames=NULL) {
 #' @param x a new m by d sized matrix of inputs
 #' @return A list with \code{mean} and \code{var} at new x
 #' @export
-predob = function(obmodel, x){
+obpred = function(obmodel, x){
   obmodel$predobj$update(x)
   out = list()
   out$mean = obmodel$predobj$mean()

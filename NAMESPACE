@@ -2,11 +2,11 @@
 
 export(BFGS_lpdf)
 export(BFGS_std)
-export(fitob)
 export(listcov)
+export(obfit)
+export(obpred)
 export(obtest_borehole3d)
 export(obtest_borehole8d)
-export(predob)
 exportPattern("^[[:alpha:]]+")
 import(Rcpp)
 import(methods)
