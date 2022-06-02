@@ -93,7 +93,7 @@ obfit = function(x, y, numb=100, covnames=NULL) {
 
 #' pred from an outerbase
 #' 
-#' @param obmodel output from \code{\link{fitob}}
+#' @param obmodel output from \code{\link{obfit}}
 #' @param x a new m by d sized matrix of inputs
 #' @return A list with \code{mean} and \code{var} at new x
 #' @export
