@@ -14,72 +14,103 @@ knitr::opts_chunk$set(
 )
 ```
 
+This page is designed to explain how `outerbase` can facilitate fast inference with smart modeling choices.  
 ```{r setup}
 library(outerbase)
 ```
-
+This is important as the sample size grows, so we will use `500` datapoints.
 ```{r}
-sampsize = 1000
+sampsize = 500
 d = 8
 x = matrix(runif(sampsize*d),ncol=d)
 y = obtest_borehole8d(x)
 ```
+The differences get more dramatic with larger sample sizes, however in the spirit of running quickly we will use this sample size.
 
-```{r}
-xtest = matrix(runif(1000*d),ncol=d) #prediction points
-ytest =  obtest_borehole8d(xtest)
-```
-
-
+First setup an `outermod` object.
 ```{r}
 om = new(outermod)
-```
-
-```{r}
-setcovfs(om, rep("mat25",8))
+setcovfs(om, rep("mat25pow",8))
 knotlist = list();
 for(k in 1:d) knotlist[[k]] = seq(0.01,1,by=0.025)
-
 setknot(om, knotlist) #40 knot point for each dim
 ```
 
+More data should mean more basis functions.
 ```{r}
-p = 200
+p = 250
 terms = om$selectterms(p)
 ```
 
+
+
+
+
+
+## Different models
+
+To begin, lets use `?loglik_std` to represent our slow approach.
 ```{r}
 loglik_slow = new(loglik_std, om, terms, y, x) 
 logpr_slow = new(logpr_gauss, om, terms)
 logpdf_slow = new(lpdfvec, loglik_slow, logpr_slow)
-logpdf_slow$domarg = T
-logpdf_slow$optnewton()
 ```
 
+`logpdf_slow` can be optimized using `lpdf$optnewton`.
+```{r}
+logpdf_slow$optnewton()
+```
+Newton's method involves solving a linear system, thus it takes one step, but is expensive.
+
+`?loglik_gauss` is a `lpdf` model designed for speed.  It is a nice comparison because `loglik_gauss` uses the same model as `loglik_std`, with a few approximations for speed. 
 ```{r}
 loglik_fast = new(loglik_gauss, om, terms, y, x) 
 logpr_fast = new(logpr_gauss, om, terms)
 logpdf_fast = new(lpdfvec, loglik_fast, logpr_fast)
-logpdf_fast$domarg = T
-logpdf_fast$optcg(0.001, 100)
-logpdf_fast$setnthreads(4)
-loglik_slow$val
-loglik_fast$val
-logpr_slow$val
-logpr_fast$val
-logpdf_slow$val
-logpdf_fast$val
-
-hyp0_slow = list(para = getpara(logpdf_fast), hyp = gethyp(om))
-hyp0_fast = list(para = getpara(logpdf_fast), hyp = gethyp(om))
 ```
 
 
+`logpdf_fast` will through an error if you try to use `optnewton`.  This is because it is written so that it never builds a `hess` matrix.
+```{r, error=TRUE}
+logpdf_fast$optnewton()
+```
+It is suggested to use `lpdf$optcg` (conjugate gradient) to optimize the coefficients in the fast version.
+```{r}
+logpdf_fast$optcg(0.001, 100)
+```
+
+As an aside, `omp` speed ups are possible, but you need to have correctly compiled with `omp`.  One check is to call the following.  
+```{r}
+ob = new(outerbase, om, x) 
+ob$nthreads
+```
+If the answer is `1` but you have a multi-threaded processor (most modern processors), things are likely mis-aligned.
+
+You can manually set the number of threads for `lpdf` objects.
+```{r}
+logpdf_slow$setnthreads(4)
+logpdf_fast$setnthreads(4)
+```
+
+## Timing
+
+The main cost with models like these is hyperparameter optimization.  Thus will we show the difference in time to build hyperparameters.  Let's save starting points (since they share `om`) for fairness.
+```{r}
+hyp0_slow = list(para = getpara(logpdf_slow), hyp = gethyp(om))
+hyp0_fast = list(para = getpara(logpdf_fast), hyp = gethyp(om))
+```
+
+Test points will verify the predictions are equally good with either model, the only difference is speed.
+```{r}
+xtest = matrix(runif(1000*d),ncol=d) #prediction points
+ytest =  obtest_borehole8d(xtest)
+```
+We will use the unsophisticated ` proc.time` to do some quick timing comparisons.  
 ```{r}
 ptm = proc.time()
-opth = BFGS_lpdf(om, logpdf_slow, verbose = 1, newt= T)  
+opth = BFGS_lpdf(om, logpdf_slow, 
+                 rho=hyp0_slow, newt=T)  
 t_slow = proc.time() - ptm
-print(t_slow)
 pred_slow = new(predictor,loglik_slow)
 pred_slow$update(xtest)
 yhat_slow = as.vector(pred_slow$mean())
@@ -88,9 +119,8 @@ yhat_slow = as.vector(pred_slow$mean())
 
 ```{r}
 ptm = proc.time()
-ptm <- proc.time()
-opth = BFGS_lpdf(rho=hyp0_fast, verbose = 1,
-                  om, logpdf_fast,  F)  
+opth = BFGS_lpdf(om, logpdf_fast, 
+                 rho=hyp0_fast, newt=F)  
 t_fast = proc.time() - ptm
 pred_fast = new(predictor,loglik_fast)
 pred_fast$update(xtest)
@@ -98,6 +128,7 @@ yhat_fast = as.vector(pred_fast$mean())
 ```
 ## Comparison of results
 
+And simply plotting the results tells the story: faster inference with no discernible dropoff in quality.  
 ```{r}
 par(mfrow=c(1,2))
 rmse_slow = sqrt(mean((ytest-yhat_slow)^2))
@@ -112,7 +143,6 @@ hist((ytest-yhat_fast), main=paste("fast method \n rmse =",
                                    ", time:",
                                    round(t_fast[3],2),'s'), 
      xlab = "prediction residuals")
-
 ```
 
 

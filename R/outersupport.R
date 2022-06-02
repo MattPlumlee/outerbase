@@ -165,7 +165,7 @@ BFGS_lpdf <- function(om, logpdf, rho=list(), newt=F, ...){
   
   .lpdfwrapper(rho, om, logpdf, newt=newt)
   
-  optsum = BFGS_std(.lpdfwrapper, rho, om=om,
+  optsum = BFGS_std(.lpdfwrapper, rho, om=om, newt=newt,
                     logpdf=logpdf, ...)
   
   .lpdfwrapper(optsum$vec, om, logpdf, newt=newt)

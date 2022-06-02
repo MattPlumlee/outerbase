@@ -17,17 +17,19 @@ knitr::opts_chunk$set(
 
 ## Overview
 
-The goal of outerbase is to make the production of near-interpolators easy, stable, and scalable.  It is based on a `C++` backend, powered specifically by `{Rcpp}`.  Specifically, it leverages unique, fast linear algebra using `{RcppArmadillo}` ([Armadillo](http://arma.sourceforge.net)) and `omp`.  The overall structure is designed to be interacted with in an object-oriented manner using `Rcpp` modules.  
+The goal of `outerbase` is to make the production of near-interpolators easy, stable, and scalable.  It is based on a `C++` backend, powered specifically by `{Rcpp}`.  Specifically, it leverages unique, fast linear algebra using `{RcppArmadillo}` ([Armadillo](http://arma.sourceforge.net)) and `omp`.  The overall structure is designed to be interacted with in an object-oriented manner using `Rcpp` modules.  
 
-To begin, load the package
+There are ways to interact with `outerbase` for those who are uncomfortable with (or just actively detest) object oriented programming.
+
+To begin, load the package.
 ```{r setup}
 library(outerbase)
 ```
-Note that if you built this package from source, make sure you use a compiler that can process `omp` commands to get all the speed benefits.
+Note that if you built this package from source, make sure you use a compiler that can process `omp` commands to access the entire speed benefits.
 
 ## Simple prediction
 
-To understand how to get started with using the package, we will try to predict using data from a function with an eight dimensional input commonly known as the Borehole function.  First we will generate `1000` points, leverage a built-in test function `obtest_borehole8d`.
+To understand how to get started with using the package, we will try to predict using data from a function with an eight dimensional input commonly known as the Borehole function.  First we will generate `1000` points using a test function built into the package `?obtest_borehole8d`.
 ```{r}
 sampsize = 400
 d = 8
@@ -52,9 +54,8 @@ Note `obfit` has some checks in place to prevent serious damage.  They are not f
 obmodel = obfit(x, y, covnames=rep("elephant",8))
 obmodel = obfit(x, y[1:200], covnames=rep("mat25pow",5))
 obmodel = obfit(x[1:2,], y[1:2], covnames=rep("mat25pow",8))
-obmodel = obfit(x[1:2,], y[1:2], numb = 2, covnames=rep("mat25pow",8))
+obmodel = obfit(x, y, numb = 2, covnames=rep("mat25pow",8))
 obmodel = obfit(100*x, y, covnames=rep("mat25pow",8))
-obmodel = obfit(0.001*x, y, covnames=rep("mat25pow",8))
 obmodel = obfit(0.001*x, y, covnames=rep("mat25pow",8))
 ```
 
@@ -63,15 +64,17 @@ Here is one correct deployment, where `mat25pow` is used for all dimensions.
 obmodel = obfit(x, y, numb = 300, covnames=rep("mat25pow",8))
 ```
 
+
 We can then predict using `obpred`.  Consider predicting at our training points, we can see that while it is not an interpolator, it is close.
 ```{r}
 predtr = obpred(obmodel, x)
 rmsetr = sqrt(mean((y-predtr$mean)^2))
-plot(predtr$mean, y, main= paste("training \n RMSE = ", 
-                                    round(rmsetr,3)),
-     xlab = "prediction", ylab = "actual")
+plot(predtr$mean, y,
+     main=paste("training \n RMSE = ", round(rmsetr,3)),
+     xlab="prediction", ylab = "actual")
 ```
-We can use the fact that we generated this data to demonstrate that `outerbase` can reasonably predict the truth, meaning overfitting is not an issue.
+
+The fact that we generated this data means we can show that `outerbase` can reasonably predict ground truth, meaning overfitting is not an issue.
 ```{r}
 ytrue = obtest_borehole8d(x)
 rmsetr = sqrt(mean((ytrue-predtr$mean)^2))
@@ -80,14 +83,14 @@ plot(predtr$mean, ytrue,
      xlab="prediction", ylab="actual")
 ```
 
-To really test it, let's use `1000` test points generated the same way as our original data.
+`1000` test points generated the same way as our original data can also serve as a verification process.
 ```{r}
 xtest = matrix(runif(1000*d),ncol=d) #prediction points
 ytest = obtest_borehole8d(xtest) + 0.5*rnorm(1000)
 ```
 
 
-The predictions that we get are also outstanding here at these new points.  Not quite as good, but we are extrapolating here. 
+The predictions that we get are also outstanding here at these new points.  Not quite as good as the residuals on the test set, but we are extrapolating here. 
 ```{r}
 predtest = obpred(obmodel, xtest)
 

@@ -18,7 +18,7 @@ logpr_gauss::logpr_gauss(const outermod& om_, umat terms_)
   terms = terms_;
   
   para0.set_size(1);
-  para0[0] = 0;
+  para0[0] = 6;
   paravar.set_size(1);
   paravar[0] = 4;
   

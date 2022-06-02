@@ -40,6 +40,10 @@ obfit = function(x, y, numb=100, covnames=NULL) {
   if(numb > dim(x)[1]) 
     warning('\n number of basis functions larger than sample size, not tested')
   
+  y_cent = mean(y)
+  y_sca = sd(y)
+  y = (y - y_cent) / y_sca
+  
   d = dim(x)[2]
   
   if(!is.null(covnames)){
@@ -80,6 +84,8 @@ obfit = function(x, y, numb=100, covnames=NULL) {
     BFGS_lpdf(om, logpdf_faster,verbose=0) 
   }
   obmodel = list()
+  obmodel$y_cent = y_cent
+  obmodel$y_sca = y_sca
   obmodel$om = om
   obmodel$predobj = new(predictor,loglik_faster)
   obmodel
@@ -94,8 +100,8 @@ obfit = function(x, y, numb=100, covnames=NULL) {
 obpred = function(obmodel, x){
   obmodel$predobj$update(x)
   out = list()
-  out$mean = obmodel$predobj$mean()
-  out$var = obmodel$predobj$var()
+  out$mean = (obmodel$y_cent+obmodel$y_sca*obmodel$predobj$mean())
+  out$var = (obmodel$y_sca^2) * obmodel$predobj$var()
   out
 }
 
