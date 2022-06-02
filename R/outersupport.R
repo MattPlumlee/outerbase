@@ -5,7 +5,7 @@
 #' @import methods
 #' @import Rcpp
 #' @importFrom utils relist
-#' @importFrom stats quantile
+#' @importFrom stats quantile sd
 #' @useDynLib outerbase, .registration = TRUE
 #' @exportPattern "^[[:alpha:]]+"
 "_PACKAGE"
