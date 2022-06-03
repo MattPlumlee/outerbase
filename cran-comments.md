@@ -1,11 +1,13 @@
 
-* This is a new release.
 
-This package covers an important development in new methodology I would like to 
-easily share with collaborators. 
+* This is a new release, but was earlier submitted and threw an error on Debian
+ in testing.  It should now be resolved.
 
-The package is tested using Github actions. The only remaining notes are about 
-GNU being needed with Rcpp and the size of the libraries, which seems to be 
+This package covers an important development in new methodology I would like to
+easily share with collaborators.
+
+The package is tested using Github actions. The only remaining notes are about
+GNU being needed with Rcpp and the size of the libraries, which seems to be
 needed to make it work. Notes are summarized below.
 
 ## Github actions results
