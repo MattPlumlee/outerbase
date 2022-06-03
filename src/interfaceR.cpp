@@ -196,7 +196,7 @@ RCPP_EXPOSED_CLASS(lpdf)
 //' hyp[1:2] = 0.5
 //' om$updatehyp(hyp)
 //' coeffvar = om$getvar(terms)
-//' @seealso \code{\link{outerbase}} the main product from outermods
+//' @seealso \code{\link{outerbase}} the main product from an outermod
 
 //' @name outermod$updatehyp
 //' @title Update hyperparameters
@@ -345,7 +345,7 @@ RCPP_EXPOSED_CLASS(lpdf)
 //' @field lpdf$compute_grad on calling \code{update}, compute gradient with 
 //' respect to coefficients and store in \code{grad}
 //' @field lpdf$compute_gradhyp on calling \code{update}, compute gradient
-//' with respect to covariance hyparameters and store in \code{gradhyp}
+//' with respect to covariance hyperparameters and store in \code{gradhyp}
 //' @field lpdf$compute_gradpara on calling \code{update}, compute gradient
 //' with respect to model parameters and store in \code{gradpara}
 //' @field lpdf$update(coeff) update using new coefficients
@@ -379,7 +379,7 @@ RCPP_EXPOSED_CLASS(lpdf)
 //' @name lpdfvec
 //' @aliases
 //' Rcpp_lpdfvec-class Rcpp_lpdfvec 
-//' @title Vector of lpdf objects
+//' @title Vector of `lpdf` objects
 //' @description 
 //' \preformatted{
 //' logpdf = new(lpdfvec, loglik, logpr)
@@ -509,10 +509,11 @@ RCPP_EXPOSED_CLASS(lpdf)
 //' \preformatted{
 //' logpr = new(logpr_gauss, om, terms)
 //' }
-//' This is a standard model of coefficents which has them as drawn independently
+//' This is a standard model of coefficients which has them as drawn 
+//' independently
 //' from
 //' \deqn{ \theta_i \sim N(0, \rho c_i)}
-//' where \eqn{c_i} is the variance supplied by \code{om} for the $i$th term. 
+//' where \eqn{c_i} is the variance supplied by \code{om} for the \eqn{i}th term. 
 //' The parameter vector is of length 1 where 
 //' \eqn{\rho=} \code{exp(para[0])}.
 //' @param om an \code{\link{outermod}} object to be referred to

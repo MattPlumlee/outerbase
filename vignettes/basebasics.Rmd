@@ -14,7 +14,7 @@ knitr::opts_chunk$set(
 )
 ```
 
-This page is designed to explain how `?outermod` and `?outerbase` are designed to function for learning.
+This page is designed to explain `?outermod` and `?outerbase`.
 ```{r setup}
 library(outerbase)
 ```
@@ -29,7 +29,7 @@ y = obtest_borehole3d(x)
 ```
 
 ## Covariance functions
-Covariance functions are an important building block of Gaussian process inference.  In this package, they flexible classes.  See `?covf` for more information on the base class.
+Covariance functions are an important building block of Gaussian process inference.  This package uses a custom class to represent covariance function.  See `?covf` for more information on the base class.
 
 Creating instances is done through the `?methods::new` call with the class name listed inside.
 ```{r}
@@ -37,12 +37,13 @@ corf = new(covf_mat25)
 ?covf_mat25
 ```
 
-The `cov` method is what builds covariances matrices.  Below the covariance between the first columns first 5 elements is ploted.  Note that these are designed to be single demensional covariance functions.
+The `cov` method builds covariances matrices.  Below is an example of calling this method.  Note that these are designed to be single dimensional covariance functions.
 ```{r}
 xred = x[1:5,1]
 print(corf$cov(xred,xred),3)
 ```
-Hyperparameters are important to almost all covariance functions. They control the general shape of the predictive surface.  They are stored in the `covf` class in the (editable) field `hyp`.
+
+Hyperparameters are important for almost all covariance functions. They control the general shape and behavior of the covariance function.  They are stored in the `covf` class in the (editable) field `hyp`.
 ```{r}
 corf$hyp
 ```
@@ -62,7 +63,7 @@ lines(x[,1],corf$cov(x[,1],0.5), type='l')
 
 Gaussian processes have long been shown to be top performers for near interpolation.  For more information on general Gaussian processes, see the textbooks [Gaussian Processes for Machine Learning](https://gaussianprocess.org/gpml/) or [Surrogates](https://bobby.gramacy.com/surrogates/), among others.
 
-The idea is to represent a surface as a realization of a Gaussian process controlled by a covariance function. An outer product of covariance functions can do this job in three dimensions.  This means we need to first build correlation functions.
+The idea is to represent a surface as a realization of a Gaussian process controlled by a covariance function. An outer product of covariance functions can do this job in three dimensions.  This means we need to first build covariance functions.
 ```{r}
 corf1 = new(covf_mat25)
 corf2 = new(covf_mat25)
@@ -72,7 +73,7 @@ corf2$hyp = c(-0.5) # hyperparameter for now
 corf3$hyp = c(-0.5)
 ```
 
-And then multiply them to calculate covariances.
+And then multiply them to calculate the covariance between two sets of points.
 ```{r}
 covftot = function(x1,x2){
   corf1$cov(x1[,1],x2[,1])*
@@ -82,13 +83,13 @@ covftot = function(x1,x2){
 cormattot = covftot(x,x) #total correlation matrix
 ```
 
-The goal is to predict at some number of points, say `1000` points.
+The goal of Gaussian process inference is to take our data and predict at some number of points, say `1000` points.
 ```{r}
 testsampsize = 1000
 xtest = matrix(runif(testsampsize*d),ncol=d)
 ```
 
-Then we built the predictor (assuming y is zero mean) using typical formulas.
+The predictor follows from typical formulas (assuming y is zero mean, see textbooks).
 ```{r}
 yhat = covftot(xtest,x) %*% solve(cormattot,y)
 ```
@@ -113,23 +114,24 @@ hist((ytest-yhat)/sqrt(diag(varpred)),
      xlab = "standarized test residuals")
 ```
 
+The main complaints about Gaussian process inference are stability and computation speed.  This package is designed to reduce those concerns.
 
 ## outermod and outerbase
 
 The core classes in this package are `?outermod` and `?outerbase`. An `outermod` instance contains all the information to build an `outerbase` instance, but does not build the objects corresponding to a specific `x`.  An `outerbase` instance is used build inference at a specific `x`.
 
 ### outermod
-An `outermod` instance is created using `new` command.
+An instance of the class `outermod` is designed to hold the information needed to create a basis matrix. An `outermod` instance is created using `new` command.
 ```{r}
 om = new(outermod)
 ```
-The first step is to set the covariances and the knots.  To set the vector of `covfs`, use `?setcovfs` alongside a vector strings of covariances in the package. The list can be found at `listcov()`. 
+The first step is to set the covariance functions and the knots.  To set the vector of `covfs`, use `?setcovfs` alongside a vector strings of covariance functions in the package (`?listcov`). 
 ```{r}
 setcovfs(om, rep("mat25",3))
 ```
 This fixes the dimension of the `outermod` instance `om` to `3`.
 
-Then we need to give it a set of knot points for each dimension.  The choice of these is still being researched, but choosing points that are spread out in each dimension that look like our actual responses is currently recommended.  You will need to invert a matrix of the size of these knot points, so it is recommended to keep it small, `<50` in general.  The function `?setknot` should be used.
+Then we need to give it a set of knot points for each dimension.  The choice of these is still being researched, but choosing points that are spread out in each dimension that look like our actual data is currently recommended.  You will need to invert a matrix of the size of these knot points, so it is recommended to keep it small, `<50` in general.  The function `?setknot` should be used.
 ```{r}
 knotlist = list(seq(0,1,by=0.025),
                 seq(0,1,by=0.025),
@@ -137,7 +139,7 @@ knotlist = list(seq(0,1,by=0.025),
 setknot(om, knotlist)
 ```
 
-We can get an set our hyperparameters to align with our general Gaussian processes inference.
+The hyperparameters can be set directly through our `outermod` object.
 ```{r}
 gethyp(om)
 om$updatehyp(c(-0.5,-0.5,-0.5))
@@ -145,15 +147,14 @@ gethyp(om)
 ```
 
 ### outerbase
-An `outerbase` is the equivalent of a basis matrix with 
-fast computation methods included.
+An instance of the class `outerbase` is the equivalent of a basis matrix with fast computation methods included.  It is also created with `new`, but it also requires a reference to an `outermod` instance and a specific set of prediction points `x`.
 ```{r}
 ob = new(outerbase, 
-         om, #give it the outermod (reference)
-          x) #give it the input matrix
+         om, # an outermod (reference only)
+          x) # an input matrix
 ```
 
-This basically just builds a set of basis functions for each dimension, which sometimes just look like polynomials.  They are not quite polynomials, and some `covf`s give different shapes.  The call `outermod$getbase` will allow you to access the basis functions for each dimension.
+This builds a set of basis functions for each dimension, which sometimes just look like polynomials.  They are not quite polynomials, and some covariance functions give different shapes.  The call `outerbase$getbase` will allow you to access the basis functions for each dimension.  This is mostly useful for plotting.
 ```{r}
 basis_func = ob$getbase(1)
 matplot(x[,1],basis_func[,1:4], 
@@ -161,18 +162,19 @@ matplot(x[,1],basis_func[,1:4],
 ```
 
 ### outermod and outerbase
-`outermod` and `outerbase` are meant to be used in conjunction with each other.  One key ingredient is the `outermod$selecterms` function, which allows you to pick products of basis functions that best represent the current `outermod` response.  
+`outermod` and `outerbase` are meant to be used in conjunction with each other.  One key ingredient is the `outermod$selectterms` function, which allows you to pick products of basis functions that best represent the current `outermod` response.  
 ```{r}
 p = 60
 terms = om$selectterms(p) # 60 by 3 matrix
 head(terms)
 ```
-`outermod$getvar` will tell us the vector of variances associated with these coefficients at these `terms`.
+
+`outermod$getvar` returns the vector of variances associated with these coefficients at these `terms`.
 ```{r}
 covcoeff = as.vector(om$getvar(terms))
 ```
 
-The specific basis matrix can be formed by getting the basis matrix at these selected `terms`.
+The specific basis matrix can be formed by getting the basis matrix at these selected `terms`.  `outerbase$getmat` will give a short cut to building this matrix.
 ```{r}
 basismat = ob$getmat(terms)
 
@@ -181,16 +183,16 @@ basevec = ob$getbase(1)[,terms[termno,1]+1]*
   ob$getbase(2)[,terms[termno,2]+1]*
   ob$getbase(3)[,terms[termno,3]+1]
 
-cbind(basevec[1:5],basismat[1:5,5]) #equal
+cbind(basevec[1:5],basismat[1:5,5]) # expect equal
 ```
 
 ## Feature space approximation
 
 This package leverages the insight that Gaussian processes are no more than linear combinations of basis functions with random coefficients.  This viewpoint is often called the _feature space_ view of Gaussian processes.
 
-To understand why this is valuable, we first show that if you take the `covcoeff` and `basismat` together, the correlation function is very well approximated through the following manipulation.
+To see this, not that if you take the `covcoeff` and `basismat` together, the correlation function is very well approximated through the following manipulation.
 ```{r}
-cormatob = basismat %*% diag(covcoeff ) %*% t(basismat)
+cormatob = basismat%*%diag(covcoeff)%*%t(basismat)
 
 print(round(cormattot[1:5,1:5],3)) # typical gp
 print(round(cormatob[1:5,1:5],3)) # outerbase
@@ -213,8 +215,8 @@ coeffest = postcov%*%(1/noisevar*t(basismat)%*%y)
 Consider predicting at some new `xtest` to examine if the inference works the same between the traditional Gaussian process and the feature space approximation.
 ```{r}
 obtest = new(outerbase, 
-         om, #same outermod 
-          xtest) #give it the input matrix
+         om,     # same outermod 
+          xtest) # new input matrix
 
 basistest = obtest$getmat(terms)
 ```

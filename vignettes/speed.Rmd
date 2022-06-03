@@ -18,14 +18,14 @@ This page is designed to explain how `outerbase` can facilitate fast inference w
 ```{r setup}
 library(outerbase)
 ```
-This is important as the sample size grows, so we will use `500` datapoints.
+
+The potential benefits grow as the sample size grows. We use a sample size of `500` here in the spirit of running quickly.  The point will be obvious, but more dramatic results can be had by increasing the sample size.
 ```{r}
 sampsize = 500
 d = 8
 x = matrix(runif(sampsize*d),ncol=d)
 y = obtest_borehole8d(x)
 ```
-The differences get more dramatic with larger sample sizes, however in the spirit of running quickly we will use this sample size.
 
 First setup an `outermod` object.
 ```{r}
@@ -36,7 +36,8 @@ for(k in 1:d) knotlist[[k]] = seq(0.01,1,by=0.025)
 setknot(om, knotlist) #40 knot point for each dim
 ```
 
-More data should mean more basis functions.
+More data should mean more basis functions.  So we will choose `250` terms for
+our feature space approximation.
 ```{r}
 p = 250
 terms = om$selectterms(p)
@@ -70,13 +71,14 @@ logpdf_fast = new(lpdfvec, loglik_fast, logpr_fast)
 ```
 
 
-`logpdf_fast` will through an error if you try to use `optnewton`.  This is because it is written so that it never builds a `hess` matrix.
+`logpdf_fast` will through an error if you try to use `optnewton`.  This is because it is written so that it never builds a Hessian (`hess` in the code) matrix.
 ```{r, error=TRUE}
 logpdf_fast$optnewton()
 ```
-It is suggested to use `lpdf$optcg` (conjugate gradient) to optimize the coefficients in the fast version.
+It is instead suggested to use `lpdf$optcg` (conjugate gradient) to optimize the coefficients in the fast version.
 ```{r}
-logpdf_fast$optcg(0.001, 100)
+logpdf_fast$optcg(0.001,  # tolerance
+                  100)    # max epochs
 ```
 
 As an aside, `omp` speed ups are possible, but you need to have correctly compiled with `omp`.  One check is to call the following.  
@@ -84,7 +86,7 @@ As an aside, `omp` speed ups are possible, but you need to have correctly compil
 ob = new(outerbase, om, x) 
 ob$nthreads
 ```
-If the answer is `1` but you have a multi-threaded processor (most modern processors), things are likely mis-aligned.
+If the answer is `1` but you have a multicore processor (most modern processors), your installation might be incorrect.
 
 You can manually set the number of threads for `lpdf` objects.
 ```{r}
@@ -94,10 +96,10 @@ logpdf_fast$setnthreads(4)
 
 ## Timing
 
-The main cost with models like these is hyperparameter optimization.  Thus will we show the difference in time to build hyperparameters.  Let's save starting points (since they share `om`) for fairness.
+The main cost of fitting `outerbase` models is hyperparameter optimization.  The difference between `logpdf_slow` and `logpdf_fast` will be apparent.  Let's save starting points (since they share `om`) for fairness.
 ```{r}
-hyp0_slow = list(para = getpara(logpdf_slow), hyp = gethyp(om))
-hyp0_fast = list(para = getpara(logpdf_fast), hyp = gethyp(om))
+parlist_slow = list(para = getpara(logpdf_slow), hyp = gethyp(om))
+parlist_fast = list(para = getpara(logpdf_fast), hyp = gethyp(om))
 ```
 
 Test points will verify the predictions are equally good with either model, the only difference is speed.
@@ -109,7 +111,7 @@ We will use the unsophisticated ` proc.time` to do some quick timing comparisons
 ```{r}
 ptm = proc.time()
 opth = BFGS_lpdf(om, logpdf_slow, 
-                 rho=hyp0_slow, newt=T)  
+                 par=parlist_slow, newt=T)  
 t_slow = proc.time() - ptm
 pred_slow = new(predictor,loglik_slow)
 pred_slow$update(xtest)
@@ -121,7 +123,7 @@ print(t_slow)
 ```{r}
 ptm = proc.time()
 opth = BFGS_lpdf(om, logpdf_fast, 
-                 rho=hyp0_fast, newt=F)  
+                 par=parlist_fast, newt=F)  
 t_fast = proc.time() - ptm
 pred_fast = new(predictor,loglik_fast)
 pred_fast$update(xtest)
@@ -130,7 +132,7 @@ print(t_fast)
 ```
 ## Comparison of results
 
-And simply plotting the results tells the story: faster inference with no discernible dropoff in quality.  
+And simply plotting the results tells the story: faster inference with no discernible drop off in quality.  Note there are serious approximations here, but the approximations just have a negligible effect.
 ```{r}
 par(mfrow=c(1,2))
 rmse_slow = sqrt(mean((ytest-yhat_slow)^2))
