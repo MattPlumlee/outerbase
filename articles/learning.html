@@ -154,15 +154,15 @@
 <span class="va">coeff0</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="fl">0</span>,<span class="va">loglik</span><span class="op">$</span><span class="va">nterms</span><span class="op">)</span>
 <span class="va">loglik</span><span class="op">$</span><span class="fu">update</span><span class="op">(</span><span class="va">coeff0</span><span class="op">)</span> <span class="co"># update it to get gradients</span>
 <span class="va">loglik</span><span class="op">$</span><span class="va">val</span>
-<span class="co">#&gt; [1] -160.7101</span>
+<span class="co">#&gt; [1] -154.5835</span>
 <span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">loglik</span><span class="op">$</span><span class="va">grad</span><span class="op">)</span> <span class="co"># dim 60 for number of coeffients</span>
-<span class="co">#&gt;             [,1]</span>
-<span class="co">#&gt; [1,] -0.08982348</span>
-<span class="co">#&gt; [2,] -0.37662047</span>
-<span class="co">#&gt; [3,] -0.42188351</span>
-<span class="co">#&gt; [4,]  2.83584796</span>
-<span class="co">#&gt; [5,] -0.23054614</span>
-<span class="co">#&gt; [6,] -0.69450178</span></code></pre></div>
+<span class="co">#&gt;            [,1]</span>
+<span class="co">#&gt; [1,]  0.1037818</span>
+<span class="co">#&gt; [2,] -0.8199780</span>
+<span class="co">#&gt; [3,] -0.9035095</span>
+<span class="co">#&gt; [4,]  2.1541716</span>
+<span class="co">#&gt; [5,] -0.4297731</span>
+<span class="co">#&gt; [6,]  0.3917221</span></code></pre></div>
 <p>A reasonable statistical model also needs prior on the coefficients. This tells us what distribution we expect on the coefficients.</p>
 <div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">logpr</span> <span class="op">=</span> <span class="fu">new</span><span class="op">(</span><span class="va">logpr_gauss</span>, <span class="va">om</span>, <span class="va">terms</span><span class="op">)</span></code></pre></div>
@@ -172,12 +172,12 @@
 <span class="va">para0</span> <span class="op">=</span> <span class="fu"><a href="../reference/getpara.html">getpara</a></span><span class="op">(</span><span class="va">logpdf</span><span class="op">)</span>
 <span class="va">para0</span>
 <span class="co">#&gt; noisescale coeffscale </span>
-<span class="co">#&gt;   3.036223   6.000000</span>
+<span class="co">#&gt;   3.223278   6.000000</span>
 <span class="va">para0</span><span class="op">[</span><span class="fl">2</span><span class="op">]</span> <span class="op">=</span> <span class="fl">4</span>
 <span class="va">logpdf</span><span class="op">$</span><span class="fu">updatepara</span><span class="op">(</span><span class="va">para0</span><span class="op">)</span>
 <span class="fu"><a href="../reference/getpara.html">getpara</a></span><span class="op">(</span><span class="va">logpdf</span><span class="op">)</span>
 <span class="co">#&gt; noisescale coeffscale </span>
-<span class="co">#&gt;   3.036223   4.000000</span></code></pre></div>
+<span class="co">#&gt;   3.223278   4.000000</span></code></pre></div>
 <p>The coefficients <code>coeff</code> are considered ancillary parameters that need to be optimized out (or something more sophisticated, hint on current research). For this class, it is easiest to do this via <code>lpdf$optnewton</code>, which takes a single Newton step to optimize the coefficients.</p>
 <div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">logpdf</span><span class="op">$</span><span class="fu">optnewton</span><span class="op">(</span><span class="op">)</span></code></pre></div>
@@ -207,17 +207,17 @@
 <div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">logpdf</span><span class="op">$</span><span class="fu">optnewton</span><span class="op">(</span><span class="op">)</span>
 <span class="va">logpdf</span><span class="op">$</span><span class="va">gradhyp</span>    <span class="co"># dim 6 for all hyperparameter</span>
-<span class="co">#&gt;            [,1]</span>
-<span class="co">#&gt; [1,] -2.2467786</span>
-<span class="co">#&gt; [2,]  0.0745169</span>
-<span class="co">#&gt; [3,]  7.0862725</span>
-<span class="co">#&gt; [4,]  0.8148180</span>
-<span class="co">#&gt; [5,]  7.3426841</span>
-<span class="co">#&gt; [6,]  0.8010884</span>
+<span class="co">#&gt;             [,1]</span>
+<span class="co">#&gt; [1,] -2.29889771</span>
+<span class="co">#&gt; [2,]  0.01675102</span>
+<span class="co">#&gt; [3,]  6.30161244</span>
+<span class="co">#&gt; [4,]  0.69841592</span>
+<span class="co">#&gt; [5,]  6.79937367</span>
+<span class="co">#&gt; [6,]  0.74972531</span>
 <span class="va">logpdf</span><span class="op">$</span><span class="va">gradpara</span>   <span class="co"># dim 2 since 2 parameters</span>
 <span class="co">#&gt;           [,1]</span>
-<span class="co">#&gt; [1,] -18.86985</span>
-<span class="co">#&gt; [2,]  -1.86919</span></code></pre></div>
+<span class="co">#&gt; [1,] -18.97176</span>
+<span class="co">#&gt; [2,]  -1.40106</span></code></pre></div>
 <p>This allows us to use custom functions to learn these hyperparameters to give maximum predictive power. The goal right now is a single point estimate of these hyperparameters. One has to be very careful to keep these in good ranges, and the call below will make sure to return <code>-inf</code> if there is a problem with the chosen hyperparameters.</p>
 <div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">totobj</span> <span class="op">=</span> <span class="kw">function</span><span class="op">(</span><span class="va">parlist</span><span class="op">)</span> <span class="op">{</span> <span class="co">#my optimization function for tuning</span>
@@ -239,74 +239,74 @@
 <code class="sourceCode R"><span class="va">parlist</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>para <span class="op">=</span> <span class="fu"><a href="../reference/getpara.html">getpara</a></span><span class="op">(</span><span class="va">logpdf</span><span class="op">)</span>, hyp <span class="op">=</span> <span class="fu"><a href="../reference/gethyp.html">gethyp</a></span><span class="op">(</span><span class="va">om</span><span class="op">)</span><span class="op">)</span>
 <span class="fu">totobj</span><span class="op">(</span><span class="va">parlist</span><span class="op">)</span>
 <span class="co">#&gt; $val</span>
-<span class="co">#&gt; [1] 86.1085</span>
+<span class="co">#&gt; [1] 90.21949</span>
 <span class="co">#&gt; </span>
 <span class="co">#&gt; $gval</span>
 <span class="co">#&gt; $gval$para</span>
-<span class="co">#&gt;          [,1]</span>
-<span class="co">#&gt; [1,] 18.86985</span>
-<span class="co">#&gt; [2,]  1.36919</span>
+<span class="co">#&gt;            [,1]</span>
+<span class="co">#&gt; [1,] 18.9717609</span>
+<span class="co">#&gt; [2,]  0.9010602</span>
 <span class="co">#&gt; </span>
 <span class="co">#&gt; $gval$hyp</span>
-<span class="co">#&gt;             [,1]</span>
-<span class="co">#&gt; [1,]  -3.1103642</span>
-<span class="co">#&gt; [2,]  -0.0745169</span>
-<span class="co">#&gt; [3,] -12.4434154</span>
-<span class="co">#&gt; [4,]  -0.8148180</span>
-<span class="co">#&gt; [5,] -12.6998270</span>
-<span class="co">#&gt; [6,]  -0.8010884</span>
+<span class="co">#&gt;              [,1]</span>
+<span class="co">#&gt; [1,]  -3.05824515</span>
+<span class="co">#&gt; [2,]  -0.01675102</span>
+<span class="co">#&gt; [3,] -11.65875530</span>
+<span class="co">#&gt; [4,]  -0.69841592</span>
+<span class="co">#&gt; [5,] -12.15651653</span>
+<span class="co">#&gt; [6,]  -0.74972531</span>
 <span class="va">opth</span> <span class="op">=</span> <span class="fu"><a href="../reference/BFGS_std.html">BFGS_std</a></span><span class="op">(</span><span class="va">totobj</span>, <span class="va">parlist</span>, verbose<span class="op">=</span><span class="fl">3</span><span class="op">)</span> <span class="co">#</span>
 <span class="co">#&gt; [1] "doing opt..."</span>
 <span class="co">#&gt; [1] "Wolfe conditions"</span>
-<span class="co">#&gt; [1]  -2.543082 -45.439669</span>
-<span class="co">#&gt; [1] 83.56492</span>
+<span class="co">#&gt; [1]  -2.803293 -36.372524</span>
+<span class="co">#&gt; [1] 87.41572</span>
 <span class="co">#&gt; [1] "Wolfe conditions"</span>
-<span class="co">#&gt; [1] -1.0374504  0.7747972</span>
-<span class="co">#&gt; [1] 75.96987</span>
+<span class="co">#&gt; [1] -1.1104148  0.7904893</span>
+<span class="co">#&gt; [1] 83.15925</span>
 <span class="co">#&gt; [1] "Wolfe conditions"</span>
-<span class="co">#&gt; [1] -13.30154 -62.37942</span>
-<span class="co">#&gt; [1] 62.66481</span>
+<span class="co">#&gt; [1] -16.08309 -22.00971</span>
+<span class="co">#&gt; [1] 67.07403</span>
 <span class="co">#&gt; [1] "Wolfe conditions"</span>
-<span class="co">#&gt; [1]  -7.971211 -18.725923</span>
-<span class="co">#&gt; [1] 54.69173</span>
+<span class="co">#&gt; [1] -6.445922 -4.350100</span>
+<span class="co">#&gt; [1] 60.62733</span>
 <span class="co">#&gt; [1] "Wolfe conditions"</span>
-<span class="co">#&gt; [1] -7.0232894 -0.4355899</span>
-<span class="co">#&gt; [1] 47.66768</span>
+<span class="co">#&gt; [1] -8.898894 -8.544808</span>
+<span class="co">#&gt; [1] 51.7273</span>
 <span class="co">#&gt; [1] "Wolfe conditions"</span>
-<span class="co">#&gt; [1] -12.73953 -60.33919</span>
-<span class="co">#&gt; [1] 34.9238</span>
+<span class="co">#&gt; [1] -7.560037 -4.861970</span>
+<span class="co">#&gt; [1] 44.16633</span>
 <span class="co">#&gt; [1] "Wolfe conditions"</span>
-<span class="co">#&gt; [1]  -3.393848 -16.764454</span>
-<span class="co">#&gt; [1] 31.52852</span>
+<span class="co">#&gt; [1] -6.753155 -5.837951</span>
+<span class="co">#&gt; [1] 37.41231</span>
 <span class="co">#&gt; [1] "Wolfe conditions"</span>
-<span class="co">#&gt; [1] -0.9501185 -3.8245236</span>
-<span class="co">#&gt; [1] 30.57809</span>
+<span class="co">#&gt; [1] -3.385748 -9.704727</span>
+<span class="co">#&gt; [1] 34.02594</span>
 <span class="co">#&gt; [1] "Wolfe conditions"</span>
-<span class="co">#&gt; [1] -0.3354883 -1.4002641</span>
-<span class="co">#&gt; [1] 30.24247</span>
+<span class="co">#&gt; [1] -0.3423167 -1.7497803</span>
+<span class="co">#&gt; [1] 33.68353</span>
 <span class="co">#&gt; [1] "Wolfe conditions"</span>
-<span class="co">#&gt; [1] -0.09008546 -0.19099465</span>
+<span class="co">#&gt; [1] -0.04135020 -0.02582447</span>
 <span class="co">#&gt; [1] "finished opt..."</span></code></pre></div>
 <p>Then we just have to update out parameters and re-optimize, and we can check that we are at least must closer to stationary point.</p>
 <div class="sourceCode" id="cb18"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu">totobj</span><span class="op">(</span><span class="va">opth</span><span class="op">$</span><span class="va">par</span><span class="op">)</span>
 <span class="co">#&gt; $val</span>
-<span class="co">#&gt; [1] 30.15237</span>
+<span class="co">#&gt; [1] 33.64218</span>
 <span class="co">#&gt; </span>
 <span class="co">#&gt; $gval</span>
 <span class="co">#&gt; $gval$para</span>
 <span class="co">#&gt;            [,1]</span>
-<span class="co">#&gt; [1,]  0.2043193</span>
-<span class="co">#&gt; [2,] -0.7216317</span>
+<span class="co">#&gt; [1,] -0.6253316</span>
+<span class="co">#&gt; [2,] -0.3563686</span>
 <span class="co">#&gt; </span>
 <span class="co">#&gt; $gval$hyp</span>
-<span class="co">#&gt;             [,1]</span>
-<span class="co">#&gt; [1,]  0.28198626</span>
-<span class="co">#&gt; [2,]  0.25268431</span>
-<span class="co">#&gt; [3,]  0.69456892</span>
-<span class="co">#&gt; [4,]  0.25800426</span>
-<span class="co">#&gt; [5,]  0.36277765</span>
-<span class="co">#&gt; [6,] -0.05851311</span></code></pre></div>
+<span class="co">#&gt;            [,1]</span>
+<span class="co">#&gt; [1,] -1.6721776</span>
+<span class="co">#&gt; [2,] -0.5421035</span>
+<span class="co">#&gt; [3,] -0.8130574</span>
+<span class="co">#&gt; [4,] -1.3953348</span>
+<span class="co">#&gt; [5,] -2.2099222</span>
+<span class="co">#&gt; [6,] -1.0318738</span></code></pre></div>
 <p>These steps can all be nicely wrapped up in another function <code><a href="../reference/BFGS_lpdf.html">?BFGS_lpdf</a></code>, which is a simpler call with the same result. Note because of some things not fully understood, these numbers will not match <em>exactly</em> above, but they will be quite close and functionally the same.</p>
 <div class="sourceCode" id="cb19"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">opth</span> <span class="op">=</span> <span class="fu"><a href="../reference/BFGS_lpdf.html">BFGS_lpdf</a></span><span class="op">(</span><span class="va">om</span>, <span class="va">logpdf</span>, 
@@ -314,37 +314,34 @@
                  verbose <span class="op">=</span> <span class="fl">3</span>, newt<span class="op">=</span> <span class="cn">T</span><span class="op">)</span>  
 <span class="co">#&gt; [1] "doing opt..."</span>
 <span class="co">#&gt; [1] "Wolfe conditions"</span>
-<span class="co">#&gt; [1]  -2.543082 -45.439669</span>
-<span class="co">#&gt; [1] 83.56492</span>
+<span class="co">#&gt; [1]  -2.803293 -36.372524</span>
+<span class="co">#&gt; [1] 87.41572</span>
 <span class="co">#&gt; [1] "Wolfe conditions"</span>
-<span class="co">#&gt; [1] -1.0374504  0.7747972</span>
-<span class="co">#&gt; [1] 75.7476</span>
+<span class="co">#&gt; [1] -1.1104148  0.7904893</span>
+<span class="co">#&gt; [1] 83.15925</span>
 <span class="co">#&gt; [1] "Wolfe conditions"</span>
-<span class="co">#&gt; [1]  -9.08536 -87.70176</span>
-<span class="co">#&gt; [1] 66.65842</span>
+<span class="co">#&gt; [1] -16.08309 -22.00971</span>
+<span class="co">#&gt; [1] 67.07403</span>
 <span class="co">#&gt; [1] "Wolfe conditions"</span>
-<span class="co">#&gt; [1] -10.96653 -36.06925</span>
-<span class="co">#&gt; [1] 55.68864</span>
+<span class="co">#&gt; [1] -6.445922 -4.350100</span>
+<span class="co">#&gt; [1] 60.62733</span>
 <span class="co">#&gt; [1] "Wolfe conditions"</span>
-<span class="co">#&gt; [1] -6.1912041 -0.1808788</span>
-<span class="co">#&gt; [1] 49.49678</span>
+<span class="co">#&gt; [1] -8.898894 -8.544808</span>
+<span class="co">#&gt; [1] 51.7273</span>
 <span class="co">#&gt; [1] "Wolfe conditions"</span>
-<span class="co">#&gt; [1] -10.81943 -88.95870</span>
-<span class="co">#&gt; [1] 38.67212</span>
+<span class="co">#&gt; [1] -7.560037 -4.861970</span>
+<span class="co">#&gt; [1] 44.16633</span>
 <span class="co">#&gt; [1] "Wolfe conditions"</span>
-<span class="co">#&gt; [1]  -1.765363 -45.186544</span>
-<span class="co">#&gt; [1] 36.90322</span>
+<span class="co">#&gt; [1] -6.753155 -5.837951</span>
+<span class="co">#&gt; [1] 37.41231</span>
 <span class="co">#&gt; [1] "Wolfe conditions"</span>
-<span class="co">#&gt; [1] -5.530817 -9.564180</span>
-<span class="co">#&gt; [1] 31.37129</span>
+<span class="co">#&gt; [1] -3.385748 -9.704727</span>
+<span class="co">#&gt; [1] 34.02594</span>
 <span class="co">#&gt; [1] "Wolfe conditions"</span>
-<span class="co">#&gt; [1] -1.128216 -2.536217</span>
-<span class="co">#&gt; [1] 30.24281</span>
+<span class="co">#&gt; [1] -0.3423167 -1.7497803</span>
+<span class="co">#&gt; [1] 33.68353</span>
 <span class="co">#&gt; [1] "Wolfe conditions"</span>
-<span class="co">#&gt; [1] -0.06653211 -0.33401501</span>
-<span class="co">#&gt; [1] 30.17625</span>
-<span class="co">#&gt; [1] "Wolfe conditions"</span>
-<span class="co">#&gt; [1] -0.02778653 -0.06042550</span>
+<span class="co">#&gt; [1] -0.04135020 -0.02582446</span>
 <span class="co">#&gt; [1] "finished opt..."</span></code></pre></div>
 <p>The revised predictions are then built after hyperparameter optimization where we find improved predictive accuracy in nearly every category. Here we can see a much better alignment between predictions and actual alongside a better plot of standardized residuals (more like a standard normal distribution).</p>
 <div class="sourceCode" id="cb20"><pre class="downlit sourceCode r">
