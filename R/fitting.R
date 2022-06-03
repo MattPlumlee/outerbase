@@ -7,13 +7,17 @@ listcov = function() {
   c("mat25pow", "mat25", "mat25ang")
 }
 
-#' fit an outerbase
+#' Outerbase model fit
+#' 
+#' This function fits an outerbase model for prediction and hides most of the
+#' actual object-oriented aspects of the package.
 #' 
 #' @param x a n by d sized matrix of inputs
 #' @param y a n length vector of outputs
 #' @param numb size of basis to use
 #' @param covnames a d length vector of covariance names
-#' @return Saving important model information
+#' @return Saving important model information to be used with 
+#' \code{\link{obpred}}
 #' @export
 obfit = function(x, y, numb=100, covnames=NULL) {
   if(dim(x)[1] != length(y)) stop("\n x and y dims do not align")
@@ -91,11 +95,15 @@ obfit = function(x, y, numb=100, covnames=NULL) {
   obmodel
 }
 
-#' pred from an outerbase
+#' Prediction from outerbase
+#' 
+#' This function allows for turning an \code{obmodel} into predictions with 
+#' mean and variance.
 #' 
 #' @param obmodel output from \code{\link{obfit}}
 #' @param x a new m by d sized matrix of inputs
 #' @return A list with \code{mean} and \code{var} at new x
+#' @seealso obfit
 #' @export
 obpred = function(obmodel, x){
   obmodel$predobj$update(x)

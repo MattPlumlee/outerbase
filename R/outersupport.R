@@ -14,17 +14,18 @@ Rcpp::loadModule("obmod", TRUE)
 #' BFGS standard
 #' 
 #' Do generic minimization of a function \code{funcw} that takes
-#' a list rho using the Broyden-Fletcher-Goldfarb-Shanno algorithm.
-#' Useful for hyperparameter optimization because it handles infs 
+#' a list par using the "Broyden-Fletcher-Goldfarb-Shanno" (BFGS) algorithm.
+#' Useful for hyperparameter optimization because it handles infinite returns
 #' fairly easily.  
 #' 
 #' @param funcw An object to optimize
-#' @param rho An initial point
+#' @param par An initial point as a list
 #' @param ... additional parameters passed to \code{funcw}
-#' @param verbose Integer from 0-3 where larger prints more information
-#' @return A list of information from optimization
+#' @param verbose an integer from 0-3 where larger prints more information
+#' @return a list of information from optimization, with the value stored in
+#' `par`
 #' @export
-BFGS_std <- function(funcw, rho, ...,verbose = 0){
+BFGS_std <- function(funcw, par, ...,verbose = 0){
   #linesearchparameters
   Bs = NULL #initial inverse hessian
   lr0 = 0.1 #initial learning rate
@@ -33,9 +34,9 @@ BFGS_std <- function(funcw, rho, ...,verbose = 0){
   numatte0 = 5
   
   lr = lr0
-  rhov = unlist(rho)
+  parv = unlist(par)
   
-  optid = funcw(relist(rhov,rho), ...)
+  optid = funcw(relist(parv,par), ...)
   valo = optid$val
   go = unlist(optid$gval)
   resetB = TRUE
@@ -54,8 +55,8 @@ BFGS_std <- function(funcw, rho, ...,verbose = 0){
       dirc = as.vector(-B %*% go)
       
       st = lr*dirc
-      rhovp = rhov + st
-      optid = funcw(relist(rhovp,rho), ...)
+      parvp = parv + st
+      optid = funcw(relist(parvp,par), ...)
       wolfcond1 = (optid$val-valo) - c1*lr*(sum(dirc*go))
       wolfcond2 = -(sum(dirc*unlist(optid$gval)))+(c2*(sum(dirc*go)))
       
@@ -80,8 +81,8 @@ BFGS_std <- function(funcw, rho, ...,verbose = 0){
           if(is.finite(lrub)) lrh = 1/2*(lrlb+lrub)
           else lrh = 2*lrlb
         }
-        rhovp = rhov + lrh*dirc
-        optidh = funcw(relist(rhovp,rho), ...)
+        parvp = parv + lrh*dirc
+        optidh = funcw(relist(parvp,par), ...)
         wolfcond1 = (optidh$val-valo) - c1*lrh*(sum(dirc*go))
         wolfcond2 = -(sum(dirc*unlist(optidh$gval)))+(c2*(sum(dirc*go)))
         numatte = numatte-1
@@ -98,7 +99,7 @@ BFGS_std <- function(funcw, rho, ...,verbose = 0){
         if(lr0 < lr00/(10^2+1)){
           break
         }
-        optid = funcw(relist(rhov,rho), ...) #do not feed it extra info
+        optid = funcw(relist(parv,par), ...) #do not feed it extra info
         valo = optid$val
         go = unlist(optid$gval)
         B = diag(1/sqrt(0.01+go^2))
@@ -106,11 +107,11 @@ BFGS_std <- function(funcw, rho, ...,verbose = 0){
       } else {
         if(lr != lrh){
           lr = lrh
-          st = rhovp-rhov
-          rhov = rhovp
+          st = parvp-parv
+          parv = parvp
           optid = optidh
         } else{
-          rhov = rhovp
+          parv = parvp
         }
         
         if (k > 2 && sum(st*go) > -length(go)/4 && twice){
@@ -126,7 +127,7 @@ BFGS_std <- function(funcw, rho, ...,verbose = 0){
         yv = go-goo
         
         if(resetB){
-          B = sum(st*yv)/sum(yv*yv)* diag(length(rhov))
+          B = sum(st*yv)/sum(yv*yv)* diag(length(parv))
           resetB = FALSE
         }
         
@@ -140,9 +141,9 @@ BFGS_std <- function(funcw, rho, ...,verbose = 0){
       stop('initial gradient was undefined, stopping.')
     }
   
-  funcw(relist(rhov,rho), ...) #finish by evaluating
+  funcw(relist(parv,par), ...) #finish by evaluating
   if (verbose > 0) print('finished opt...')
-  list(vec=relist(rhov,rho), B=B, lr=lr, optid=optid)
+  list(par=relist(parv,par), B=B, lr=lr, optid=optid)
 }
 
 #' BFGS lpdf
@@ -154,21 +155,19 @@ BFGS_std <- function(funcw, rho, ...,verbose = 0){
 #' 
 #' @param om an \code{\link{outermod}} object
 #' @param logpdf a \code{\link{lpdf}} object
-#' @param rho an initial point, initialized from objects if needed
-#' @param newt bool for if Newtons method should be used
+#' @param par an initial point, initialized from objects if needed
+#' @param newt boolean for if Newtons method should be used
 #' @param ... additional parameters passed to \code{\link{BFGS_std}}
 #' @return A list of information from optimization
 #' @export
-BFGS_lpdf <- function(om, logpdf, rho=list(), newt=F, ...){
-  if(is.null(rho$hyp)) rho$hyp = gethyp(om)
-  if(is.null(rho$para)) rho$para = getpara(logpdf)
+BFGS_lpdf <- function(om, logpdf, par=list(), newt=F, ...){
+  if(is.null(par$hyp)) par$hyp = gethyp(om)
+  if(is.null(par$para)) par$para = getpara(logpdf)
   
-  .lpdfwrapper(rho, om, logpdf, newt=newt)
-  
-  optsum = BFGS_std(.lpdfwrapper, rho, om=om, newt=newt,
+  .lpdfwrapper(par, om, logpdf, newt=newt)
+  optsum = BFGS_std(.lpdfwrapper, par, om=om, newt=newt,
                     logpdf=logpdf, ...)
-  
-  .lpdfwrapper(optsum$vec, om, logpdf, newt=newt)
+  .lpdfwrapper(optsum$par, om, logpdf, newt=newt)
   
   optsum
 }
@@ -176,19 +175,19 @@ BFGS_lpdf <- function(om, logpdf, rho=list(), newt=F, ...){
 # Optimization wrapper
 # 
 # returns list of \code{val} and \code{grad}
-.lpdfwrapper = function(hypl, om, logpdf, newt = F) {
-  regpara = logpdf$paralpdf(hypl$para)
-  reghyp = om$hyplpdf(hypl$hyp)
+.lpdfwrapper = function(parlist, om, logpdf, newt = F) {
+  regpara = logpdf$paralpdf(parlist$para)
+  reghyp = om$hyplpdf(parlist$hyp)
   if(is.finite(regpara) && is.finite(reghyp)) { 
-    om$updatehyp(hypl$hyp)
+    om$updatehyp(parlist$hyp)
     logpdf$updateom()
-    logpdf$updatepara(hypl$para)
+    logpdf$updatepara(parlist$para)
     if(newt) logpdf$optnewton()
     else logpdf$optcg(0.001, 100)
     
-    gval = hypl
-    gval$hyp = -logpdf$gradhyp-om$hyplpdf_grad(hypl$hyp)
-    gval$para = -logpdf$gradpara-logpdf$paralpdf_grad(hypl$para)#
+    gval = parlist
+    gval$hyp = -logpdf$gradhyp-om$hyplpdf_grad(parlist$hyp)
+    gval$para = -logpdf$gradpara-logpdf$paralpdf_grad(parlist$para)#
     list(val = -logpdf$val-reghyp-regpara, gval = gval)#
-  } else list(val = Inf, gval = hypl) 
+  } else list(val = Inf, gval = NULL) 
 }

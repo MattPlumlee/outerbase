@@ -20,14 +20,10 @@ om = new(outermod)
 
 testmultgrad = function(ss=400,nterms=100){
   
+  
   d = 8
+  set.seed(42)
   xo = matrix(runif(ss*d),ncol=d)
-  A = matrix(0,nrow=d,ncol=d)
-  for(i in 1:d) for(j in 1:d) A[i,j] = 0.001^abs(i-j)
-  xo = ((xo-0.5) %*% A) +0.5
-  miv = apply(xo,2,min)
-  mav = apply(xo,2,max)
-  xo = t(0.005+0.99*(t(xo)-miv)/(mav-miv))
   yo = borehole(xo)
   x = xo
   
@@ -35,11 +31,8 @@ testmultgrad = function(ss=400,nterms=100){
   scale = sd(yo)
   y = (yo-offset)/scale
   knotlist = list()
-  for(k in 1:d)  knotlist[[k]] = quantile(x[,k],
-                                          seq(0,1,length=40)*40/
-                                            (40+1)+0.5/(40+1))
+  for(k in 1:d)  knotlist[[k]] = seq(0.001,0.999,0.025)
   
-  eta = 0.1+0.1*(runif(2*d)-0.5)#rep(c(0,0),d)
   setcovfs(om, c("mat25pow",rep("mat25",d-1)))
   
   setknot(om,knotlist)
@@ -73,7 +66,7 @@ testmultgrad = function(ss=400,nterms=100){
 }
 
 expect_equal_or_warn <- function(...) tryCatch(expect_equal(...),
-      error = function(e) warning("some errors on grad, this can be normal."))
+      error = function(e) warning("some inexact grad, this can be normal."))
 
 
 test_that("short, skinny test", {
