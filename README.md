@@ -8,7 +8,7 @@ status](https://www.r-pkg.org/badges/version/outerbase)](https://CRAN.R-project.
 
 # outerbase
 
-outerbase is an `R` package providing regression approaches designed for
+outerbase is an R package providing regression approaches designed for
 creating emulators for high-accuracy simulations. The package creates
 high-dimensional approximations (near-interpolators) using a unique
 outer product basis function structure. The advantages over other
@@ -24,13 +24,13 @@ construct predictors that
 -   accommodate flexible data generation.
 
 The software is open source, which can be found on
-[github](https://github.com/MattPlumlee/outerbase/), and it is licensed
+[Github](https://github.com/MattPlumlee/outerbase/), and it is licensed
 under the MIT license. For details on installation and references to
 papers, see the [webpage
 docs](https://mattplumlee.github.io/outerbase/).
 
 A `CRAN` package is on the way, but `Github` will be a reliable way to
-check in on the project:
+try out the code. The code can be pulled directly using `{devtools}`.
 
 <div class=".outerbase-devel">
 
