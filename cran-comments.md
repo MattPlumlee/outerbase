@@ -1,15 +1,12 @@
+
+* This is a new release.
+
 This package covers an important development in new methodology I would like to 
 easily share with collaborators. 
 
 The package is tested using Github actions. The only remaining notes are about 
 GNU being needed with Rcpp and the size of the libraries, which seems to be 
 needed to make it work. Notes are summarized below.
-
-## R CMD check results
-
-0 errors | 0 warnings | 1 note
-
-* This is a new release.
 
 ## Github actions results
 
