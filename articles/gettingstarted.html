@@ -90,17 +90,17 @@
 <div class="section level2">
 <h2 id="overview">Overview<a class="anchor" aria-label="anchor" href="#overview"></a>
 </h2>
-<p>The goal of <code>outerbase</code> is to make the production of near-interpolators easy, stable, and scalable. It is based on a <code>C++</code> backend, powered specifically by <a href="http://www.rcpp.org" class="external-link">Rcpp</a>. Specifically, it leverages unique, fast linear algebra using <a href="https://github.com/RcppCore/RcppArmadillo" class="external-link">RcppArmadillo</a> (<a href="http://arma.sourceforge.net" class="external-link">Armadillo</a>) and <code>omp</code>. The overall structure is designed to be interacted with in an object-oriented manner using <code>Rcpp</code> modules.</p>
+<p>The goal of <code>outerbase</code> is to make the production of near-interpolators easy, stable, and scalable. It is based on a <code>C++</code> backend and interfaced with <code>R</code> via <a href="http://www.rcpp.org" class="external-link">Rcpp</a>. Under the hood, it leverages unique, custom linear algebra using <a href="https://github.com/RcppCore/RcppArmadillo" class="external-link">RcppArmadillo</a> (<a href="http://arma.sourceforge.net" class="external-link">Armadillo</a>) and <code>omp</code>. The overall structure is designed to be interacted with in an object-oriented manner using <code>Rcpp</code> modules.</p>
 <p>There are ways to interact with <code>outerbase</code> for those who are uncomfortable with (or just actively detest) object oriented programming.</p>
 <p>To begin, load the package.</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://mattplumlee.github.io/outerbase">outerbase</a></span><span class="op">)</span></code></pre></div>
+<code class="sourceCode R"><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://mattplumlee.github.io/outerbase/">outerbase</a></span><span class="op">)</span></code></pre></div>
 <p>Note that if you built this package from source, make sure you use a compiler that can process <code>omp</code> commands to access the entire speed benefits.</p>
 </div>
 <div class="section level2">
 <h2 id="simple-prediction">Simple prediction<a class="anchor" aria-label="anchor" href="#simple-prediction"></a>
 </h2>
-<p>To understand how to get started with using the package, we will try to predict using data from a function with an eight dimensional input commonly known as the Borehole function. First we will generate <code>1000</code> points using a test function built into the package <code><a href="../reference/obtest_borehole8d.html">?obtest_borehole8d</a></code>.</p>
+<p>To understand how to get started with using the package, we predict using data from a function with an eight dimensional input commonly known as the <a href="https://www.sfu.ca/~ssurjano/borehole.html" class="external-link">Borehole function</a>. We begin by generating <code>1000</code> points using a test function <code><a href="../reference/obtest_borehole8d.html">?obtest_borehole8d</a></code> built into the package.</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">sampsize</span> <span class="op">=</span> <span class="fl">400</span>
 <span class="va">d</span> <span class="op">=</span> <span class="fl">8</span>
@@ -108,8 +108,8 @@
 <span class="va">y</span> <span class="op">=</span> <span class="fu"><a href="../reference/obtest_borehole8d.html">obtest_borehole8d</a></span><span class="op">(</span><span class="va">x</span><span class="op">)</span> <span class="op">+</span> <span class="fl">0.5</span><span class="op">*</span><span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">rnorm</a></span><span class="op">(</span><span class="va">sampsize</span><span class="op">)</span></code></pre></div>
 <p>Our goal will be to design a predictor for <code>y</code> given <code>x</code> that is a near-interpolator.</p>
 <p>The simplest way to interact with this package is using <code><a href="../reference/obfit.html">?obfit</a></code> (fitting outerbase). The function requires <code>x</code>, <code>y</code> and two other objects.</p>
-<p>The value of <code>numb</code> is the number of basis functions you want to use. The choice of <code>numb</code> is still under research, but generally you want it to be large-ish. Play around!</p>
-<p>The underlying concepts of this approach come from Gaussian processes. Thus the core building block of predictors will be covariances functions. The choice of the covariances needed for <code>obfit</code> is a list of strings the corresponding to each columns in <code>x</code>. Type <code><a href="../reference/listcov.html">listcov()</a></code> to discover what covariance functions are are currently deployed.</p>
+<p>The value of <code>numb</code> is the number of basis functions you want to use. The choice of <code>numb</code> is still under research, but generally you want it to be large as tolerable. Play around!</p>
+<p>The underlying concepts of this approach come from Gaussian processes. Thus the core building block of predictors will be covariances functions. The choice of the covariances needed for <code>obfit</code> is a list of strings corresponding to each column in <code>x</code>. Type <code><a href="../reference/listcov.html">listcov()</a></code> to discover what covariance functions are are currently deployed.</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="../reference/listcov.html">listcov</a></span><span class="op">(</span><span class="op">)</span>
 <span class="co">#&gt; [1] "mat25pow" "mat25"    "mat25ang"</span></code></pre></div>
@@ -138,10 +138,10 @@
 <span class="co">#&gt;  x are too small for ranges</span>
 <span class="co">#&gt;  the limits are between 0 and 1  </span>
 <span class="co">#&gt;  try rescaling</span></code></pre></div>
-<p>Here is one correct deployment, where <code>mat25pow</code> is used for all dimensions.</p>
+<p>Below is one correct deployment, where <code>mat25pow</code> is used for all dimensions. This should take a bit to run, but it should be less than a minute on most modern computers.</p>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">obmodel</span> <span class="op">=</span> <span class="fu"><a href="../reference/obfit.html">obfit</a></span><span class="op">(</span><span class="va">x</span>, <span class="va">y</span>, numb <span class="op">=</span> <span class="fl">300</span>, covnames<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="st">"mat25pow"</span>,<span class="fl">8</span><span class="op">)</span><span class="op">)</span></code></pre></div>
-<p>We can then predict using <code>obpred</code>. Consider predicting at our training points, we can see that while it is not an interpolator, it is close.</p>
+<p>We can then predict using <code><a href="../reference/obpred.html">?obpred</a></code>. While it is not an exact interpolator, it is close.</p>
 <div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">predtr</span> <span class="op">=</span> <span class="fu"><a href="../reference/obpred.html">obpred</a></span><span class="op">(</span><span class="va">obmodel</span>, <span class="va">x</span><span class="op">)</span>
 <span class="va">rmsetr</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/MathFun.html" class="external-link">sqrt</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/mean.html" class="external-link">mean</a></span><span class="op">(</span><span class="op">(</span><span class="va">y</span><span class="op">-</span><span class="va">predtr</span><span class="op">$</span><span class="va">mean</span><span class="op">)</span><span class="op">^</span><span class="fl">2</span><span class="op">)</span><span class="op">)</span>
@@ -149,7 +149,7 @@
      main<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste</a></span><span class="op">(</span><span class="st">"training \n RMSE = "</span>, <span class="fu"><a href="https://rdrr.io/r/base/Round.html" class="external-link">round</a></span><span class="op">(</span><span class="va">rmsetr</span>,<span class="fl">3</span><span class="op">)</span><span class="op">)</span>,
      xlab<span class="op">=</span><span class="st">"prediction"</span>, ylab <span class="op">=</span> <span class="st">"actual"</span><span class="op">)</span></code></pre></div>
 <p><img src="gettingstarted_files/figure-html/unnamed-chunk-6-1.png" width="700"></p>
-<p>The fact that we generated this data means we can show that <code>outerbase</code> can reasonably predict ground truth, meaning overfitting is not an issue.</p>
+<p>Since we generated this data, we can show that <code>outerbase</code> can reasonably predict ground truth, meaning overfitting is not an issue.</p>
 <div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">ytrue</span> <span class="op">=</span> <span class="fu"><a href="../reference/obtest_borehole8d.html">obtest_borehole8d</a></span><span class="op">(</span><span class="va">x</span><span class="op">)</span>
 <span class="va">rmsetr</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/MathFun.html" class="external-link">sqrt</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/mean.html" class="external-link">mean</a></span><span class="op">(</span><span class="op">(</span><span class="va">ytrue</span><span class="op">-</span><span class="va">predtr</span><span class="op">$</span><span class="va">mean</span><span class="op">)</span><span class="op">^</span><span class="fl">2</span><span class="op">)</span><span class="op">)</span>
@@ -161,7 +161,7 @@
 <div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">xtest</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/matrix.html" class="external-link">matrix</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/stats/Uniform.html" class="external-link">runif</a></span><span class="op">(</span><span class="fl">1000</span><span class="op">*</span><span class="va">d</span><span class="op">)</span>,ncol<span class="op">=</span><span class="va">d</span><span class="op">)</span> <span class="co">#prediction points</span>
 <span class="va">ytest</span> <span class="op">=</span> <span class="fu"><a href="../reference/obtest_borehole8d.html">obtest_borehole8d</a></span><span class="op">(</span><span class="va">xtest</span><span class="op">)</span> <span class="op">+</span> <span class="fl">0.5</span><span class="op">*</span><span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">rnorm</a></span><span class="op">(</span><span class="fl">1000</span><span class="op">)</span></code></pre></div>
-<p>The predictions that we get are also outstanding here at these new points. Not quite as good as the residuals on the test set, but we are extrapolating here.</p>
+<p>The predictions at these new points are also quite good. Not quite as good as the residuals on the test set, but we are extrapolating here.</p>
 <div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">predtest</span> <span class="op">=</span> <span class="fu"><a href="../reference/obpred.html">obpred</a></span><span class="op">(</span><span class="va">obmodel</span>, <span class="va">xtest</span><span class="op">)</span>
 

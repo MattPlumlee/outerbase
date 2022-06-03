@@ -89,14 +89,13 @@
     
 <p>This page is designed to explain how <code>outerbase</code> can facilitate fast inference with smart modeling choices.</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://mattplumlee.github.io/outerbase">outerbase</a></span><span class="op">)</span></code></pre></div>
-<p>This is important as the sample size grows, so we will use <code>500</code> datapoints.</p>
+<code class="sourceCode R"><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://mattplumlee.github.io/outerbase/">outerbase</a></span><span class="op">)</span></code></pre></div>
+<p>The potential benefits grow as the sample size grows. We use a sample size of <code>500</code> here in the spirit of running quickly. The point will be obvious, but more dramatic results can be had by increasing the sample size.</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">sampsize</span> <span class="op">=</span> <span class="fl">500</span>
 <span class="va">d</span> <span class="op">=</span> <span class="fl">8</span>
 <span class="va">x</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/matrix.html" class="external-link">matrix</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/stats/Uniform.html" class="external-link">runif</a></span><span class="op">(</span><span class="va">sampsize</span><span class="op">*</span><span class="va">d</span><span class="op">)</span>,ncol<span class="op">=</span><span class="va">d</span><span class="op">)</span>
 <span class="va">y</span> <span class="op">=</span> <span class="fu"><a href="../reference/obtest_borehole8d.html">obtest_borehole8d</a></span><span class="op">(</span><span class="va">x</span><span class="op">)</span></code></pre></div>
-<p>The differences get more dramatic with larger sample sizes, however in the spirit of running quickly we will use this sample size.</p>
 <p>First setup an <code>outermod</code> object.</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">om</span> <span class="op">=</span> <span class="fu">new</span><span class="op">(</span><span class="va">outermod</span><span class="op">)</span>
@@ -104,7 +103,7 @@
 <span class="va">knotlist</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="op">)</span>;
 <span class="kw">for</span><span class="op">(</span><span class="va">k</span> <span class="kw">in</span> <span class="fl">1</span><span class="op">:</span><span class="va">d</span><span class="op">)</span> <span class="va">knotlist</span><span class="op">[[</span><span class="va">k</span><span class="op">]</span><span class="op">]</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq</a></span><span class="op">(</span><span class="fl">0.01</span>,<span class="fl">1</span>,by<span class="op">=</span><span class="fl">0.025</span><span class="op">)</span>
 <span class="fu"><a href="../reference/setknot.html">setknot</a></span><span class="op">(</span><span class="va">om</span>, <span class="va">knotlist</span><span class="op">)</span> <span class="co">#40 knot point for each dim</span></code></pre></div>
-<p>More data should mean more basis functions.</p>
+<p>More data should mean more basis functions. So we will choose <code>250</code> terms for our feature space approximation.</p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">p</span> <span class="op">=</span> <span class="fl">250</span>
 <span class="va">terms</span> <span class="op">=</span> <span class="va">om</span><span class="op">$</span><span class="fu">selectterms</span><span class="op">(</span><span class="va">p</span><span class="op">)</span></code></pre></div>
@@ -125,19 +124,20 @@
 <code class="sourceCode R"><span class="va">loglik_fast</span> <span class="op">=</span> <span class="fu">new</span><span class="op">(</span><span class="va">loglik_gauss</span>, <span class="va">om</span>, <span class="va">terms</span>, <span class="va">y</span>, <span class="va">x</span><span class="op">)</span> 
 <span class="va">logpr_fast</span> <span class="op">=</span> <span class="fu">new</span><span class="op">(</span><span class="va">logpr_gauss</span>, <span class="va">om</span>, <span class="va">terms</span><span class="op">)</span>
 <span class="va">logpdf_fast</span> <span class="op">=</span> <span class="fu">new</span><span class="op">(</span><span class="va">lpdfvec</span>, <span class="va">loglik_fast</span>, <span class="va">logpr_fast</span><span class="op">)</span></code></pre></div>
-<p><code>logpdf_fast</code> will through an error if you try to use <code>optnewton</code>. This is because it is written so that it never builds a <code>hess</code> matrix.</p>
+<p><code>logpdf_fast</code> will through an error if you try to use <code>optnewton</code>. This is because it is written so that it never builds a Hessian (<code>hess</code> in the code) matrix.</p>
 <div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">logpdf_fast</span><span class="op">$</span><span class="fu">optnewton</span><span class="op">(</span><span class="op">)</span>
 <span class="co">#&gt; Error in logpdf_fast$optnewton(): addition: incompatible matrix dimensions: 0x0 and 250x250</span></code></pre></div>
-<p>It is suggested to use <code>lpdf$optcg</code> (conjugate gradient) to optimize the coefficients in the fast version.</p>
+<p>It is instead suggested to use <code>lpdf$optcg</code> (conjugate gradient) to optimize the coefficients in the fast version.</p>
 <div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">logpdf_fast</span><span class="op">$</span><span class="fu">optcg</span><span class="op">(</span><span class="fl">0.001</span>, <span class="fl">100</span><span class="op">)</span></code></pre></div>
+<code class="sourceCode R"><span class="va">logpdf_fast</span><span class="op">$</span><span class="fu">optcg</span><span class="op">(</span><span class="fl">0.001</span>,  <span class="co"># tolerance</span>
+                  <span class="fl">100</span><span class="op">)</span>    <span class="co"># max epochs</span></code></pre></div>
 <p>As an aside, <code>omp</code> speed ups are possible, but you need to have correctly compiled with <code>omp</code>. One check is to call the following.</p>
 <div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">ob</span> <span class="op">=</span> <span class="fu">new</span><span class="op">(</span><span class="va">outerbase</span>, <span class="va">om</span>, <span class="va">x</span><span class="op">)</span> 
 <span class="va">ob</span><span class="op">$</span><span class="va">nthreads</span>
 <span class="co">#&gt; [1] 2</span></code></pre></div>
-<p>If the answer is <code>1</code> but you have a multi-threaded processor (most modern processors), things are likely mis-aligned.</p>
+<p>If the answer is <code>1</code> but you have a multicore processor (most modern processors), your installation might be incorrect.</p>
 <p>You can manually set the number of threads for <code>lpdf</code> objects.</p>
 <div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">logpdf_slow</span><span class="op">$</span><span class="fu">setnthreads</span><span class="op">(</span><span class="fl">4</span><span class="op">)</span>
@@ -146,10 +146,10 @@
 <div class="section level2">
 <h2 id="timing">Timing<a class="anchor" aria-label="anchor" href="#timing"></a>
 </h2>
-<p>The main cost with models like these is hyperparameter optimization. Thus will we show the difference in time to build hyperparameters. Let’s save starting points (since they share <code>om</code>) for fairness.</p>
+<p>The main cost of fitting <code>outerbase</code> models is hyperparameter optimization. The difference between <code>logpdf_slow</code> and <code>logpdf_fast</code> will be apparent. Let’s save starting points (since they share <code>om</code>) for fairness.</p>
 <div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">hyp0_slow</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>para <span class="op">=</span> <span class="fu"><a href="../reference/getpara.html">getpara</a></span><span class="op">(</span><span class="va">logpdf_slow</span><span class="op">)</span>, hyp <span class="op">=</span> <span class="fu"><a href="../reference/gethyp.html">gethyp</a></span><span class="op">(</span><span class="va">om</span><span class="op">)</span><span class="op">)</span>
-<span class="va">hyp0_fast</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>para <span class="op">=</span> <span class="fu"><a href="../reference/getpara.html">getpara</a></span><span class="op">(</span><span class="va">logpdf_fast</span><span class="op">)</span>, hyp <span class="op">=</span> <span class="fu"><a href="../reference/gethyp.html">gethyp</a></span><span class="op">(</span><span class="va">om</span><span class="op">)</span><span class="op">)</span></code></pre></div>
+<code class="sourceCode R"><span class="va">parlist_slow</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>para <span class="op">=</span> <span class="fu"><a href="../reference/getpara.html">getpara</a></span><span class="op">(</span><span class="va">logpdf_slow</span><span class="op">)</span>, hyp <span class="op">=</span> <span class="fu"><a href="../reference/gethyp.html">gethyp</a></span><span class="op">(</span><span class="va">om</span><span class="op">)</span><span class="op">)</span>
+<span class="va">parlist_fast</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>para <span class="op">=</span> <span class="fu"><a href="../reference/getpara.html">getpara</a></span><span class="op">(</span><span class="va">logpdf_fast</span><span class="op">)</span>, hyp <span class="op">=</span> <span class="fu"><a href="../reference/gethyp.html">gethyp</a></span><span class="op">(</span><span class="va">om</span><span class="op">)</span><span class="op">)</span></code></pre></div>
 <p>Test points will verify the predictions are equally good with either model, the only difference is speed.</p>
 <div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">xtest</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/matrix.html" class="external-link">matrix</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/stats/Uniform.html" class="external-link">runif</a></span><span class="op">(</span><span class="fl">1000</span><span class="op">*</span><span class="va">d</span><span class="op">)</span>,ncol<span class="op">=</span><span class="va">d</span><span class="op">)</span> <span class="co">#prediction points</span>
@@ -158,30 +158,30 @@
 <div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">ptm</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/proc.time.html" class="external-link">proc.time</a></span><span class="op">(</span><span class="op">)</span>
 <span class="va">opth</span> <span class="op">=</span> <span class="fu"><a href="../reference/BFGS_lpdf.html">BFGS_lpdf</a></span><span class="op">(</span><span class="va">om</span>, <span class="va">logpdf_slow</span>, 
-                 rho<span class="op">=</span><span class="va">hyp0_slow</span>, newt<span class="op">=</span><span class="cn">T</span><span class="op">)</span>  
+                 par<span class="op">=</span><span class="va">parlist_slow</span>, newt<span class="op">=</span><span class="cn">T</span><span class="op">)</span>  
 <span class="va">t_slow</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/proc.time.html" class="external-link">proc.time</a></span><span class="op">(</span><span class="op">)</span> <span class="op">-</span> <span class="va">ptm</span>
 <span class="va">pred_slow</span> <span class="op">=</span> <span class="fu">new</span><span class="op">(</span><span class="va">predictor</span>,<span class="va">loglik_slow</span><span class="op">)</span>
 <span class="va">pred_slow</span><span class="op">$</span><span class="fu">update</span><span class="op">(</span><span class="va">xtest</span><span class="op">)</span>
 <span class="va">yhat_slow</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/vector.html" class="external-link">as.vector</a></span><span class="op">(</span><span class="va">pred_slow</span><span class="op">$</span><span class="fu">mean</span><span class="op">(</span><span class="op">)</span><span class="op">)</span>
 <span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">t_slow</span><span class="op">)</span>
 <span class="co">#&gt;    user  system elapsed </span>
-<span class="co">#&gt;  18.466   0.012  17.782</span></code></pre></div>
+<span class="co">#&gt;  21.652   0.024  20.736</span></code></pre></div>
 <div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">ptm</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/proc.time.html" class="external-link">proc.time</a></span><span class="op">(</span><span class="op">)</span>
 <span class="va">opth</span> <span class="op">=</span> <span class="fu"><a href="../reference/BFGS_lpdf.html">BFGS_lpdf</a></span><span class="op">(</span><span class="va">om</span>, <span class="va">logpdf_fast</span>, 
-                 rho<span class="op">=</span><span class="va">hyp0_fast</span>, newt<span class="op">=</span><span class="cn">F</span><span class="op">)</span>  
+                 par<span class="op">=</span><span class="va">parlist_fast</span>, newt<span class="op">=</span><span class="cn">F</span><span class="op">)</span>  
 <span class="va">t_fast</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/proc.time.html" class="external-link">proc.time</a></span><span class="op">(</span><span class="op">)</span> <span class="op">-</span> <span class="va">ptm</span>
 <span class="va">pred_fast</span> <span class="op">=</span> <span class="fu">new</span><span class="op">(</span><span class="va">predictor</span>,<span class="va">loglik_fast</span><span class="op">)</span>
 <span class="va">pred_fast</span><span class="op">$</span><span class="fu">update</span><span class="op">(</span><span class="va">xtest</span><span class="op">)</span>
 <span class="va">yhat_fast</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/vector.html" class="external-link">as.vector</a></span><span class="op">(</span><span class="va">pred_fast</span><span class="op">$</span><span class="fu">mean</span><span class="op">(</span><span class="op">)</span><span class="op">)</span>
 <span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">t_fast</span><span class="op">)</span>
 <span class="co">#&gt;    user  system elapsed </span>
-<span class="co">#&gt;   1.996   0.068   1.304</span></code></pre></div>
+<span class="co">#&gt;   2.212   0.145   1.571</span></code></pre></div>
 </div>
 <div class="section level2">
 <h2 id="comparison-of-results">Comparison of results<a class="anchor" aria-label="anchor" href="#comparison-of-results"></a>
 </h2>
-<p>And simply plotting the results tells the story: faster inference with no discernible dropoff in quality.</p>
+<p>And simply plotting the results tells the story: faster inference with no discernible drop off in quality. Note there are serious approximations here, but the approximations just have a negligible effect.</p>
 <div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/graphics/par.html" class="external-link">par</a></span><span class="op">(</span>mfrow<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>,<span class="fl">2</span><span class="op">)</span><span class="op">)</span>
 <span class="va">rmse_slow</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/MathFun.html" class="external-link">sqrt</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/mean.html" class="external-link">mean</a></span><span class="op">(</span><span class="op">(</span><span class="va">ytest</span><span class="op">-</span><span class="va">yhat_slow</span><span class="op">)</span><span class="op">^</span><span class="fl">2</span><span class="op">)</span><span class="op">)</span>
