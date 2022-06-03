@@ -1,8 +1,11 @@
 testcovgrad <- function(covname) {
+  
   ss = 10
   covobj = new(get(paste("covf_",covname,sep="")))
+  range = covobj$uppbnd-covobj$lowbnd
+  xo = seq(covobj$lowbnd+range/ss/2,covobj$uppbnd-range/ss/2,
+           length.out=ss)
   
-  xo = runif(ss)*(covobj$uppbnd-covobj$lowbnd)+covobj$lowbnd
   hyp0 = covobj$hyp0 + (covobj$hypub-covobj$hyplb)*
     (runif(length(covobj$hyp))-0.5)/2
   
@@ -25,11 +28,14 @@ testcovgrad <- function(covname) {
 
 
 testdiagcov <- function(covname) {
-  ss = 10
-  eval(parse(text=
-               paste("covobj = new(","covf_",covname,")",sep="")))
   
-  xo = runif(ss)*(covobj$uppbnd-covobj$lowbnd)+covobj$lowbnd
+  ss = 10
+  covobj = new(get(paste("covf_",covname,sep="")))
+  
+  set.seed(42)
+  range = covobj$uppbnd-covobj$lowbnd
+  xo = seq(covobj$lowbnd+range/ss/2,covobj$uppbnd-range/ss/2,
+           length.out=ss)
   
   A = covobj$cov(xo, xo)
   dA = covobj$covdiag(xo)

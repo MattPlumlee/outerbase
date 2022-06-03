@@ -69,15 +69,11 @@ perturbvals = function(obj, coeff, coeffp,
 
 
 fulltest = function(ss, nterms, corr=0, ep = 10^(-4)){
+  
   d = 8
   
+  set.seed(42)
   xo = matrix(runif(ss*d),ncol=d)
-  A = matrix(0,nrow=d,ncol=d)
-  for(i in 1:d) for(j in 1:d) A[i,j] = corr^abs(i-j)
-  xo = ((xo-0.5) %*% A) +0.5
-  miv = apply(xo,2,min)
-  mav = apply(xo,2,max)
-  xo = t(0.005+0.99*(t(xo)-miv)/(mav-miv))
   yo = borehole(xo)
   x = xo
   
@@ -85,11 +81,9 @@ fulltest = function(ss, nterms, corr=0, ep = 10^(-4)){
   scale = sd(yo)
   d = dim(x)[2]
   y = (yo-offset)/scale
-  setcovfs(om, rep("mat25pow",d))
+  setcovfs(om, rep("mat25",d))
   knotlist = list()
-  for(k in 1:d)  knotlist[[k]] = quantile(x[,k],
-                                          seq(0,1,length=40)*40/
-                                            (40+1)+0.5/(40+1))
+  for(k in 1:d)  knotlist[[k]] = seq(0.001,0.999,0.025)
   
   hyp = gethyp(om)
   prpara = log(1)
@@ -132,7 +126,7 @@ fulltest = function(ss, nterms, corr=0, ep = 10^(-4)){
 }
 
 expect_equal_or_warnh <- function(...) tryCatch(expect_equal(...),
-        error = function(e) warning("some errors on grad, this can be normal."))
+        error = function(e) warning("some inexact grad, this can be normal."))
 
 
 test_that("short, skinny test", {

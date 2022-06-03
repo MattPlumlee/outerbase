@@ -18,17 +18,12 @@ borehole <- function(x) {
 
 om = new(outermod)
 
-testsimple = function(ss=400){
+testsimple = function(ss=80){
   
   nterms = 20
   d = 8
+  set.seed(42)
   xo = matrix(runif(ss*d),ncol=d)
-  A = matrix(0,nrow=d,ncol=d)
-  for(i in 1:d) for(j in 1:d) A[i,j] = 0.001^abs(i-j)
-  xo = ((xo-0.5) %*% A) +0.5
-  miv = apply(xo,2,min)
-  mav = apply(xo,2,max)
-  xo = t(0.005+0.99*(t(xo)-miv)/(mav-miv))
   yo = borehole(xo)
   x = xo
   
@@ -36,11 +31,8 @@ testsimple = function(ss=400){
   scale = sd(yo)
   y = (yo-offset)/scale
   knotlist = list()
-  for(k in 1:d)  knotlist[[k]] = quantile(x[,k],
-                                          seq(0,1,length=40)*40/
-                                            (40+1)+0.5/(40+1))
+  for(k in 1:d)  knotlist[[k]] = seq(0.001,0.999,0.025)
   
-  eta = 0.1+0.1*(runif(2*d)-0.5)#rep(c(0,0),d)
   setcovfs(om, c("mat25pow",rep("mat25",d-1)))
   
   setknot(om,knotlist)
@@ -53,11 +45,13 @@ testsimple = function(ss=400){
   
   basemat_getbase = matrix(1,ncol=nterms,nrow=ss)
   for(k in 1:8){
-    basemat_getbase = basemat_getbase*ob$getbase(k)[,terms[,k]+1]
+    Bh = ob$getbase(k)
+    basemat_getbase = basemat_getbase * Bh[,terms[,k]+1]
   }
   basemat_getmat = ob$getmat(terms)
   
   getmatgetbasediff = sum(abs(basemat_getmat-basemat_getbase))
+  
   vec1_getmat = basemat_getmat %*% theta
   vec1_matmul = ob$matmul(terms,theta)
   getmatmatmuldiff = sum(abs(vec1_getmat-vec1_matmul))
@@ -74,13 +68,11 @@ testsimple = function(ss=400){
 }
 
 test_that("basic test", {
-  L = testsimple(500)
+  L = testsimple(15)
   expect_equal(L$getbase, 0, tolerance = 0.01,
-               label="base agreement")
-  expect_equal(L$getmat, 0, tolerance = 0.01,
-               label="mat grad agreement")
+               label="base mat agreement")
   expect_equal(L$matmul, 0, tolerance = 0.01,
-               label="getmat grad agreement")
+               label="mult agreement")
   expect_equal(L$tmatmul, 0, tolerance = 0.01,
-               label="tmult grad agreement")
+               label="tmult agreement")
 })
