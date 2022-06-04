@@ -15,11 +15,15 @@ listcov = function() {
 #' @param x a n by d sized matrix of inputs
 #' @param y a n length vector of outputs
 #' @param numb size of basis to use
-#' @param covnames a d length vector of covariance names
+#' @param hyp initial covariance hyperparmaeters
+#' @param verbose 0-3, how much information on optimization to print to console
+#' @param covnames a d length vector of covariance names, ignored if \code{omst}
+#' is provided
 #' @return Saving important model information to be used with 
 #' \code{\link{obpred}}
 #' @export
-obfit = function(x, y, numb=100, covnames=NULL) {
+obfit = function(x, y, numb=100, verbose = 0,
+                 covnames=NULL, hyp=NULL) {
   if(dim(x)[1] != length(y)) stop("\n x and y dims do not align")
   if(dim(x)[1] < dim(x)[2]) 
     stop('\n dimension larger than sample size has not been tested')
@@ -47,7 +51,6 @@ obfit = function(x, y, numb=100, covnames=NULL) {
   y_cent = mean(y)
   y_sca = sd(y)
   y = (y - y_cent) / y_sca
-  
   d = dim(x)[2]
   
   if(!is.null(covnames)){
@@ -62,30 +65,43 @@ obfit = function(x, y, numb=100, covnames=NULL) {
   
   om = new(outermod)
   setcovfs(om, covnames)
+  
+  if (length(hyp) == length(gethyp(om))) om$updatehyp(hyp)
+  
   setknot(om, .genknotlist(rep(40,d), x)) #40 knot point for each dim
   
-  terms = om$selectterms(min(numb, 100*d)) #small number of terms
-  
+  numbr = min(c(floor(length(y)/2), numb, 80*d))
+  terms = om$selectterms(min(c(numbr))) #small number of terms
+  ssr = min(c(length(y),3*numbr))
   logpr = new(logpr_gauss, om, terms) #initial parameter
-  loglik = new(loglik_gda, om, terms, y, x) #initial parameter
+  subsetinds = sample(length(y),ssr)
+  yr = y[subsetinds]
+  xr = x[subsetinds,]
+  loglik = new(loglik_gda, om, terms, yr, xr) #
   loglik$dodiag = T # for the first round, go ahead and go the diagonal
   logpdf = new(lpdfvec, logpr, loglik)
   
-  BFGS_lpdf(om, logpdf,verbose=0) 
+  optinfo = BFGS_lpdf(om, logpdf, verbose = verbose) 
   
   terms = om$selectterms(numb) #get new terms
   bassize = ceiling(pmax(16,
                          pmin(70,
                               2*apply(terms,2,max))))
   setknot(om, .genknotlist(bassize, x))
+  
   loglik_faster = new(loglik_gauss, om, terms, y, x) #initial parameter
   logpdf_faster = new(lpdfvec, logpr, loglik_faster)
-  logpdf_faster$domarg = T
+  logpdf_faster$domarg = T 
+  #one fewer para, so we will strip that one off
+  optinfo$B = optinfo$B[,-ncol(optinfo$B)]
+  optinfo$B = optinfo$B[-nrow(optinfo$B),]
+  logpdf_faster$updatepara(getpara(logpdf)[1:2])
   
   for(k in 1:2){
     terms = om$selectterms(numb)
     logpdf_faster$updateterms(terms)
-    BFGS_lpdf(om, logpdf_faster,verbose=0) 
+    BFGS_lpdf(om, logpdf_faster, verbose=verbose,
+              B = optinfo$B, lr = optinfo$lr/2) 
   }
   obmodel = list()
   obmodel$y_cent = y_cent

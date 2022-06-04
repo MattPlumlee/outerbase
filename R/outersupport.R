@@ -20,20 +20,21 @@ Rcpp::loadModule("obmod", TRUE)
 #' 
 #' @param funcw An object to optimize
 #' @param par An initial point as a list
+#' @param B An initial Hessian to start from
+#' @param lr An initial learning rate to start from
 #' @param ... additional parameters passed to \code{funcw}
 #' @param verbose an integer from 0-3 where larger prints more information
 #' @return a list of information from optimization, with the value stored in
 #' `par`
 #' @export
-BFGS_std <- function(funcw, par, ...,verbose = 0){
+BFGS_std <- function(funcw, par, 
+                     B = NULL, lr = 0.1, 
+                     ...,verbose = 0){
   #linesearchparameters
-  Bs = NULL #initial inverse hessian
-  lr0 = 0.1 #initial learning rate
   c1 = 0.0001
   c2 = 0.9
   numatte0 = 5
   
-  lr = lr0
   parv = unlist(par)
   
   optid = funcw(relist(parv,par), ...)
@@ -41,13 +42,12 @@ BFGS_std <- function(funcw, par, ...,verbose = 0){
   go = unlist(optid$gval)
   resetB = TRUE
   
-  if(is.null(Bs)) Bs = diag(1/sqrt(go^2+0.001))
+  if(is.null(B)) B = diag(1/sqrt(go^2+0.001))
   else resetB = FALSE
   
   twice = F
-  
-  B = Bs
-  lr00 = lr0
+  lr0 = lr
+  lr00 = lr
   numtimes = 0
   if (verbose > 0) print('doing opt...')
   if(!sum(is.na(go))){
@@ -93,7 +93,7 @@ BFGS_std <- function(funcw, par, ...,verbose = 0){
       if(wolfcond1>0){
         if(resetB){
           c2 = c2^0.5
-          lr0 = lr0/10
+          lr0 = lr0 / 10
           lr = lr0
         }
         if(lr0 < lr00/(10^2+1)){
@@ -102,7 +102,7 @@ BFGS_std <- function(funcw, par, ...,verbose = 0){
         optid = funcw(relist(parv,par), ...) #do not feed it extra info
         valo = optid$val
         go = unlist(optid$gval)
-        B = diag(1/sqrt(0.01+go^2))
+        B = diag(1/sqrt(0.001+go^2))
         resetB = TRUE
       } else {
         if(lr != lrh){
@@ -114,11 +114,10 @@ BFGS_std <- function(funcw, par, ...,verbose = 0){
           parv = parvp
         }
         
-        if (k > 2 && sum(st*go) > -length(go)/4 && twice){
+        if (k > 2 && (sum(st*go) > -length(go)/4) && twice){
           break
-        } else if (k > 2 && sum(st*go) > -length(go)/4){
-          twice=T
-          resetB = TRUE
+        } else if (k > 2 && (sum(st*go) > -length(go)/4)){
+          twice = T
         }
         
         goo = go
@@ -126,7 +125,7 @@ BFGS_std <- function(funcw, par, ...,verbose = 0){
         go = unlist(optid$gval)
         yv = go-goo
         
-        if(resetB){
+        if (resetB) {
           B = sum(st*yv)/sum(yv*yv)* diag(length(parv))
           resetB = FALSE
         }
@@ -164,10 +163,9 @@ BFGS_lpdf <- function(om, logpdf, par=list(), newt=F, ...){
   if(is.null(par$hyp)) par$hyp = gethyp(om)
   if(is.null(par$para)) par$para = getpara(logpdf)
   
-  .lpdfwrapper(par, om, logpdf, newt=newt)
+  .lpdfwrapper(par, om, logpdf, newt=newt) #start by aligning para with actual
   optsum = BFGS_std(.lpdfwrapper, par, om=om, newt=newt,
                     logpdf=logpdf, ...)
-  .lpdfwrapper(optsum$par, om, logpdf, newt=newt)
   
   optsum
 }
