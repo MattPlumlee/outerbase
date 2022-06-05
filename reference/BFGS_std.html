@@ -71,7 +71,7 @@ fairly easily.</p>
 
     <div class="section level2">
     <h2 id="ref-usage">Usage<a class="anchor" aria-label="anchor" href="#ref-usage"></a></h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="fu">BFGS_std</span><span class="op">(</span><span class="va">funcw</span>, <span class="va">par</span>, <span class="va">...</span>, verbose <span class="op">=</span> <span class="fl">0</span><span class="op">)</span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="fu">BFGS_std</span><span class="op">(</span><span class="va">funcw</span>, <span class="va">par</span>, B <span class="op">=</span> <span class="cn">NULL</span>, lr <span class="op">=</span> <span class="fl">0.1</span>, <span class="va">...</span>, verbose <span class="op">=</span> <span class="fl">0</span><span class="op">)</span></code></pre></div>
     </div>
 
     <div class="section level2">
@@ -80,6 +80,10 @@ fairly easily.</p>
 <dd><p>An object to optimize</p></dd>
 <dt>par</dt>
 <dd><p>An initial point as a list</p></dd>
+<dt>B</dt>
+<dd><p>An initial Hessian to start from</p></dd>
+<dt>lr</dt>
+<dd><p>An initial learning rate to start from</p></dd>
 <dt>...</dt>
 <dd><p>additional parameters passed to <code>funcw</code></p></dd>
 <dt>verbose</dt>

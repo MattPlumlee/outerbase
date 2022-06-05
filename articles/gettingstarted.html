@@ -127,7 +127,7 @@
 <span class="co">#&gt;  dimension larger than sample size has not been tested</span>
 <span class="va">obmodel</span> <span class="op">=</span> <span class="fu"><a href="../reference/obfit.html">obfit</a></span><span class="op">(</span><span class="va">x</span>, <span class="va">y</span>, numb <span class="op">=</span> <span class="fl">2</span>, covnames<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="st">"mat25pow"</span>,<span class="fl">8</span><span class="op">)</span><span class="op">)</span>
 <span class="co">#&gt; Error in obfit(x, y, numb = 2, covnames = rep("mat25pow", 8)): </span>
-<span class="co">#&gt;  number of basis functions should be over twice the dimension</span>
+<span class="co">#&gt;  number of basis functions should be less than twice the dimension</span>
 <span class="va">obmodel</span> <span class="op">=</span> <span class="fu"><a href="../reference/obfit.html">obfit</a></span><span class="op">(</span><span class="fl">100</span><span class="op">*</span><span class="va">x</span>, <span class="va">y</span>, covnames<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="st">"mat25pow"</span>,<span class="fl">8</span><span class="op">)</span><span class="op">)</span>
 <span class="co">#&gt; Error in .checkcov(covnames[k], x[, k]): </span>
 <span class="co">#&gt;  x ranges exceed limits of covariance functions </span>

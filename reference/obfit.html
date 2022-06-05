@@ -65,7 +65,15 @@ actual object-oriented aspects of the package.</p>
 
     <div class="section level2">
     <h2 id="ref-usage">Usage<a class="anchor" aria-label="anchor" href="#ref-usage"></a></h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="fu">obfit</span><span class="op">(</span><span class="va">x</span>, <span class="va">y</span>, numb <span class="op">=</span> <span class="fl">100</span>, covnames <span class="op">=</span> <span class="cn">NULL</span><span class="op">)</span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="fu">obfit</span><span class="op">(</span>
+  <span class="va">x</span>,
+  <span class="va">y</span>,
+  numb <span class="op">=</span> <span class="fl">100</span>,
+  verbose <span class="op">=</span> <span class="fl">0</span>,
+  covnames <span class="op">=</span> <span class="cn">NULL</span>,
+  hyp <span class="op">=</span> <span class="cn">NULL</span>,
+  numberopts <span class="op">=</span> <span class="fl">2</span>
+<span class="op">)</span></code></pre></div>
     </div>
 
     <div class="section level2">
@@ -76,8 +84,16 @@ actual object-oriented aspects of the package.</p>
 <dd><p>a n length vector of outputs</p></dd>
 <dt>numb</dt>
 <dd><p>size of basis to use</p></dd>
+<dt>verbose</dt>
+<dd><p>0-3, how much information on optimization to print to console</p></dd>
 <dt>covnames</dt>
-<dd><p>a d length vector of covariance names</p></dd>
+<dd><p>a d length vector of covariance names, ignored if <code>omst</code></p></dd>
+<dt>hyp</dt>
+<dd><p>initial covariance hyperparmaeters</p></dd>
+<dt>numberopts</dt>
+<dd><p>number of optimizations done for hyperparameters, must be
+larger than 1
+is provided</p></dd>
 </dl></div>
     <div class="section level2">
     <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
