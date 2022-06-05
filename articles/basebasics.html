@@ -234,10 +234,10 @@
 <span class="co">#&gt;      [,1] [,2] [,3]</span>
 <span class="co">#&gt; [1,]    0    0    0</span>
 <span class="co">#&gt; [2,]    1    0    0</span>
-<span class="co">#&gt; [3,]    0    1    0</span>
-<span class="co">#&gt; [4,]    0    0    1</span>
-<span class="co">#&gt; [5,]    0    1    1</span>
-<span class="co">#&gt; [6,]    1    0    1</span></code></pre></div>
+<span class="co">#&gt; [3,]    0    0    1</span>
+<span class="co">#&gt; [4,]    0    1    0</span>
+<span class="co">#&gt; [5,]    1    0    1</span>
+<span class="co">#&gt; [6,]    1    1    0</span></code></pre></div>
 <p><code>outermod$getvar</code> returns the vector of variances associated with these coefficients at these <code>terms</code>.</p>
 <div class="sourceCode" id="cb20"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">covcoeff</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/vector.html" class="external-link">as.vector</a></span><span class="op">(</span><span class="va">om</span><span class="op">$</span><span class="fu">getvar</span><span class="op">(</span><span class="va">terms</span><span class="op">)</span><span class="op">)</span></code></pre></div>
@@ -251,12 +251,12 @@
   <span class="va">ob</span><span class="op">$</span><span class="fu">getbase</span><span class="op">(</span><span class="fl">3</span><span class="op">)</span><span class="op">[</span>,<span class="va">terms</span><span class="op">[</span><span class="va">termno</span>,<span class="fl">3</span><span class="op">]</span><span class="op">+</span><span class="fl">1</span><span class="op">]</span>
 
 <span class="fu"><a href="https://rdrr.io/r/base/cbind.html" class="external-link">cbind</a></span><span class="op">(</span><span class="va">basevec</span><span class="op">[</span><span class="fl">1</span><span class="op">:</span><span class="fl">5</span><span class="op">]</span>,<span class="va">basismat</span><span class="op">[</span><span class="fl">1</span><span class="op">:</span><span class="fl">5</span>,<span class="fl">5</span><span class="op">]</span><span class="op">)</span> <span class="co"># expect equal</span>
-<span class="co">#&gt;             [,1]        [,2]</span>
-<span class="co">#&gt; [1,] -0.77547521 -0.77547521</span>
-<span class="co">#&gt; [2,] -0.55557290 -0.55557290</span>
-<span class="co">#&gt; [3,]  0.02152427  0.02152427</span>
-<span class="co">#&gt; [4,]  1.51427430  1.51427430</span>
-<span class="co">#&gt; [5,]  0.22592522  0.22592522</span></code></pre></div>
+<span class="co">#&gt;            [,1]       [,2]</span>
+<span class="co">#&gt; [1,] -1.4639107 -1.4639107</span>
+<span class="co">#&gt; [2,]  2.2470844  2.2470844</span>
+<span class="co">#&gt; [3,]  0.6698860  0.6698860</span>
+<span class="co">#&gt; [4,] -1.7842495 -1.7842495</span>
+<span class="co">#&gt; [5,] -0.5683441 -0.5683441</span></code></pre></div>
 </div>
 </div>
 <div class="section level2">
@@ -269,18 +269,18 @@
 
 <span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/Round.html" class="external-link">round</a></span><span class="op">(</span><span class="va">cormattot</span><span class="op">[</span><span class="fl">1</span><span class="op">:</span><span class="fl">5</span>,<span class="fl">1</span><span class="op">:</span><span class="fl">5</span><span class="op">]</span>,<span class="fl">3</span><span class="op">)</span><span class="op">)</span> <span class="co"># typical gp</span>
 <span class="co">#&gt;       [,1]  [,2]  [,3]  [,4]  [,5]</span>
-<span class="co">#&gt; [1,] 1.000 0.561 0.825 0.677 0.900</span>
-<span class="co">#&gt; [2,] 0.561 1.000 0.834 0.538 0.602</span>
-<span class="co">#&gt; [3,] 0.825 0.834 1.000 0.793 0.895</span>
-<span class="co">#&gt; [4,] 0.677 0.538 0.793 1.000 0.878</span>
-<span class="co">#&gt; [5,] 0.900 0.602 0.895 0.878 1.000</span>
+<span class="co">#&gt; [1,] 1.000 0.575 0.853 0.935 0.926</span>
+<span class="co">#&gt; [2,] 0.575 1.000 0.830 0.431 0.613</span>
+<span class="co">#&gt; [3,] 0.853 0.830 1.000 0.729 0.913</span>
+<span class="co">#&gt; [4,] 0.935 0.431 0.729 1.000 0.899</span>
+<span class="co">#&gt; [5,] 0.926 0.613 0.913 0.899 1.000</span>
 <span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/Round.html" class="external-link">round</a></span><span class="op">(</span><span class="va">cormatob</span><span class="op">[</span><span class="fl">1</span><span class="op">:</span><span class="fl">5</span>,<span class="fl">1</span><span class="op">:</span><span class="fl">5</span><span class="op">]</span>,<span class="fl">3</span><span class="op">)</span><span class="op">)</span> <span class="co"># outerbase</span>
 <span class="co">#&gt;       [,1]  [,2]  [,3]  [,4]  [,5]</span>
-<span class="co">#&gt; [1,] 1.000 0.561 0.825 0.677 0.900</span>
-<span class="co">#&gt; [2,] 0.561 1.000 0.834 0.538 0.602</span>
-<span class="co">#&gt; [3,] 0.825 0.834 1.000 0.793 0.895</span>
-<span class="co">#&gt; [4,] 0.677 0.538 0.793 1.000 0.878</span>
-<span class="co">#&gt; [5,] 0.900 0.602 0.895 0.878 1.000</span></code></pre></div>
+<span class="co">#&gt; [1,] 1.000 0.575 0.853 0.935 0.927</span>
+<span class="co">#&gt; [2,] 0.575 1.000 0.830 0.431 0.613</span>
+<span class="co">#&gt; [3,] 0.853 0.830 1.000 0.729 0.913</span>
+<span class="co">#&gt; [4,] 0.935 0.431 0.729 1.000 0.899</span>
+<span class="co">#&gt; [5,] 0.927 0.613 0.913 0.899 1.000</span></code></pre></div>
 <p>They means that we can leverage <a href="https://en.wikipedia.org/wiki/Bayesian_linear_regression" class="external-link">Bayesian linear regression</a> to do prediction. This will require assuming that there is some <code>noisevar</code>, which is also called the nugget in the Gaussian process literature.</p>
 <div class="sourceCode" id="cb23"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">noisevar</span> <span class="op">=</span> <span class="fl">10</span><span class="op">^</span><span class="op">(</span><span class="op">-</span><span class="fl">4</span><span class="op">)</span>

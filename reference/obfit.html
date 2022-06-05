@@ -72,7 +72,8 @@ actual object-oriented aspects of the package.</p>
   verbose <span class="op">=</span> <span class="fl">0</span>,
   covnames <span class="op">=</span> <span class="cn">NULL</span>,
   hyp <span class="op">=</span> <span class="cn">NULL</span>,
-  numberopts <span class="op">=</span> <span class="fl">2</span>
+  numberopts <span class="op">=</span> <span class="fl">2</span>,
+  nthreads <span class="op">=</span> <span class="cn">NULL</span>
 <span class="op">)</span></code></pre></div>
     </div>
 
@@ -89,10 +90,12 @@ actual object-oriented aspects of the package.</p>
 <dt>covnames</dt>
 <dd><p>a d length vector of covariance names, ignored if <code>omst</code></p></dd>
 <dt>hyp</dt>
-<dd><p>initial covariance hyperparmaeters</p></dd>
+<dd><p>initial covariance hyperparameters</p></dd>
 <dt>numberopts</dt>
 <dd><p>number of optimizations done for hyperparameters, must be
-larger than 1
+larger than 1</p></dd>
+<dt>nthreads</dt>
+<dd><p>number of threads used in learning
 is provided</p></dd>
 </dl></div>
     <div class="section level2">
