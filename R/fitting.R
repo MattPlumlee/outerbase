@@ -50,7 +50,7 @@ obfit = function(x, y, numb=100, verbose = 0,
     stop('\n number of basis functions is beyond testing')
   if(numb > dim(x)[1]) 
     warning(paste0('\n number of basis functions larger than sample size, \n',
-    'this has not been throughly tested'))
+    'this has not been thoroughly tested'))
   
   y_cent = mean(y)
   y_sca = sd(y)
