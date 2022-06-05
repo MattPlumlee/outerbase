@@ -1,10 +1,14 @@
+* This is a new release, but was earlier submitted.  
+* The license file has now been updated to comply with CRAN.  
+* Some general references are now provided in the description.  
+The website contains the most amount of information on this new methodology
 
-
-* This is a new release, but was earlier submitted and threw an error on Debian
- in testing.  It should now be resolved.
+There is no current publications, but I have 
 
 This package covers an important development in new methodology I would like to
 easily share with collaborators.
+
+
 
 The package is tested using Github actions. The only remaining notes are about
 GNU being needed with Rcpp and the size of the libraries, which seems to be
@@ -17,7 +21,7 @@ macOS-latest (release)
 ❯ checking for GNU extensions in Makefiles ... NOTE
   GNU make is a SystemRequirements.
 
-0 errors ✔ | 0 warnings ✔ | 1 note ✖
+0 errors | 0 warnings | 1 note 
 
 
 windows-latest (release)
@@ -25,7 +29,7 @@ windows-latest (release)
 ❯ checking for GNU extensions in Makefiles ... NOTE
   GNU make is a SystemRequirements.
 
-0 errors ✔ | 0 warnings ✔ | 1 note ✖
+0 errors | 0 warnings | 1 note
 
 ubuntu-latest (release)
 
@@ -37,4 +41,4 @@ ubuntu-latest (release)
 ❯ checking for GNU extensions in Makefiles ... NOTE
   GNU make is a SystemRequirements.
 
-0 errors ✔ | 0 warnings ✔ | 2 notes ✖
+0 errors | 0 warnings | 2 notes 
