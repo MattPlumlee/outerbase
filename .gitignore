@@ -3,6 +3,8 @@
 .RData
 .Ruserdata
 
+cran-comments.*
+
 *.dll
 
 src/RcppExports.cpp
