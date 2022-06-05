@@ -15,7 +15,7 @@ listcov = function() {
 #' @param x a n by d sized matrix of inputs
 #' @param y a n length vector of outputs
 #' @param numb size of basis to use
-#' @param hyp initial covariance hyperparmaeters
+#' @param hyp initial covariance hyperparameters
 #' @param verbose 0-3, how much information on optimization to print to console
 #' @param covnames a d length vector of covariance names, ignored if \code{omst}
 #' @param numberopts number of optimizations done for hyperparameters, must be

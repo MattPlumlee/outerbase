@@ -67,7 +67,7 @@ matplot(x[,1],basis_func1[,1:4],
 
 ## lpdf for learning
 
-The core building block for outerbase learning is the base class `?lpdf`, log probability density functions.  This base class forms the backbone behind learning using statistical models. Instances of this class allow us to optimize coefficients, infer on uncertainty and learn hyperparmeters of covariance functions. 
+The core building block for outerbase learning is the base class `?lpdf`, log probability density functions.  This base class forms the backbone behind learning using statistical models. Instances of this class allow us to optimize coefficients, infer on uncertainty and learn hyperparameters of covariance functions. 
 
 A small dataset can illustrate (almost) all core concepts related to `lpdf`.
 ```{r}
