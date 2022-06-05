@@ -15,22 +15,19 @@ listcov = function() {
 #' @param x a n by d sized matrix of inputs
 #' @param y a n length vector of outputs
 #' @param numb size of basis to use
-<<<<<<< HEAD
 #' @param hyp initial covariance hyperparameters
-=======
-#' @param hyp initial covariance hyperparmaeters
->>>>>>> main
 #' @param verbose 0-3, how much information on optimization to print to console
 #' @param covnames a d length vector of covariance names, ignored if \code{omst}
 #' @param numberopts number of optimizations done for hyperparameters, must be
 #' larger than 1
+#' @param nthreads number of threads used in learning
 #' is provided
 #' @return Saving important model information to be used with 
 #' \code{\link{obpred}}
 #' @export
 obfit = function(x, y, numb=100, verbose = 0,
                  covnames=NULL, hyp=NULL,
-                 numberopts=2) {
+                 numberopts=2, nthreads=NULL) {
   if(dim(x)[1] != length(y)) stop("\n x and y dims do not align")
   if(dim(x)[1] < dim(x)[2]) 
     stop('\n dimension larger than sample size has not been tested')
@@ -88,7 +85,12 @@ obfit = function(x, y, numb=100, verbose = 0,
   loglik = new(loglik_gda, om, terms, yr, xr) #
   loglik$dodiag = T # for the first round, go ahead and go the diagonal
   logpdf = new(lpdfvec, logpr, loglik)
-  
+  if(!is.null(nthreads)) {
+    nthreads = ceiling(nthreads)
+    if(nthreads < 1) stop('nthreads must be bigger than 1')
+    if(nthreads > 100) stop('nthreads should be small than 100 (for now).')
+    logpdf$setnthreads(nthreads)
+  }
   if (verbose >0) {
     cat('doing partial optimization ', '\n')
     if (verbose >1) cat('max number of cg steps set to', 100, '\n')
@@ -111,6 +113,8 @@ obfit = function(x, y, numb=100, verbose = 0,
   #decrease scale
   optinfo$B = length(yr)/length(y)*optinfo$B
   logpdf_faster$updatepara(getpara(logpdf)[1:2])
+  
+  if(!is.null(nthreads)) logpdf_faster$setnthreads(nthreads)
   
   for(k in 1:numberopts){
     nsteps = .getsteps(numb, length(y),
