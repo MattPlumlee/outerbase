@@ -20,20 +20,21 @@ Rcpp::loadModule("obmod", TRUE)
 #' 
 #' @param funcw An object to optimize
 #' @param par An initial point as a list
+#' @param B An initial Hessian to start from
+#' @param lr An initial learning rate to start from
 #' @param ... additional parameters passed to \code{funcw}
 #' @param verbose an integer from 0-3 where larger prints more information
 #' @return a list of information from optimization, with the value stored in
 #' `par`
 #' @export
-BFGS_std <- function(funcw, par, ...,verbose = 0){
+BFGS_std <- function(funcw, par, 
+                     B = NULL, lr = 0.1, 
+                     ...,verbose = 0){
   #linesearchparameters
-  Bs = NULL #initial inverse hessian
-  lr0 = 0.1 #initial learning rate
   c1 = 0.0001
   c2 = 0.9
   numatte0 = 5
   
-  lr = lr0
   parv = unlist(par)
   
   optid = funcw(relist(parv,par), ...)
@@ -41,15 +42,22 @@ BFGS_std <- function(funcw, par, ...,verbose = 0){
   go = unlist(optid$gval)
   resetB = TRUE
   
-  if(is.null(Bs)) Bs = diag(1/sqrt(go^2+0.001))
+  if(is.null(B)) B = diag(1/sqrt(go^2+0.001))
   else resetB = FALSE
   
   twice = F
-  
-  B = Bs
-  lr00 = lr0
+  lr0 = lr
+  lr00 = lr
   numtimes = 0
-  if (verbose > 0) print('doing opt...')
+  
+  optdf = data.frame('iter.no'=0,'obj.value'=valo,
+                     'wolfe.cond.1'=NA,'wolfe.cond.2'=NA,
+                     'learning.rate'=lr)
+  
+  rownames(optdf) <- NULL
+  if (verbose > 0) cat('\n', '########started BFGS#######', '\n', sep = "")
+  if (verbose > 1) print(optdf[1,], row.names = FALSE, 
+                         digits = 6)
   if(!sum(is.na(go))){
     for(k in 1:100){
       dirc = as.vector(-B %*% go)
@@ -66,10 +74,6 @@ BFGS_std <- function(funcw, par, ...,verbose = 0){
       lrh = lr
       wolfcond2o = wolfcond2
       numatte = numatte0
-      if (verbose > 1) {
-        print('Wolfe conditions')
-        print(c(wolfcond1,wolfcond2))
-      }
       while(numatte > 0 && 
             ((is.na(wolfcond1) || is.na(wolfcond2)) ||
              ((wolfcond1>0) || (wolfcond2>0)))){
@@ -93,7 +97,7 @@ BFGS_std <- function(funcw, par, ...,verbose = 0){
       if(wolfcond1>0){
         if(resetB){
           c2 = c2^0.5
-          lr0 = lr0/10
+          lr0 = lr0 / 10
           lr = lr0
         }
         if(lr0 < lr00/(10^2+1)){
@@ -102,9 +106,18 @@ BFGS_std <- function(funcw, par, ...,verbose = 0){
         optid = funcw(relist(parv,par), ...) #do not feed it extra info
         valo = optid$val
         go = unlist(optid$gval)
-        B = diag(1/sqrt(0.01+go^2))
+        B = diag(1/sqrt(0.001+go^2))
         resetB = TRUE
+        if (verbose > 0) cat('restarted hessian','\n', sep = "")
+        
+        optdf[k+1,] <- data.frame('iter.no'=k,
+                                  'obj.value'=NA,
+                                  'wolfe.cond.1'=NA,
+                                  'wolfe.cond.2'=NA,
+                                  'learning.rate'=lr)
       } else {
+        
+        
         if(lr != lrh){
           lr = lrh
           st = parvp-parv
@@ -114,19 +127,28 @@ BFGS_std <- function(funcw, par, ...,verbose = 0){
           parv = parvp
         }
         
-        if (k > 2 && sum(st*go) > -length(go)/4 && twice){
+        if (k > 2 && (sum(st*go) > -length(go)/4) && twice){
           break
-        } else if (k > 2 && sum(st*go) > -length(go)/4){
-          twice=T
-          resetB = TRUE
+        } else if (k > 2 && (sum(st*go) > -length(go)/4)){
+          twice = T
         }
+        
+        
         
         goo = go
         valo = optid$val
         go = unlist(optid$gval)
         yv = go-goo
         
-        if(resetB){
+        optdf[k+1,] <- data.frame('iter.no'=k,
+                                  'obj.value'=valo,
+                                  'wolfe.cond.1'=wolfcond1,
+                                  'wolfe.cond.2'=wolfcond2,
+                                  'learning.rate'=lr)
+        if (verbose > 1) print(optdf[k+1,], row.names = FALSE, 
+                               digits = 6)
+        
+        if (resetB) {
           B = sum(st*yv)/sum(yv*yv)* diag(length(parv))
           resetB = FALSE
         }
@@ -134,15 +156,22 @@ BFGS_std <- function(funcw, par, ...,verbose = 0){
         cvh = 1/sum(st*yv)
         M1 = diag(length(go)) - cvh*outer(st,yv)
         B = M1 %*% B %*% t(M1) + cvh*outer(st,st)
-        lr = lr * 1.05
+        lr = lr^0.9 #drift toward 1
       }
-      if (verbose > 0) print(valo)
     }} else{
       stop('initial gradient was undefined, stopping.')
     }
   
-  funcw(relist(parv,par), ...) #finish by evaluating
-  if (verbose > 0) print('finished opt...')
+  optid = funcw(relist(parv,par), ...) #finish by evaluating
+  if (verbose > 0){
+    cat('num iter: ',k,'  ',
+        'obj start: ', optdf[1,2],'  ',
+        'obj end: ',   optid$val, '\n', sep = "")
+    cat('final learning rate: ', lr, '\n', sep = "")
+    cat('approx lower bound (not achieved): ',
+        optid$val+sum(dirc*go), '\n', sep = "")
+    if (verbose > 0) cat('#########finished BFGS########', '\n\n')
+  } 
   list(par=relist(parv,par), B=B, lr=lr, optid=optid)
 }
 
@@ -157,17 +186,19 @@ BFGS_std <- function(funcw, par, ...,verbose = 0){
 #' @param logpdf a \code{\link{lpdf}} object
 #' @param par an initial point, initialized from objects if needed
 #' @param newt boolean for if Newtons method should be used
+#' @param cgsteps max number of cg iterations, if \code{newt=FALSE}
+#' @param cgtol cg tolerance, if \code{newt=FALSE}
 #' @param ... additional parameters passed to \code{\link{BFGS_std}}
 #' @return A list of information from optimization
 #' @export
-BFGS_lpdf <- function(om, logpdf, par=list(), newt=F, ...){
+BFGS_lpdf <- function(om, logpdf, par=list(), newt=F, 
+                      cgsteps=100, cgtol=0.001, ...){
   if(is.null(par$hyp)) par$hyp = gethyp(om)
   if(is.null(par$para)) par$para = getpara(logpdf)
   
-  .lpdfwrapper(par, om, logpdf, newt=newt)
+  .lpdfwrapper(par, om, logpdf, newt=newt) #start by aligning para with actual
   optsum = BFGS_std(.lpdfwrapper, par, om=om, newt=newt,
                     logpdf=logpdf, ...)
-  .lpdfwrapper(optsum$par, om, logpdf, newt=newt)
   
   optsum
 }
@@ -175,7 +206,8 @@ BFGS_lpdf <- function(om, logpdf, par=list(), newt=F, ...){
 # Optimization wrapper
 # 
 # returns list of \code{val} and \code{grad}
-.lpdfwrapper = function(parlist, om, logpdf, newt = F) {
+.lpdfwrapper = function(parlist, om, logpdf, newt = F,
+                        cgsteps=100, cgtol=0.001) {
   regpara = logpdf$paralpdf(parlist$para)
   reghyp = om$hyplpdf(parlist$hyp)
   if(is.finite(regpara) && is.finite(reghyp)) { 
@@ -183,7 +215,7 @@ BFGS_lpdf <- function(om, logpdf, par=list(), newt=F, ...){
     logpdf$updateom()
     logpdf$updatepara(parlist$para)
     if(newt) logpdf$optnewton()
-    else logpdf$optcg(0.001, 100)
+    else logpdf$optcg(cgtol, cgsteps)
     
     gval = parlist
     gval$hyp = -logpdf$gradhyp-om$hyplpdf_grad(parlist$hyp)

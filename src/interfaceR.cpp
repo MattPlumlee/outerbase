@@ -715,18 +715,20 @@ RCPP_MODULE(obmod){
   class_<loglik_gauss>("loglik_gauss")
     .derives<lpdf>("lpdf")
     .constructor<const outermod&, umat, vec, mat>()
+    .field_readonly("yhat",&loglik_gauss::yhat)
   ;
   
   class_<loglik_gda>("loglik_gda")
     .derives<lpdf>("lpdf")
     .constructor<const outermod&, umat, vec, mat>()
     .field("dodiag", &loglik_gda::doda)
+    .field_readonly("yhat",&loglik_gda::yhat)
   ;
   
   class_<logpr_gauss>("logpr_gauss")
     .derives<lpdf>("lpdf")
     .constructor<const outermod&, umat>()
-    .field_readonly("thetasd", &logpr_gauss::coeffsd)
+    .field_readonly("coeffsd", &logpr_gauss::coeffsd)
   ;
   
   class_<lpdfvec>("lpdfvec")

@@ -7,3 +7,4 @@
 ^README\.Rmd
 ^.*\.Rproj$
 ^cran-comments\.md$
+^LICENSE\.md$

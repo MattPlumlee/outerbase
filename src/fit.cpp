@@ -267,7 +267,7 @@ void lpdfvec::buildhess(){
       gradpara_margadj = -0.5*sum(tempm,0).as_col();
     }
     
-    if (fullhess) {   
+    if (fullhess) {     
       hessv = lpdfvec::hess_(); //first hull hessian
       settothess(hessv);
       if (domargadj) { // save this stuff if we need marginal adjustment

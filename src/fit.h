@@ -234,6 +234,7 @@ public:
   outerbase ob;
   vec y;
   mat x;
+  vec yhat;
   
   loglik_gauss(const outermod&, umat, vec, mat);
   
@@ -251,7 +252,6 @@ public:
   
   predf* pred() const; 
 private:
-  vec yhat;
   vec obsvar;
   vec lobsvar;
   vec obssd;
@@ -288,6 +288,7 @@ public:
   outerbase ob;
   vec y;
   mat x;
+  vec yhat;
   
   bool doda;   
   
@@ -307,7 +308,6 @@ public:
   
   predf* pred() const; 
 private:
-  vec yhat;
   
   bool redostd;
   vec obssd;
