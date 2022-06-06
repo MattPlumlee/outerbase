@@ -138,48 +138,61 @@
 <span class="co">#&gt;  x are too small for ranges</span>
 <span class="co">#&gt;  the limits are between 0 and 1  </span>
 <span class="co">#&gt;  try rescaling</span></code></pre></div>
-<p>Below is one correct deployment, where <code>mat25pow</code> is used for all dimensions. This should take a bit to run, but it should be less than a minute on most modern computers.</p>
+<p>Below is one correct deployment, where <code>mat25pow</code> is used for all dimensions. This should take a bit to run, but it should be around a second on most modern computers.</p>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">obmodel</span> <span class="op">=</span> <span class="fu"><a href="../reference/obfit.html">obfit</a></span><span class="op">(</span><span class="va">x</span>, <span class="va">y</span>, numb <span class="op">=</span> <span class="fl">300</span>, covnames<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="st">"mat25pow"</span>,<span class="fl">8</span><span class="op">)</span><span class="op">)</span></code></pre></div>
-<p>We can then predict using <code><a href="../reference/obpred.html">?obpred</a></code>. While it is not an exact interpolator, it is close.</p>
+<code class="sourceCode R"><span class="va">ptm</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/proc.time.html" class="external-link">proc.time</a></span><span class="op">(</span><span class="op">)</span>
+<span class="va">obmodel</span> <span class="op">=</span> <span class="fu"><a href="../reference/obfit.html">obfit</a></span><span class="op">(</span><span class="va">x</span>, <span class="va">y</span>, numb<span class="op">=</span><span class="fl">300</span>, covnames<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="st">"mat25pow"</span>,<span class="fl">8</span><span class="op">)</span><span class="op">)</span> 
+<span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/proc.time.html" class="external-link">proc.time</a></span><span class="op">(</span><span class="op">)</span> <span class="op">-</span> <span class="va">ptm</span><span class="op">)</span><span class="op">[</span><span class="fl">3</span><span class="op">]</span><span class="op">)</span>
+<span class="co">#&gt; elapsed </span>
+<span class="co">#&gt;   0.853</span></code></pre></div>
+<p>Note that by changing threads to match the computer, we can adjust how processing is done. The default is to grab all available threads. Below we reduce ourselves to a single thread, which should slow things down.</p>
 <div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="va">ptm</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/proc.time.html" class="external-link">proc.time</a></span><span class="op">(</span><span class="op">)</span>
+<span class="va">obmodel</span> <span class="op">=</span> <span class="fu"><a href="../reference/obfit.html">obfit</a></span><span class="op">(</span><span class="va">x</span>, <span class="va">y</span>, numb<span class="op">=</span><span class="fl">300</span>, covnames<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="st">"mat25pow"</span>,<span class="fl">8</span><span class="op">)</span>,
+                nthreads<span class="op">=</span><span class="fl">1</span><span class="op">)</span> <span class="co">#optional input</span>
+<span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/proc.time.html" class="external-link">proc.time</a></span><span class="op">(</span><span class="op">)</span> <span class="op">-</span> <span class="va">ptm</span><span class="op">)</span><span class="op">[</span><span class="fl">3</span><span class="op">]</span><span class="op">)</span>
+<span class="co">#&gt; elapsed </span>
+<span class="co">#&gt;   1.823</span></code></pre></div>
+<p>Note that the package relies on <code>omp</code> for parallelization, so if the package was not compiled with that in place there will be no benefits.</p>
+<p>We can then predict using <code><a href="../reference/obpred.html">?obpred</a></code>. While it is not an exact interpolator, it is close.</p>
+<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">predtr</span> <span class="op">=</span> <span class="fu"><a href="../reference/obpred.html">obpred</a></span><span class="op">(</span><span class="va">obmodel</span>, <span class="va">x</span><span class="op">)</span>
 <span class="va">rmsetr</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/MathFun.html" class="external-link">sqrt</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/mean.html" class="external-link">mean</a></span><span class="op">(</span><span class="op">(</span><span class="va">y</span><span class="op">-</span><span class="va">predtr</span><span class="op">$</span><span class="va">mean</span><span class="op">)</span><span class="op">^</span><span class="fl">2</span><span class="op">)</span><span class="op">)</span>
 <span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">predtr</span><span class="op">$</span><span class="va">mean</span>, <span class="va">y</span>,
      main<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste</a></span><span class="op">(</span><span class="st">"training \n RMSE = "</span>, <span class="fu"><a href="https://rdrr.io/r/base/Round.html" class="external-link">round</a></span><span class="op">(</span><span class="va">rmsetr</span>,<span class="fl">3</span><span class="op">)</span><span class="op">)</span>,
      xlab<span class="op">=</span><span class="st">"prediction"</span>, ylab <span class="op">=</span> <span class="st">"actual"</span><span class="op">)</span></code></pre></div>
-<p><img src="gettingstarted_files/figure-html/unnamed-chunk-6-1.png" width="700"></p>
+<p><img src="gettingstarted_files/figure-html/unnamed-chunk-7-1.png" width="700"></p>
 <p>Since we generated this data, we can show that <code>outerbase</code> can reasonably predict ground truth, meaning overfitting is not an issue.</p>
-<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">ytrue</span> <span class="op">=</span> <span class="fu"><a href="../reference/obtest_borehole8d.html">obtest_borehole8d</a></span><span class="op">(</span><span class="va">x</span><span class="op">)</span>
 <span class="va">rmsetr</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/MathFun.html" class="external-link">sqrt</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/mean.html" class="external-link">mean</a></span><span class="op">(</span><span class="op">(</span><span class="va">ytrue</span><span class="op">-</span><span class="va">predtr</span><span class="op">$</span><span class="va">mean</span><span class="op">)</span><span class="op">^</span><span class="fl">2</span><span class="op">)</span><span class="op">)</span>
 <span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">predtr</span><span class="op">$</span><span class="va">mean</span>, <span class="va">ytrue</span>,
      main<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste</a></span><span class="op">(</span><span class="st">"oracle \n RMSE = "</span>, <span class="fu"><a href="https://rdrr.io/r/base/Round.html" class="external-link">round</a></span><span class="op">(</span><span class="va">rmsetr</span>,<span class="fl">3</span><span class="op">)</span><span class="op">)</span>,
      xlab<span class="op">=</span><span class="st">"prediction"</span>, ylab<span class="op">=</span><span class="st">"actual"</span><span class="op">)</span></code></pre></div>
-<p><img src="gettingstarted_files/figure-html/unnamed-chunk-7-1.png" width="700"></p>
+<p><img src="gettingstarted_files/figure-html/unnamed-chunk-8-1.png" width="700"></p>
 <p><code>1000</code> test points generated the same way as our original data can also serve as a verification process.</p>
-<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">xtest</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/matrix.html" class="external-link">matrix</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/stats/Uniform.html" class="external-link">runif</a></span><span class="op">(</span><span class="fl">1000</span><span class="op">*</span><span class="va">d</span><span class="op">)</span>,ncol<span class="op">=</span><span class="va">d</span><span class="op">)</span> <span class="co">#prediction points</span>
 <span class="va">ytest</span> <span class="op">=</span> <span class="fu"><a href="../reference/obtest_borehole8d.html">obtest_borehole8d</a></span><span class="op">(</span><span class="va">xtest</span><span class="op">)</span> <span class="op">+</span> <span class="fl">0.5</span><span class="op">*</span><span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">rnorm</a></span><span class="op">(</span><span class="fl">1000</span><span class="op">)</span></code></pre></div>
 <p>The predictions at these new points are also quite good. Not quite as good as the residuals on the test set, but we are extrapolating here.</p>
-<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">predtest</span> <span class="op">=</span> <span class="fu"><a href="../reference/obpred.html">obpred</a></span><span class="op">(</span><span class="va">obmodel</span>, <span class="va">xtest</span><span class="op">)</span>
 
 <span class="va">rmsetst</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/MathFun.html" class="external-link">sqrt</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/mean.html" class="external-link">mean</a></span><span class="op">(</span><span class="op">(</span><span class="va">ytest</span><span class="op">-</span><span class="va">predtest</span><span class="op">$</span><span class="va">mean</span><span class="op">)</span><span class="op">^</span><span class="fl">2</span><span class="op">)</span><span class="op">)</span>
 <span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">predtest</span><span class="op">$</span><span class="va">mean</span>, <span class="va">ytest</span>, 
      main<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste</a></span><span class="op">(</span><span class="st">"testing \n RMSE = "</span>, <span class="fu"><a href="https://rdrr.io/r/base/Round.html" class="external-link">round</a></span><span class="op">(</span><span class="va">rmsetst</span>,<span class="fl">3</span><span class="op">)</span><span class="op">)</span>,
      xlab<span class="op">=</span><span class="st">"prediction"</span>, ylab<span class="op">=</span><span class="st">"actual"</span><span class="op">)</span></code></pre></div>
-<p><img src="gettingstarted_files/figure-html/unnamed-chunk-9-1.png" width="700"></p>
+<p><img src="gettingstarted_files/figure-html/unnamed-chunk-10-1.png" width="700"></p>
 <p>This package also produces variances on the predictions which we can use to test reasonableness. The fact that the second histogram looks like a standard Normal is promising that the predictions are reasonable.</p>
-<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/graphics/hist.html" class="external-link">hist</a></span><span class="op">(</span><span class="op">(</span><span class="va">ytest</span><span class="op">-</span><span class="va">predtest</span><span class="op">$</span><span class="va">mean</span><span class="op">)</span>,
      main<span class="op">=</span><span class="st">"testing \n  residuals"</span>, xlab<span class="op">=</span><span class="st">"residuals"</span><span class="op">)</span></code></pre></div>
-<p><img src="gettingstarted_files/figure-html/unnamed-chunk-10-1.png" width="700"></p>
-<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
+<p><img src="gettingstarted_files/figure-html/unnamed-chunk-11-1.png" width="700"></p>
+<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/graphics/hist.html" class="external-link">hist</a></span><span class="op">(</span><span class="op">(</span><span class="va">ytest</span><span class="op">-</span><span class="va">predtest</span><span class="op">$</span><span class="va">mean</span><span class="op">)</span><span class="op">/</span><span class="fu"><a href="https://rdrr.io/r/base/MathFun.html" class="external-link">sqrt</a></span><span class="op">(</span><span class="va">predtest</span><span class="op">$</span><span class="va">var</span><span class="op">)</span>,
      main<span class="op">=</span><span class="st">"testing \n standarized residuals"</span>,
      xlab<span class="op">=</span><span class="st">"standarized residuals"</span><span class="op">)</span></code></pre></div>
-<p><img src="gettingstarted_files/figure-html/unnamed-chunk-10-2.png" width="700"></p>
+<p><img src="gettingstarted_files/figure-html/unnamed-chunk-11-2.png" width="700"></p>
 </div>
   </main><aside class="col-md-3"><nav id="toc"><h2>On this page</h2>
     </nav></aside>

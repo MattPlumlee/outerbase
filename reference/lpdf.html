@@ -165,12 +165,35 @@ respect to coefficients</p></dd>
 
 
 <dt><code>lpdf$diaghessgradhyp()</code></dt>
-<dd><p>returns the gradient of <code>diaghess()</code> with</p></dd>
+<dd><p>returns the gradient of <code>diaghess()</code> with 
+respect to  covariance hyperparameters</p></dd>
+
+
+<dt><code>lpdf$diaghessgradpara()</code></dt>
+<dd><p>returns the gradient of <code>diaghess()</code> with 
+respect to model parameters</p></dd>
+
+
+<dt><code>lpdf$paralpdf(para)</code></dt>
+<dd><p>compute the log-prior on the parameters, useful for 
+fitting</p></dd>
+
+
+<dt><code>lpdf$paralpdf_grad(para)</code></dt>
+<dd><p>gradient of <code>paralpdf(para)</code></p></dd>
 
 
 </dl></div>
+    <div class="section level2">
+    <h2 id="see-also">See also<a class="anchor" aria-label="anchor" href="#see-also"></a></h2>
+    <div class="dont-index"><p>container class: <code><a href="lpdfvec.html">lpdfvec</a></code></p>
+<p>derived classes: <code><a href="loglik_std.html">loglik_std</a></code>, 
+<code><a href="loglik_gauss.html">loglik_gauss</a></code>, <code><a href="loglik_gda.html">loglik_gda</a></code>, 
+<code><a href="logpr_gauss.html">logpr_gauss</a></code></p></div>
+    </div>
 
-  </main></div>
+  </main><aside class="col-md-3"><nav id="toc"><h2>On this page</h2>
+    </nav></aside></div>
 
 
     <footer><div class="pkgdown-footer-left">

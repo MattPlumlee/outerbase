@@ -154,15 +154,15 @@
 <span class="va">coeff0</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="fl">0</span>,<span class="va">loglik</span><span class="op">$</span><span class="va">nterms</span><span class="op">)</span>
 <span class="va">loglik</span><span class="op">$</span><span class="fu">update</span><span class="op">(</span><span class="va">coeff0</span><span class="op">)</span> <span class="co"># update it to get gradients</span>
 <span class="va">loglik</span><span class="op">$</span><span class="va">val</span>
-<span class="co">#&gt; [1] -161.4159</span>
+<span class="co">#&gt; [1] -165.8946</span>
 <span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">loglik</span><span class="op">$</span><span class="va">grad</span><span class="op">)</span> <span class="co"># dim 60 for number of coeffients</span>
-<span class="co">#&gt;            [,1]</span>
-<span class="co">#&gt; [1,]  0.1057980</span>
-<span class="co">#&gt; [2,] -1.2550244</span>
-<span class="co">#&gt; [3,] -1.0408845</span>
-<span class="co">#&gt; [4,]  2.9117202</span>
-<span class="co">#&gt; [5,]  0.3000319</span>
-<span class="co">#&gt; [6,] -0.2828231</span></code></pre></div>
+<span class="co">#&gt;             [,1]</span>
+<span class="co">#&gt; [1,] -0.01409797</span>
+<span class="co">#&gt; [2,] -0.91698190</span>
+<span class="co">#&gt; [3,]  3.43017546</span>
+<span class="co">#&gt; [4,] -0.42483593</span>
+<span class="co">#&gt; [5,] -0.10561420</span>
+<span class="co">#&gt; [6,] -0.18467333</span></code></pre></div>
 <p>A reasonable statistical model also needs prior on the coefficients. This tells us what distribution we expect on the coefficients.</p>
 <div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">logpr</span> <span class="op">=</span> <span class="fu">new</span><span class="op">(</span><span class="va">logpr_gauss</span>, <span class="va">om</span>, <span class="va">terms</span><span class="op">)</span></code></pre></div>
@@ -172,12 +172,12 @@
 <span class="va">para0</span> <span class="op">=</span> <span class="fu"><a href="../reference/getpara.html">getpara</a></span><span class="op">(</span><span class="va">logpdf</span><span class="op">)</span>
 <span class="va">para0</span>
 <span class="co">#&gt; noisescale coeffscale </span>
-<span class="co">#&gt;   3.021208   6.000000</span>
+<span class="co">#&gt;   2.918121   6.000000</span>
 <span class="va">para0</span><span class="op">[</span><span class="fl">2</span><span class="op">]</span> <span class="op">=</span> <span class="fl">4</span>
 <span class="va">logpdf</span><span class="op">$</span><span class="fu">updatepara</span><span class="op">(</span><span class="va">para0</span><span class="op">)</span>
 <span class="fu"><a href="../reference/getpara.html">getpara</a></span><span class="op">(</span><span class="va">logpdf</span><span class="op">)</span>
 <span class="co">#&gt; noisescale coeffscale </span>
-<span class="co">#&gt;   3.021208   4.000000</span></code></pre></div>
+<span class="co">#&gt;   2.918121   4.000000</span></code></pre></div>
 <p>The coefficients <code>coeff</code> are considered ancillary parameters that need to be optimized out (or something more sophisticated, hint on current research). For this class, it is easiest to do this via <code>lpdf$optnewton</code>, which takes a single Newton step to optimize the coefficients.</p>
 <div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">logpdf</span><span class="op">$</span><span class="fu">optnewton</span><span class="op">(</span><span class="op">)</span></code></pre></div>
@@ -208,16 +208,16 @@
 <code class="sourceCode R"><span class="va">logpdf</span><span class="op">$</span><span class="fu">optnewton</span><span class="op">(</span><span class="op">)</span>
 <span class="va">logpdf</span><span class="op">$</span><span class="va">gradhyp</span>    <span class="co"># dim 6 for all hyperparameter</span>
 <span class="co">#&gt;            [,1]</span>
-<span class="co">#&gt; [1,] -1.4809189</span>
-<span class="co">#&gt; [2,]  0.1827801</span>
-<span class="co">#&gt; [3,]  7.4764545</span>
-<span class="co">#&gt; [4,]  0.7704068</span>
-<span class="co">#&gt; [5,]  7.2081800</span>
-<span class="co">#&gt; [6,]  0.7620623</span>
+<span class="co">#&gt; [1,] -0.4354245</span>
+<span class="co">#&gt; [2,]  0.3445387</span>
+<span class="co">#&gt; [3,]  8.4598222</span>
+<span class="co">#&gt; [4,]  0.9965684</span>
+<span class="co">#&gt; [5,]  8.2870239</span>
+<span class="co">#&gt; [6,]  0.8652708</span>
 <span class="va">logpdf</span><span class="op">$</span><span class="va">gradpara</span>   <span class="co"># dim 2 since 2 parameters</span>
 <span class="co">#&gt;            [,1]</span>
-<span class="co">#&gt; [1,] -18.507744</span>
-<span class="co">#&gt; [2,]  -2.652426</span></code></pre></div>
+<span class="co">#&gt; [1,] -17.476154</span>
+<span class="co">#&gt; [2,]  -3.226378</span></code></pre></div>
 <p>This allows us to use custom functions to learn these hyperparameters to give maximum predictive power. The goal right now is a single point estimate of these hyperparameters. One has to be very careful to keep these in good ranges, and the call below will make sure to return <code>-inf</code> if there is a problem with the chosen hyperparameters.</p>
 <div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">totobj</span> <span class="op">=</span> <span class="kw">function</span><span class="op">(</span><span class="va">parlist</span><span class="op">)</span> <span class="op">{</span> <span class="co">#my optimization function for tuning</span>
@@ -239,67 +239,69 @@
 <code class="sourceCode R"><span class="va">parlist</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>para <span class="op">=</span> <span class="fu"><a href="../reference/getpara.html">getpara</a></span><span class="op">(</span><span class="va">logpdf</span><span class="op">)</span>, hyp <span class="op">=</span> <span class="fu"><a href="../reference/gethyp.html">gethyp</a></span><span class="op">(</span><span class="va">om</span><span class="op">)</span><span class="op">)</span>
 <span class="fu">totobj</span><span class="op">(</span><span class="va">parlist</span><span class="op">)</span>
 <span class="co">#&gt; $val</span>
-<span class="co">#&gt; [1] 85.49083</span>
+<span class="co">#&gt; [1] 83.9639</span>
 <span class="co">#&gt; </span>
 <span class="co">#&gt; $gval</span>
 <span class="co">#&gt; $gval$para</span>
 <span class="co">#&gt;           [,1]</span>
-<span class="co">#&gt; [1,] 18.507744</span>
-<span class="co">#&gt; [2,]  2.152426</span>
+<span class="co">#&gt; [1,] 17.476154</span>
+<span class="co">#&gt; [2,]  2.726378</span>
 <span class="co">#&gt; </span>
 <span class="co">#&gt; $gval$hyp</span>
 <span class="co">#&gt;             [,1]</span>
-<span class="co">#&gt; [1,]  -3.8762240</span>
-<span class="co">#&gt; [2,]  -0.1827801</span>
-<span class="co">#&gt; [3,] -12.8335974</span>
-<span class="co">#&gt; [4,]  -0.7704068</span>
-<span class="co">#&gt; [5,] -12.5653229</span>
-<span class="co">#&gt; [6,]  -0.7620623</span>
+<span class="co">#&gt; [1,]  -4.9217183</span>
+<span class="co">#&gt; [2,]  -0.3445387</span>
+<span class="co">#&gt; [3,] -13.8169651</span>
+<span class="co">#&gt; [4,]  -0.9965684</span>
+<span class="co">#&gt; [5,] -13.6441668</span>
+<span class="co">#&gt; [6,]  -0.8652708</span>
 <span class="va">opth</span> <span class="op">=</span> <span class="fu"><a href="../reference/BFGS_std.html">BFGS_std</a></span><span class="op">(</span><span class="va">totobj</span>, <span class="va">parlist</span>, verbose<span class="op">=</span><span class="fl">3</span><span class="op">)</span> <span class="co">#</span>
 <span class="co">#&gt; </span>
 <span class="co">#&gt; ########started BFGS#######</span>
 <span class="co">#&gt;  iter.no obj.value wolfe.cond.1 wolfe.cond.2 learning.rate</span>
-<span class="co">#&gt;        0   85.4908           NA           NA           0.1</span>
+<span class="co">#&gt;        0   83.9639           NA           NA           0.1</span>
 <span class="co">#&gt;  iter.no obj.value wolfe.cond.1 wolfe.cond.2 learning.rate</span>
-<span class="co">#&gt;        1   82.7728     -2.71749     -44.7792           0.1</span>
+<span class="co">#&gt;        1   81.0332     -2.93013     -46.5226           0.1</span>
 <span class="co">#&gt;  iter.no obj.value wolfe.cond.1 wolfe.cond.2 learning.rate</span>
-<span class="co">#&gt;        2   77.9237     -4.84862    -0.251704       0.50357</span>
+<span class="co">#&gt;        2    76.268     -4.76467    -0.339566       0.50357</span>
 <span class="co">#&gt;  iter.no obj.value wolfe.cond.1 wolfe.cond.2 learning.rate</span>
-<span class="co">#&gt;        3   60.7591      -17.162     -30.3959      0.539329</span>
+<span class="co">#&gt;        3   60.4958       -15.77     -24.9943      0.539329</span>
 <span class="co">#&gt;  iter.no obj.value wolfe.cond.1 wolfe.cond.2 learning.rate</span>
-<span class="co">#&gt;        4   54.9409     -5.81753     -2.64998      0.573679</span>
+<span class="co">#&gt;        4   54.6379     -5.85721     -2.81639      0.573679</span>
 <span class="co">#&gt;  iter.no obj.value wolfe.cond.1 wolfe.cond.2 learning.rate</span>
-<span class="co">#&gt;        5   43.8348     -11.1047     -8.10027      0.606459</span>
+<span class="co">#&gt;        5   44.0634     -10.5731     -9.40703      0.606459</span>
 <span class="co">#&gt;  iter.no obj.value wolfe.cond.1 wolfe.cond.2 learning.rate</span>
-<span class="co">#&gt;        6   34.3764     -9.45716     -7.20791      0.637561</span>
+<span class="co">#&gt;        6   35.1811     -8.88113     -5.11392      0.637561</span>
 <span class="co">#&gt;  iter.no obj.value wolfe.cond.1 wolfe.cond.2 learning.rate</span>
-<span class="co">#&gt;        7   29.6759     -4.69979     -7.52725      0.666913</span>
+<span class="co">#&gt;        7   29.0215     -6.15838     -17.4167      0.666913</span>
 <span class="co">#&gt;  iter.no obj.value wolfe.cond.1 wolfe.cond.2 learning.rate</span>
-<span class="co">#&gt;        8   28.5884     -1.08725     -4.66552      0.347242</span>
-<span class="co">#&gt; num iter: 9  obj start: 85.49083  obj end: 28.43117</span>
-<span class="co">#&gt; final learning rate: 0.3859839</span>
-<span class="co">#&gt; approx lower bound (not achieved): 27.91182</span>
+<span class="co">#&gt;        8   27.5932     -1.42791      -9.3062      0.694484</span>
+<span class="co">#&gt;  iter.no obj.value wolfe.cond.1 wolfe.cond.2 learning.rate</span>
+<span class="co">#&gt;        9   27.1559    -0.437159    -0.922883      0.720271</span>
+<span class="co">#&gt; num iter: 10  obj start: 83.9639  obj end: 27.13144</span>
+<span class="co">#&gt; final learning rate: 0.7442976</span>
+<span class="co">#&gt; approx lower bound (not achieved): 27.08945</span>
 <span class="co">#&gt; #########finished BFGS########</span></code></pre></div>
 <p>Then we just have to update out parameters and re-optimize, and we can check that we are at least must closer to stationary point.</p>
 <div class="sourceCode" id="cb18"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu">totobj</span><span class="op">(</span><span class="va">opth</span><span class="op">$</span><span class="va">par</span><span class="op">)</span>
 <span class="co">#&gt; $val</span>
-<span class="co">#&gt; [1] 28.43117</span>
+<span class="co">#&gt; [1] 27.13144</span>
 <span class="co">#&gt; </span>
 <span class="co">#&gt; $gval</span>
 <span class="co">#&gt; $gval$para</span>
-<span class="co">#&gt;             [,1]</span>
-<span class="co">#&gt; [1,] -0.07176864</span>
-<span class="co">#&gt; [2,] -1.72703247</span>
+<span class="co">#&gt;           [,1]</span>
+<span class="co">#&gt; [1,] -0.421129</span>
+<span class="co">#&gt; [2,] -0.835277</span>
 <span class="co">#&gt; </span>
 <span class="co">#&gt; $gval$hyp</span>
-<span class="co">#&gt;            [,1]</span>
-<span class="co">#&gt; [1,]  0.9124721</span>
-<span class="co">#&gt; [2,] -2.0994786</span>
-<span class="co">#&gt; [3,]  1.0010214</span>
-<span class="co">#&gt; [4,] -1.6479843</span>
-<span class="co">#&gt; [5,]  1.6461405</span>
-<span class="co">#&gt; [6,] -1.8202308</span></code></pre></div>
+<span class="co">#&gt;             [,1]</span>
+<span class="co">#&gt; [1,] -0.44363247</span>
+<span class="co">#&gt; [2,] -0.36102089</span>
+<span class="co">#&gt; [3,]  0.04007399</span>
+<span class="co">#&gt; [4,] -0.27483553</span>
+<span class="co">#&gt; [5,] -0.07262555</span>
+<span class="co">#&gt; [6,] -0.36960464</span></code></pre></div>
 <p>These steps can all be nicely wrapped up in another function <code><a href="../reference/BFGS_lpdf.html">?BFGS_lpdf</a></code>, which is a simpler call with the same result. Note because of some things not fully understood, these numbers will not match <em>exactly</em> above, but they will be quite close and functionally the same.</p>
 <div class="sourceCode" id="cb19"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">opth</span> <span class="op">=</span> <span class="fu"><a href="../reference/BFGS_lpdf.html">BFGS_lpdf</a></span><span class="op">(</span><span class="va">om</span>, <span class="va">logpdf</span>, 
@@ -308,26 +310,28 @@
 <span class="co">#&gt; </span>
 <span class="co">#&gt; ########started BFGS#######</span>
 <span class="co">#&gt;  iter.no obj.value wolfe.cond.1 wolfe.cond.2 learning.rate</span>
-<span class="co">#&gt;        0   85.4908           NA           NA           0.1</span>
+<span class="co">#&gt;        0   83.9639           NA           NA           0.1</span>
 <span class="co">#&gt;  iter.no obj.value wolfe.cond.1 wolfe.cond.2 learning.rate</span>
-<span class="co">#&gt;        1   82.7728     -2.71749     -44.7792           0.1</span>
+<span class="co">#&gt;        1   81.0332     -2.93013     -46.5226           0.1</span>
 <span class="co">#&gt;  iter.no obj.value wolfe.cond.1 wolfe.cond.2 learning.rate</span>
-<span class="co">#&gt;        2   77.9237     -4.84862    -0.251704       0.50357</span>
+<span class="co">#&gt;        2    76.268     -4.76467    -0.339566       0.50357</span>
 <span class="co">#&gt;  iter.no obj.value wolfe.cond.1 wolfe.cond.2 learning.rate</span>
-<span class="co">#&gt;        3   60.7591      -17.162     -30.3959      0.539329</span>
+<span class="co">#&gt;        3   60.4958       -15.77     -24.9943      0.539329</span>
 <span class="co">#&gt;  iter.no obj.value wolfe.cond.1 wolfe.cond.2 learning.rate</span>
-<span class="co">#&gt;        4   54.9409     -5.81753     -2.64998      0.573679</span>
+<span class="co">#&gt;        4   54.6379     -5.85721     -2.81639      0.573679</span>
 <span class="co">#&gt;  iter.no obj.value wolfe.cond.1 wolfe.cond.2 learning.rate</span>
-<span class="co">#&gt;        5   43.8348     -11.1047     -8.10027      0.606459</span>
+<span class="co">#&gt;        5   44.0634     -10.5731     -9.40703      0.606459</span>
 <span class="co">#&gt;  iter.no obj.value wolfe.cond.1 wolfe.cond.2 learning.rate</span>
-<span class="co">#&gt;        6   34.3764     -9.45716     -7.20791      0.637561</span>
+<span class="co">#&gt;        6   35.1811     -8.88113     -5.11392      0.637561</span>
 <span class="co">#&gt;  iter.no obj.value wolfe.cond.1 wolfe.cond.2 learning.rate</span>
-<span class="co">#&gt;        7   29.6759     -4.69979     -7.52725      0.666913</span>
+<span class="co">#&gt;        7   29.0215     -6.15838     -17.4167      0.666913</span>
 <span class="co">#&gt;  iter.no obj.value wolfe.cond.1 wolfe.cond.2 learning.rate</span>
-<span class="co">#&gt;        8   28.5884     -1.08725     -4.66552      0.347242</span>
-<span class="co">#&gt; num iter: 9  obj start: 85.49083  obj end: 28.43117</span>
-<span class="co">#&gt; final learning rate: 0.3859839</span>
-<span class="co">#&gt; approx lower bound (not achieved): 27.91182</span>
+<span class="co">#&gt;        8   27.5932     -1.42791      -9.3062      0.694484</span>
+<span class="co">#&gt;  iter.no obj.value wolfe.cond.1 wolfe.cond.2 learning.rate</span>
+<span class="co">#&gt;        9   27.1559    -0.437159    -0.922883      0.720271</span>
+<span class="co">#&gt; num iter: 10  obj start: 83.9639  obj end: 27.13144</span>
+<span class="co">#&gt; final learning rate: 0.7442976</span>
+<span class="co">#&gt; approx lower bound (not achieved): 27.08945</span>
 <span class="co">#&gt; #########finished BFGS########</span></code></pre></div>
 <p>The revised predictions are then built after hyperparameter optimization where we find improved predictive accuracy in nearly every category. Here we can see a much better alignment between predictions and actual alongside a better plot of standardized residuals (more like a standard normal distribution).</p>
 <div class="sourceCode" id="cb20"><pre class="downlit sourceCode r">

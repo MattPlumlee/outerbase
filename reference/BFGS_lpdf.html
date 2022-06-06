@@ -85,11 +85,12 @@ parameters, the return is simply for information.</p>
     <div class="section level2">
     <h2 id="arguments">Arguments<a class="anchor" aria-label="anchor" href="#arguments"></a></h2>
     <dl><dt>om</dt>
-<dd><p>an <code><a href="outermod.html">outermod</a></code> object</p></dd>
+<dd><p>an <code><a href="outermod.html">outermod</a></code> instance</p></dd>
 <dt>logpdf</dt>
-<dd><p>a <code><a href="lpdf.html">lpdf</a></code> object</p></dd>
+<dd><p>a <code><a href="lpdf.html">lpdf</a></code> instance</p></dd>
 <dt>par</dt>
-<dd><p>an initial point, initialized from objects if needed</p></dd>
+<dd><p>an initial point, which are pulled from `om` and `logpdf` if not 
+provided</p></dd>
 <dt>newt</dt>
 <dd><p>boolean for if Newtons method should be used</p></dd>
 <dt>cgsteps</dt>
@@ -101,7 +102,7 @@ parameters, the return is simply for information.</p>
 </dl></div>
     <div class="section level2">
     <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
-    <p>A list of information from optimization</p>
+    <p>a list of information from optimization.</p>
     </div>
 
   </main><aside class="col-md-3"><nav id="toc"><h2>On this page</h2>
