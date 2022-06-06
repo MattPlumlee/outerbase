@@ -66,15 +66,15 @@ obmodel = obfit(x, y, numb=300, covnames=rep("mat25pow",8))
 print((proc.time() - ptm)[3])
 ```
 
-Note that by changing threads to match the computer, we can adjust how processing is done. The default is to grab all available threads.  Below we reduce ourselves to a single thread, which should slow things down.  
+Note that the package is made using custom parallelization at the linear-algebra level.  The package relies on `omp` for parallelization, so if the package was not compiled with that in place there will be no benefits.  The default call of `obfit` grabs all available threads, which is ideal for desktops/laptops.  It might be less ideal for large clusters where the CPU might be shared.
+
+We can adjust the number of threads manually.  Below we reduce ourselves to a single thread, which should slow things down.  
 ```{r}
 ptm = proc.time()
 obmodel = obfit(x, y, numb=300, covnames=rep("mat25pow",8),
                 nthreads=1) #optional input
 print((proc.time() - ptm)[3])
 ```
-
-Note that the package relies on `omp` for parallelization, so if the package was not compiled with that in place there will be no benefits.
 
 We can then predict using `?obpred`.  While it is not an exact interpolator, it is close.
 ```{r}

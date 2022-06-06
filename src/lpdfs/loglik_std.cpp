@@ -219,6 +219,8 @@ predr_std::predr_std(const loglik_std& loglik) :
 om(loglik.om), para(loglik.para), terms(loglik.terms),
 x(loglik.x), ob(om,x,false) //private
 {
+  nthreads = loglik.ob.nthreads;
+  ob.nthreads = nthreads;
   coeff = loglik.coeff;
   basismat = ob.getmat(terms);
   if(!loglik.didnotothess) {
@@ -237,6 +239,7 @@ x(loglik.x), ob(om,x,false) //private
 void predr_std::update(const mat& x_) {
   x = x_;
   new (&ob) outerbase(om,x_,false);
+  ob.nthreads = nthreads;
   basismat = ob.getmat(terms);
 }
 

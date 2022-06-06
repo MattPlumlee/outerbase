@@ -9,12 +9,14 @@
 
 class predf {
 public:
+  int nthreads;
   
   predf(){}
   virtual ~predf() {}
   virtual void update(const mat&){}
   virtual vec mean() const { return {};}
   virtual vec var() const { return {};}
+  void setnthreads(int k) {nthreads = k;}
 };  
 
 
@@ -215,6 +217,7 @@ public:
   const vec para;
   const umat terms;
   mat basismat; 
+  int nthreads = 0;
   
   mat x;
   vec coeff;
@@ -269,6 +272,7 @@ public:
   const outermod& om;
   const vec para;
   const umat terms;
+  int nthreads = 0;
   
   mat x;
   vec coeff;
@@ -329,6 +333,7 @@ public:
   const outermod& om;
   const vec para;
   const umat terms;
+  int nthreads = 0;
   
   mat x;
   vec coeff;
@@ -352,6 +357,7 @@ public:
   void update(const mat& x){pred->update(x);}
   vec mean() const {return pred->mean();}
   vec var() const {return pred->var();}
+  void setnthreads(int k) {pred->setnthreads(k);}
 };
 
 #endif
