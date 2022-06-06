@@ -34,7 +34,6 @@ Covariance functions are an important building block of Gaussian process inferen
 Creating instances is done through the `?methods::new` call with the class name listed inside.
 ```{r}
 corf = new(covf_mat25)
-?covf_mat25
 ```
 
 The `cov` method builds covariances matrices.  Below is an example of calling this method.  Note that these are designed to be single dimensional covariance functions.

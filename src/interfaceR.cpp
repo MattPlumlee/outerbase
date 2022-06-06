@@ -40,10 +40,10 @@ using namespace Rcpp;
 //' \preformatted{
 //' setcovfs(om, covnames)
 //' }
-//' This function sets the covariance functions for an outermod object,
-//' which is first thing one does when creating an outermod object.//'
-//' @param om \code{\link{outermod}} object
-//' @param covnames vector of strings of the covariance functions
+//' Sets the covariance functions for an outermod class instance.
+//' This is first thing one does when creating an outermod instance.
+//' @param om an \code{\link{outermod}} instance
+//' @param covnames a vector of strings of the covariance functions
 //' @examples
 //' om = new(outermod)
 //' setcovfs(om, c("mat25", "mat25", "mat25"))
@@ -77,20 +77,19 @@ void setcovfs(outermod& om, StringVector covstr){
 //' \preformatted{
 //' setknot(om, knotslist)
 //' }
-//' This function sets the knot points to estimate the eigenfunctions
-//' and eigenvalues. It will naturally check if the knot points have the
-//' same dimension as the covariance functions.  It will also check if the 
-//' knot points are within reasonable bounds for the covariance functions.//' 
-//' @param om \code{\link{outermod}} object
-//' @param knotslist list of one dimensional vectors
+//' Sets the knot points of \code{om} to \code{knotslist} to estimate the 
+//' eigenfunctions and eigenvalues. It will naturally check if the knot points 
+//' have the same dimension as the covariance functions.  It will also check if 
+//' the knot points are within reasonable bounds for the covariance functions.
+//' @param om an \code{\link{outermod}} instance
+//' @param knotslist a list of one dimensional vectors
 //' @examples
 //' om = new(outermod)
 //' setcovfs(om, c("mat25", "mat25", "mat25"))
-//' setknot(om,
-//'          list(seq(0,1,by=0.01),seq(0,1,by=0.01),seq(0,1,by=0.01)))
+//' knotslist = list(seq(0,1,by=0.01),seq(0,1,by=0.01),seq(0,1,by=0.01))
+//' setknot(om, knotslist)
 //' @seealso \code{\link{outermod}}, \code{\link{setcovfs}}
 void setknot(outermod& om, List L){
-  /* Need to figure out how to do error checking later
   if (!om.setcovfs) {
     throw std::range_error("Need to set cov. funcs before setting knots.");
     return;
@@ -116,7 +115,6 @@ void setknot(outermod& om, List L){
       return;
     }
   }
-   */
   
   om.knotptst.resize(om.d+1);
   int currst = 0;
@@ -150,18 +148,19 @@ void setknot(outermod& om, List L){
 
 //' @name gethyp
 //' @title Get the hyperparameters
-//' @param om \code{\link{outermod}} object
 //' @description
 //' \preformatted{
 //' hyp = gethyp(om)
 //' }
-//' This function gets the current hyperparameters from an outermod object. It 
-//' formats them in a way that makes reading in `R` helpful. 
+//' Gets the current hyperparameters from an \code{\link{outermod}} instance. It 
+//' formats them in a way that makes reading in \code{R} easier. 
+//' @param om an \code{\link{outermod}} instance 
 //' @examples
 //' om = new(outermod)
 //' setcovfs(om, c("mat25", "mat25", "mat25"))
 //' hyp = gethyp(om)
 //' print(hyp)
+//' @returns a vector of parameters
 //' @seealso \code{\link{outermod}}
 NumericVector gethyp(outermod& om) {
   NumericVector out(om.hyp.n_elem);
@@ -183,11 +182,12 @@ NumericVector gethyp(outermod& om) {
 //' @title Get the model parameters
 //' @description
 //' \preformatted{
-//' para = getpara(loglik)
+//' para = getpara(logpdf)
 //' }
-//' This function gets the current parameters from an \code{\link{lpdf}} object.  
-//' It formats them in a way that makes reading in `R` helpful.
-//' @param lpdf logpdf object
+//' This function gets the current parameters from an \code{\link{lpdf}} class
+//' instance. It formats them in a way that makes reading in \code{R} easier.
+//' @returns a vector of parameters
+//' @param logpdf an \code{\link{lpdf}} class instance
 NumericVector getpara(lpdf& logpdf) {
   NumericVector out(logpdf.para.n_elem);
   out.names() = logpdf.paranames;
@@ -205,13 +205,12 @@ RCPP_EXPOSED_CLASS(lpdf)
 //' @aliases
 //' Rcpp_outermod-class Rcpp_outermod
 //' @title Outer product-type model
-//' @description Type the name of the class to see its methods.
-//' @field \link{setcovfs} to set covariance functions
-//' @field \link{setknot} to set knot points
-//' @field \link{gethyp} to get hyperparameters
-//' @field \link{outermod$updatehyp} to update hyperparameters
-//' @field \link{outermod$selectterms} to find best terms
-//' @field \link{outermod$getvar} to find variances of coefficients
+//' @description This is a class used to construct \code{\link{outerbase}}
+//' class instances.  It stores key information for constructing a basis.
+//' @field \link{outermod$updatehyp}(hyp) update hyperparameters
+//' @field \link{outermod$selectterms}(numterms) find best \code{numterms} terms
+//' @field \link{outermod$getvar}(terms) find variances of coefficients 
+//' assoicated with  \code{terms}
 //' @examples
 //' om = new(outermod)
 //' setcovfs(om, c("mat25", "mat25", "mat25"))
@@ -224,6 +223,8 @@ RCPP_EXPOSED_CLASS(lpdf)
 //' om$updatehyp(hyp)
 //' coeffvar = om$getvar(terms)
 //' @seealso \code{\link{outerbase}} the main product from an outermod
+//' @seealso \code{\link{setcovfs}}, \code{\link{setknot}}, 
+//' \code{\link{gethyp}}
 
 //' @name outermod$updatehyp
 //' @title Update hyperparameters
@@ -231,7 +232,7 @@ RCPP_EXPOSED_CLASS(lpdf)
 //' \preformatted{
 //' outermod$updatehyp(hyp)
 //' }
-//' Updates the hyperparameters
+//' Updates the hyperparameters for the instance of outermod.
 //' @param hyp A vector of hyperparameters
 //' @seealso \code{\link{outermod}}
 
@@ -241,9 +242,10 @@ RCPP_EXPOSED_CLASS(lpdf)
 //' \preformatted{
 //' terms = om$selectterms(numterms)
 //' }
-//' Selects the best \code{terms} given the current \code{outermod}
-//' @param numterms Number of basis \code{terms} desired
-//' @returns terms A matrix of \code{terms}
+//' Returns the best \code{numterms} given \code{outermod} currently using
+//' maximum variance criteria.
+//' @param numterms number of basis \code{terms} desired
+//' @returns a matrix of \code{terms}
 //' @seealso \code{\link{outermod}}
 
 
@@ -254,8 +256,8 @@ RCPP_EXPOSED_CLASS(lpdf)
 //' coeffvar = outermod$getvar(terms)
 //' }
 //' Returns the variance of the coefficients associated with \code{terms}.
-//' @param terms A matrix of \code{terms}
-//' @returns coeffvar A vector of variances of each coefficient
+//' @param terms a matrix of \code{terms}
+//' @returns a vector of variances of each coefficient
 //' @seealso \code{\link{outermod}}
 
 
@@ -267,7 +269,7 @@ RCPP_EXPOSED_CLASS(lpdf)
 //' \preformatted{
 //' ob = new(outerbase, om, x)
 //' }
-//' Object that handles the basis for a given set of points 
+//' Class that handles the basis for a given set of points 
 //' \code{x}.
 //' @param x a matrix of predictors, must have as many columns as dims in 
 //' \code{om}
@@ -276,7 +278,7 @@ RCPP_EXPOSED_CLASS(lpdf)
 //' functions
 //' @field \link{outerbase$getmat}(terms) to get the basis matrix at 
 //' \code{terms}
-//' @field \link{outerbase$build}() to (re)build the basis object
+//' @field \link{outerbase$build}() to (re)build the basis instance
 //' @field \link{outerbase$matmul}(terms,a) matrix multiply without 
 //'building the basis matrix
 //' @field \link{outerbase$tmatmul}(terms,a) transpose matrix multiply 
@@ -298,10 +300,10 @@ RCPP_EXPOSED_CLASS(lpdf)
 //' \preformatted{
 //' basis_func = outerbase$getbase(k)
 //' }
-//' Returns the basis for a dimension
+//' Returns the basis for dimension \code{k}.   Designed mostly for 
+//' visualization.
 //' @param k An integer from that corresponds to the dimension.
-//' @returns basis_func A matrix of evaluated basis functions for that 
-//' dimension.  Designed mostly for visualization.
+//' @returns a matrix of evaluated basis functions
 //' @seealso \code{\link{outerbase}}
 
 //' @name outerbase$getmat
@@ -310,9 +312,9 @@ RCPP_EXPOSED_CLASS(lpdf)
 //' \preformatted{
 //' basismat = outerbase$getmat(terms)
 //'  }
-//' Returns the basis matrix
-//' @param terms A matrix of terms
-//' @returns basismat A matrix of evaluated basis functions based on 
+//' Returns the basis matrix for a given set of \code{terms}.
+//' @param terms a matrix of terms
+//' @returns a matrix of evaluated basis functions based on 
 //' \code{terms}.
 //' @seealso \code{\link{outerbase}}
 
@@ -334,9 +336,9 @@ RCPP_EXPOSED_CLASS(lpdf)
 //' }
 //' Multiplies the basis times a vector without building the basis 
 //' matrix.
-//' @param terms A matrix of \code{terms}
-//' @param a A vector of length the same as the rows in \code{terms}
-//' @returns b A vector resulting from the matrix multiplication
+//' @param terms a matrix of \code{terms}
+//' @param a a vector of length the same as the rows in \code{terms}
+//' @returns a vector resulting from the matrix multiplication
 //' @seealso \code{\link{outerbase}}
 
 //' @name outerbase$tmatmul
@@ -347,9 +349,9 @@ RCPP_EXPOSED_CLASS(lpdf)
 //' }
 //' Multiplies the transpose of the basis times a vector without 
 //'  building the basis matrix.
-//' @param terms A matrix of \code{terms}
-//' @param a A vector of length the same as the rows in \code{outerbase}
-//' @returns b A vector resulting from the matrix multiplication
+//' @param terms a matrix of \code{terms}
+//' @param a a vector of length the same as the rows in \code{outerbase}
+//' @returns a vector resulting from the matrix multiplication
 //' @seealso \code{\link{outerbase}}
 
 //' @name lpdf
@@ -392,7 +394,7 @@ RCPP_EXPOSED_CLASS(lpdf)
 //' @field lpdf$diaghess() returns the diagonal of the hessian with 
 //' respect to coefficients
 //' @field lpdf$diaghessgradhyp() returns the gradient of \code{diaghess()} with 
-///' respect to  covariance hyperparameters
+//' respect to  covariance hyperparameters
 //' @field lpdf$diaghessgradpara() returns the gradient of \code{diaghess()} with 
 //' respect to model parameters
 //' @field lpdf$paralpdf(para) compute the log-prior on the parameters, useful for 
@@ -400,27 +402,28 @@ RCPP_EXPOSED_CLASS(lpdf)
 //' @field lpdf$paralpdf_grad(para) gradient of \code{paralpdf(para)}
 //' @seealso container class: \code{\link{lpdfvec}}
 //' @seealso derived classes: \code{\link{loglik_std}}, 
-//' \code{\link{loglik_gauss}}, \code{\link{loglik_lda}}, 
+//' \code{\link{loglik_gauss}}, \code{\link{loglik_gda}}, 
 //' \code{\link{logpr_gauss}}
 
 //' @name lpdfvec
 //' @aliases
 //' Rcpp_lpdfvec-class Rcpp_lpdfvec 
-//' @title Vector of `lpdf` objects
+//' @title Vector of \code{lpdf} instances
 //' @description 
 //' \preformatted{
 //' logpdf = new(lpdfvec, loglik, logpr)
 //' }
-//' This is a class that contains two \code{\link{lpdf}} object and can be 
-//' manipulated as a single object.  It presumes both are based on the same
-//' \code{\link{outermod}} object, thus they share hyperparameters.  However
+//' This is a class where each instance contains two \code{\link{lpdf}} 
+//' instances and can be 
+//' manipulated as a single instance.  It presumes both are based on the same
+//' \code{\link{outermod}} instance, thus they share hyperparameters.  However
 //' the model parameters are concatenated.  Currently also includes variations
 //' on marginal adjustments.  
 //'
 //' Currently it is designed only for a pair, but the ordering is arbitrary.
 //'
-//' @param loglik one reference to a \code{lpdf} object
-//' @param logpr another reference to a \code{lpdf} object that shares 
+//' @param loglik one reference to a \code{lpdf} instance
+//' @param logpr another reference to a \code{lpdf} instance that shares 
 //' \code{\link{outermod}}  with \code{loglik}
 //' @field lpdfvec$domarg  A boolean that controls if marginal adjustment is 
 //' done
@@ -433,7 +436,7 @@ RCPP_EXPOSED_CLASS(lpdf)
 //' lpdf$optcg(tol,epoch)
 //' }
 //' This optimizes the coefficient vector \code{coeff} using conjugate gradient. 
-//' It currently is designed only for quadratic \code{\link{lpdf}} objects.
+//' It currently is designed only for quadratic \code{\link{lpdf}} instaces.
 //' @param tol A positive double representing tolerance, default is 
 //' \code{0.001}.
 //' @param epoch A positive integer representing the maximum number of steps 
@@ -447,7 +450,7 @@ RCPP_EXPOSED_CLASS(lpdf)
 //' lpdf$optnewton()
 //' }
 //' This optimizes the coefficient vector \code{coeff} using Newton's Method.  
-//' It currently is designed only for quadratic \code{\link{lpdf}} objects.  
+//' It currently is designed only for quadratic \code{\link{lpdf}} instances.  
 //' It should take a single step.
 //' @seealso \code{\link{lpdf}}  
 
@@ -465,10 +468,10 @@ RCPP_EXPOSED_CLASS(lpdf)
 //' where \eqn{\phi(x)} is the basis, \eqn{\theta} is the coefficient vector,
 //' \eqn{\varepsilon} is an unseen noise vector.
 //' The parameter vector is of length 1 where 
-//' \code{para} \eqn{= \log(\sigma)}.  It is a slightly slower (sometimes) 
+//' \code{para} \eqn{= \log(\sigma)}.  It is a slower (sometimes) 
 //' version of \code{\link{loglik_gauss}} but allows for complete marginal 
 //' inference.
-//' @param om an \code{\link{outermod}} object to be referred to
+//' @param om an \code{\link{outermod}} instance to be referred to
 //' @param terms a matrix of \code{terms}, must have as many columns as dims in 
 //' \code{om}
 //' @param y a vector of observations
@@ -491,10 +494,10 @@ RCPP_EXPOSED_CLASS(lpdf)
 //' where \eqn{\phi(x)} is the basis, \eqn{\theta} is the coefficient vector,
 //' \eqn{\varepsilon} is an unseen noise vector. 
 //' The parameter vector is of length 1 where 
-//' \code{para} \eqn{= \log(\sigma)}.  It is a slightly (sometimes) version of
-//' \code{\link{loglik_std}}  but allows can only handle diagonal variational 
+//' \code{para} \eqn{= \log(\sigma)}.  It is a faster (sometimes) version of
+//' \code{\link{loglik_std}}  but can only handle diagonal variational 
 //' inference.
-//' @param om an \code{\link{outermod}} object to be referred to
+//' @param om an \code{\link{outermod}} instance to be referred to
 //' @param terms a matrix of \code{terms}, must have as many columns as dims in 
 //' \code{om}
 //' @param y a vector of observations
@@ -518,8 +521,8 @@ RCPP_EXPOSED_CLASS(lpdf)
 //' \eqn{\delta(x)} is unseen vector corresponding to unmodeled 
 //' variance \eqn{\lambda g(x)}, \eqn{\varepsilon} is an unseen noise vector.
 //' The parameter vector is of length 2 where 
-//' \eqn{\sigma=} \code{exp(para[0])} and \eqn{\lambda=}\code{exp(2 para[1])}.
-//' @param om an \code{\link{outermod}} object to be referred to
+//' \eqn{\sigma=} \code{exp(para[0])} and \eqn{\lambda=}\code{exp(2*para[1])}.
+//' @param om an \code{\link{outermod}} instance to be referred to
 //' @param terms a matrix of \code{terms}, must have as many columns as dims in 
 //' \code{om}
 //' @param y a vector of observations
@@ -543,7 +546,7 @@ RCPP_EXPOSED_CLASS(lpdf)
 //' where \eqn{c_i} is the variance supplied by \code{om} for the \eqn{i}th term. 
 //' The parameter vector is of length 1 where 
 //' \eqn{\rho=} \code{exp(para[0])}.
-//' @param om an \code{\link{outermod}} object to be referred to
+//' @param om an \code{\link{outermod}} instance to be referred to
 //' @param terms a matrix of \code{terms}, must have as many columns as dims in 
 //' \code{om}
 //' @inherit lpdf description
@@ -595,7 +598,7 @@ RCPP_EXPOSED_CLASS(lpdf)
 //' \deqn{c(x_1,x_2) = (1+ |h| + h^2/3) \exp(-|h|) }
 //' where \eqn{h = (x_1^\alpha-x_2^\alpha)/\rho} and \code{hyp} is a two 
 //' dimensional vector with \eqn{\rho}=\code{exp(2*hyp[0]+0.25*hyp[1])}
-//' and \eqn{\alpha}=\code{exp(2*hyp[0])}.
+//' and \eqn{\alpha}=\code{exp(0.25*hyp[1])}.
 //' @seealso base class: \code{\link{covf}}
 
 //' @name covf_mat25ang
@@ -610,7 +613,7 @@ RCPP_EXPOSED_CLASS(lpdf)
 //' which has form
 //' \deqn{c(x_1,x_2) = (1+ |h| + h^2/3) \exp(-|h|) }
 //' where \deqn{h = (\sin(x_1)-\sin(x_2))^2/\rho_s + 
-//' (\cos(x_1)-\cos(x_2))^2/\rho_c,.}
+//' (\cos(x_1)-\cos(x_2))^2/\rho_c}.
 //' \code{hyp} is a two dimensional vector with 
 //' \eqn{\rho_s}=\code{exp(2*hyp[0])} and \eqn{\rho_c}=\code{exp(2*hyp[1])}.
 //' @seealso base class: \code{\link{covf}}
@@ -622,16 +625,17 @@ RCPP_EXPOSED_CLASS(lpdf)
 //' @title prediction class
 //' @description 
 //' \preformatted{
-//' pred = new(predictor, logpdf)
+//' pred = new(predictor, loglik)
 //' }
 //' This is a base class design to allow for coherent building of
 //' predictions across multiple models.  Unlike many base classes in this 
 //' package, it is meant to be directly used.
 //'
-//' @param logpdf An \code{\link{lpdf}} instance to build the predictor
-//' @field predictor$update(x) update the current input for prediction
-//' @field predictor$mean() return the current mean of the prediction
-//' @field predictor$var() return the current var of the prediction
+//' @param loglik An \code{\link{lpdf}} instance, specifically that starts with 
+//' \code{loglik}, to build the predictor
+//' @field predictor$update(x) update the current input to `x` for prediction
+//' @field predictor$mean() return the vector of means for the prediction
+//' @field predictor$var() return the vector of variances for the prediction
 
 RCPP_MODULE(obmod){
   using namespace Rcpp;
@@ -693,11 +697,6 @@ RCPP_MODULE(obmod){
     .method("paralpdf", &lpdf::paralpdf)
     .method("paralpdf_grad", &lpdf::paralpdf_grad)
   ;
-  //.method("hess", &lpdf::hess)
-  //.method("hessgradhyp", &lpdf::hessgradhyp)
-  //.method("hessgradpara", &lpdf::hessgradpara)
-  //.field_readonly("totdiaghess", &lpdf::totdiaghess)
-  //.field_readonly("tothess", &lpdf::tothess)
   
   class_<predictor>("predictor")
     .constructor<const lpdf&>()
@@ -736,12 +735,6 @@ RCPP_MODULE(obmod){
     .constructor<lpdf&, lpdf&>()
     .field("domarg", &lpdfvec::domargadj)
   ;
-  /*
-   * 
-   .field("val_margadj", &lpdfvec::val_margadj)
-   .field("gradhyp_margadj", &lpdfvec::gradhyp_margadj)
-   .field("gradpara_margadj", &lpdfvec::gradpara_margadj)
-   */
   
   class_<covf>("covf")
     .constructor()
