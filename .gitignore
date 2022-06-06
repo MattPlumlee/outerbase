@@ -8,6 +8,7 @@ cran-comments.*
 *.dll
 
 src/RcppExports.cpp
+R/RcppExports.R
 
 *.o
 *.dat
@@ -28,3 +29,5 @@ docs
 .Rdata
 .httr-oauth
 .DS_Store
+
+
