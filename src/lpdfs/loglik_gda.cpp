@@ -250,6 +250,8 @@ pred_gda::pred_gda(const loglik_gda& loglik) :
 om(loglik.om), para(loglik.para), terms(loglik.terms),
 x(loglik.x), ob(om,x,false) //private
 {
+  nthreads = loglik.ob.nthreads;
+  ob.nthreads = nthreads;
   doda = loglik.doda;
   coeff = loglik.coeff;
   
@@ -266,6 +268,7 @@ x(loglik.x), ob(om,x,false) //private
 void pred_gda::update(const mat& x_) {
   x = x_;
   new (&ob) outerbase(om,x_,false);
+  ob.nthreads = nthreads;
 }
 vec pred_gda::mean() const {
   return ob.mm_out(terms, coeff);

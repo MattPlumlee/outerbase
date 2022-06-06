@@ -633,9 +633,11 @@ RCPP_EXPOSED_CLASS(lpdf)
 //'
 //' @param loglik An \code{\link{lpdf}} instance, specifically that starts with 
 //' \code{loglik}, to build the predictor
-//' @field predictor$update(x) update the current input to `x` for prediction
+//' @field predictor$update(x) update the current input to \code{x} for prediction
 //' @field predictor$mean() return the vector of means for the prediction
 //' @field predictor$var() return the vector of variances for the prediction
+//' @field predictor$setnthreads(k) specifics \code{k} as the number of threads
+//' to use
 
 RCPP_MODULE(obmod){
   using namespace Rcpp;
@@ -703,6 +705,7 @@ RCPP_MODULE(obmod){
     .method("update",&predictor::update)
     .method("mean",&predictor::mean)
     .method("var",&predictor::var)
+    .method("setnthreads", &predictor::setnthreads)
   ;
   
   class_<loglik_std>("loglik_std")

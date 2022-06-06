@@ -197,6 +197,8 @@ pred_gauss::pred_gauss(const loglik_gauss& loglik) :
 om(loglik.om), para(loglik.para), terms(loglik.terms),
 x(loglik.x), ob(om,loglik.x,false) //private
 {
+  nthreads = loglik.ob.nthreads;
+  ob.nthreads = nthreads;
   coeff = loglik.coeff;
   
   if(!loglik.didnotothess) {
@@ -212,6 +214,7 @@ x(loglik.x), ob(om,loglik.x,false) //private
 void pred_gauss::update(const mat& x_) {
   x = x_;
   new (&ob) outerbase(om,x_,false);
+  ob.nthreads = nthreads;
 }
 
 vec pred_gauss::mean() const {
