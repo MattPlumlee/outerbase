@@ -210,7 +210,7 @@ RCPP_EXPOSED_CLASS(lpdf)
 //' @field \link{outermod$updatehyp}(hyp) update hyperparameters
 //' @field \link{outermod$selectterms}(numterms) find best \code{numterms} terms
 //' @field \link{outermod$getvar}(terms) find variances of coefficients 
-//' assoicated with  \code{terms}
+//' associated with  \code{terms}
 //' @examples
 //' om = new(outermod)
 //' setcovfs(om, c("mat25", "mat25", "mat25"))
@@ -436,7 +436,7 @@ RCPP_EXPOSED_CLASS(lpdf)
 //' lpdf$optcg(tol,epoch)
 //' }
 //' This optimizes the coefficient vector \code{coeff} using conjugate gradient. 
-//' It currently is designed only for quadratic \code{\link{lpdf}} instaces.
+//' It currently is designed only for quadratic \code{\link{lpdf}} instances.
 //' @param tol A positive double representing tolerance, default is 
 //' \code{0.001}.
 //' @param epoch A positive integer representing the maximum number of steps 
