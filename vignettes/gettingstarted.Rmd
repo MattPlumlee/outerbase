@@ -59,11 +59,22 @@ obmodel = obfit(100*x, y, covnames=rep("mat25pow",8))
 obmodel = obfit(0.001*x, y, covnames=rep("mat25pow",8))
 ```
 
-Below is one correct deployment, where `mat25pow` is used for all dimensions.  This should take a bit to run, but it should be less than a minute on most modern computers.
+Below is one correct deployment, where `mat25pow` is used for all dimensions.  This should take a bit to run, but it should be around a second on most modern computers.
 ```{r}
-obmodel = obfit(x, y, numb = 300, covnames=rep("mat25pow",8))
+ptm = proc.time()
+obmodel = obfit(x, y, numb=300, covnames=rep("mat25pow",8)) 
+print((proc.time() - ptm)[3])
 ```
 
+Note that by changing threads to match the computer, we can adjust how processing is done. The default is to grab all available threads.  Below we reduce ourselves to a single thread, which should slow things down.  
+```{r}
+ptm = proc.time()
+obmodel = obfit(x, y, numb=300, covnames=rep("mat25pow",8),
+                nthreads=1) #optional input
+print((proc.time() - ptm)[3])
+```
+
+Note that the package relies on `omp` for parallelization, so if the package was not compiled with that in place there will be no benefits.
 
 We can then predict using `?obpred`.  While it is not an exact interpolator, it is close.
 ```{r}

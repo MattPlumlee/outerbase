@@ -7,10 +7,10 @@
 #' \preformatted{
 #' setcovfs(om, covnames)
 #' }
-#' This function sets the covariance functions for an outermod object,
-#' which is first thing one does when creating an outermod object.//'
-#' @param om \code{\link{outermod}} object
-#' @param covnames vector of strings of the covariance functions
+#' Sets the covariance functions for an outermod class instance.
+#' This is first thing one does when creating an outermod instance.
+#' @param om an \code{\link{outermod}} instance
+#' @param covnames a vector of strings of the covariance functions
 #' @examples
 #' om = new(outermod)
 #' setcovfs(om, c("mat25", "mat25", "mat25"))
@@ -24,34 +24,35 @@ NULL
 #' \preformatted{
 #' setknot(om, knotslist)
 #' }
-#' This function sets the knot points to estimate the eigenfunctions
-#' and eigenvalues. It will naturally check if the knot points have the
-#' same dimension as the covariance functions.  It will also check if the 
-#' knot points are within reasonable bounds for the covariance functions.//' 
-#' @param om \code{\link{outermod}} object
-#' @param knotslist list of one dimensional vectors
+#' Sets the knot points of \code{om} to \code{knotslist} to estimate the 
+#' eigenfunctions and eigenvalues. It will naturally check if the knot points 
+#' have the same dimension as the covariance functions.  It will also check if 
+#' the knot points are within reasonable bounds for the covariance functions.
+#' @param om an \code{\link{outermod}} instance
+#' @param knotslist a list of one dimensional vectors
 #' @examples
 #' om = new(outermod)
 #' setcovfs(om, c("mat25", "mat25", "mat25"))
-#' setknot(om,
-#'          list(seq(0,1,by=0.01),seq(0,1,by=0.01),seq(0,1,by=0.01)))
+#' knotslist = list(seq(0,1,by=0.01),seq(0,1,by=0.01),seq(0,1,by=0.01))
+#' setknot(om, knotslist)
 #' @seealso \code{\link{outermod}}, \code{\link{setcovfs}}
 NULL
 
 #' @name gethyp
 #' @title Get the hyperparameters
-#' @param om \code{\link{outermod}} object
 #' @description
 #' \preformatted{
 #' hyp = gethyp(om)
 #' }
-#' This function gets the current hyperparameters from an outermod object. It 
-#' formats them in a way that makes reading in `R` helpful. 
+#' Gets the current hyperparameters from an \code{\link{outermod}} instance. It 
+#' formats them in a way that makes reading in \code{R} easier. 
+#' @param om an \code{\link{outermod}} instance 
 #' @examples
 #' om = new(outermod)
 #' setcovfs(om, c("mat25", "mat25", "mat25"))
 #' hyp = gethyp(om)
 #' print(hyp)
+#' @returns a vector of parameters
 #' @seealso \code{\link{outermod}}
 NULL
 
@@ -59,24 +60,24 @@ NULL
 #' @title Get the model parameters
 #' @description
 #' \preformatted{
-#' para = getpara(loglik)
+#' para = getpara(logpdf)
 #' }
-#' This function gets the current parameters from an \code{\link{lpdf}} object.  
-#' It formats them in a way that makes reading in `R` helpful.
-#' @param lpdf logpdf object
+#' This function gets the current parameters from an \code{\link{lpdf}} class
+#' instance. It formats them in a way that makes reading in \code{R} easier.
+#' @returns a vector of parameters
+#' @param logpdf an \code{\link{lpdf}} class instance
 NULL
 
 #' @name outermod
 #' @aliases
 #' Rcpp_outermod-class Rcpp_outermod
 #' @title Outer product-type model
-#' @description Type the name of the class to see its methods.
-#' @field \link{setcovfs} to set covariance functions
-#' @field \link{setknot} to set knot points
-#' @field \link{gethyp} to get hyperparameters
-#' @field \link{outermod$updatehyp} to update hyperparameters
-#' @field \link{outermod$selectterms} to find best terms
-#' @field \link{outermod$getvar} to find variances of coefficients
+#' @description This is a class used to construct \code{\link{outerbase}}
+#' class instances.  It stores key information for constructing a basis.
+#' @field \link{outermod$updatehyp}(hyp) update hyperparameters
+#' @field \link{outermod$selectterms}(numterms) find best \code{numterms} terms
+#' @field \link{outermod$getvar}(terms) find variances of coefficients 
+#' assoicated with  \code{terms}
 #' @examples
 #' om = new(outermod)
 #' setcovfs(om, c("mat25", "mat25", "mat25"))
@@ -89,6 +90,8 @@ NULL
 #' om$updatehyp(hyp)
 #' coeffvar = om$getvar(terms)
 #' @seealso \code{\link{outerbase}} the main product from an outermod
+#' @seealso \code{\link{setcovfs}}, \code{\link{setknot}}, 
+#' \code{\link{gethyp}}
 NULL
 
 #' @name outermod$updatehyp
@@ -97,7 +100,7 @@ NULL
 #' \preformatted{
 #' outermod$updatehyp(hyp)
 #' }
-#' Updates the hyperparameters
+#' Updates the hyperparameters for the instance of outermod.
 #' @param hyp A vector of hyperparameters
 #' @seealso \code{\link{outermod}}
 NULL
@@ -108,9 +111,10 @@ NULL
 #' \preformatted{
 #' terms = om$selectterms(numterms)
 #' }
-#' Selects the best \code{terms} given the current \code{outermod}
-#' @param numterms Number of basis \code{terms} desired
-#' @returns terms A matrix of \code{terms}
+#' Returns the best \code{numterms} given \code{outermod} currently using
+#' maximum variance criteria.
+#' @param numterms number of basis \code{terms} desired
+#' @returns a matrix of \code{terms}
 #' @seealso \code{\link{outermod}}
 NULL
 
@@ -121,8 +125,8 @@ NULL
 #' coeffvar = outermod$getvar(terms)
 #' }
 #' Returns the variance of the coefficients associated with \code{terms}.
-#' @param terms A matrix of \code{terms}
-#' @returns coeffvar A vector of variances of each coefficient
+#' @param terms a matrix of \code{terms}
+#' @returns a vector of variances of each coefficient
 #' @seealso \code{\link{outermod}}
 NULL
 
@@ -134,7 +138,7 @@ NULL
 #' \preformatted{
 #' ob = new(outerbase, om, x)
 #' }
-#' Object that handles the basis for a given set of points 
+#' Class that handles the basis for a given set of points 
 #' \code{x}.
 #' @param x a matrix of predictors, must have as many columns as dims in 
 #' \code{om}
@@ -143,7 +147,7 @@ NULL
 #' functions
 #' @field \link{outerbase$getmat}(terms) to get the basis matrix at 
 #' \code{terms}
-#' @field \link{outerbase$build}() to (re)build the basis object
+#' @field \link{outerbase$build}() to (re)build the basis instance
 #' @field \link{outerbase$matmul}(terms,a) matrix multiply without 
 #'building the basis matrix
 #' @field \link{outerbase$tmatmul}(terms,a) transpose matrix multiply 
@@ -166,10 +170,10 @@ NULL
 #' \preformatted{
 #' basis_func = outerbase$getbase(k)
 #' }
-#' Returns the basis for a dimension
+#' Returns the basis for dimension \code{k}.   Designed mostly for 
+#' visualization.
 #' @param k An integer from that corresponds to the dimension.
-#' @returns basis_func A matrix of evaluated basis functions for that 
-#' dimension.  Designed mostly for visualization.
+#' @returns a matrix of evaluated basis functions
 #' @seealso \code{\link{outerbase}}
 NULL
 
@@ -179,9 +183,9 @@ NULL
 #' \preformatted{
 #' basismat = outerbase$getmat(terms)
 #'  }
-#' Returns the basis matrix
-#' @param terms A matrix of terms
-#' @returns basismat A matrix of evaluated basis functions based on 
+#' Returns the basis matrix for a given set of \code{terms}.
+#' @param terms a matrix of terms
+#' @returns a matrix of evaluated basis functions based on 
 #' \code{terms}.
 #' @seealso \code{\link{outerbase}}
 NULL
@@ -205,9 +209,9 @@ NULL
 #' }
 #' Multiplies the basis times a vector without building the basis 
 #' matrix.
-#' @param terms A matrix of \code{terms}
-#' @param a A vector of length the same as the rows in \code{terms}
-#' @returns b A vector resulting from the matrix multiplication
+#' @param terms a matrix of \code{terms}
+#' @param a a vector of length the same as the rows in \code{terms}
+#' @returns a vector resulting from the matrix multiplication
 #' @seealso \code{\link{outerbase}}
 NULL
 
@@ -219,9 +223,9 @@ NULL
 #' }
 #' Multiplies the transpose of the basis times a vector without 
 #'  building the basis matrix.
-#' @param terms A matrix of \code{terms}
-#' @param a A vector of length the same as the rows in \code{outerbase}
-#' @returns b A vector resulting from the matrix multiplication
+#' @param terms a matrix of \code{terms}
+#' @param a a vector of length the same as the rows in \code{outerbase}
+#' @returns a vector resulting from the matrix multiplication
 #' @seealso \code{\link{outerbase}}
 NULL
 
@@ -265,8 +269,7 @@ NULL
 #' @field lpdf$diaghess() returns the diagonal of the hessian with 
 #' respect to coefficients
 #' @field lpdf$diaghessgradhyp() returns the gradient of \code{diaghess()} with 
-NULL
-
+#' respect to  covariance hyperparameters
 #' @field lpdf$diaghessgradpara() returns the gradient of \code{diaghess()} with 
 #' respect to model parameters
 #' @field lpdf$paralpdf(para) compute the log-prior on the parameters, useful for 
@@ -281,21 +284,22 @@ NULL
 #' @name lpdfvec
 #' @aliases
 #' Rcpp_lpdfvec-class Rcpp_lpdfvec 
-#' @title Vector of `lpdf` objects
+#' @title Vector of \code{lpdf} instances
 #' @description 
 #' \preformatted{
 #' logpdf = new(lpdfvec, loglik, logpr)
 #' }
-#' This is a class that contains two \code{\link{lpdf}} object and can be 
-#' manipulated as a single object.  It presumes both are based on the same
-#' \code{\link{outermod}} object, thus they share hyperparameters.  However
+#' This is a class where each instance contains two \code{\link{lpdf}} 
+#' instances and can be 
+#' manipulated as a single instance.  It presumes both are based on the same
+#' \code{\link{outermod}} instance, thus they share hyperparameters.  However
 #' the model parameters are concatenated.  Currently also includes variations
 #' on marginal adjustments.  
 #'
 #' Currently it is designed only for a pair, but the ordering is arbitrary.
 #'
-#' @param loglik one reference to a \code{lpdf} object
-#' @param logpr another reference to a \code{lpdf} object that shares 
+#' @param loglik one reference to a \code{lpdf} instance
+#' @param logpr another reference to a \code{lpdf} instance that shares 
 #' \code{\link{outermod}}  with \code{loglik}
 #' @field lpdfvec$domarg  A boolean that controls if marginal adjustment is 
 #' done
@@ -309,7 +313,7 @@ NULL
 #' lpdf$optcg(tol,epoch)
 #' }
 #' This optimizes the coefficient vector \code{coeff} using conjugate gradient. 
-#' It currently is designed only for quadratic \code{\link{lpdf}} objects.
+#' It currently is designed only for quadratic \code{\link{lpdf}} instaces.
 #' @param tol A positive double representing tolerance, default is 
 #' \code{0.001}.
 #' @param epoch A positive integer representing the maximum number of steps 
@@ -324,7 +328,7 @@ NULL
 #' lpdf$optnewton()
 #' }
 #' This optimizes the coefficient vector \code{coeff} using Newton's Method.  
-#' It currently is designed only for quadratic \code{\link{lpdf}} objects.  
+#' It currently is designed only for quadratic \code{\link{lpdf}} instances.  
 #' It should take a single step.
 #' @seealso \code{\link{lpdf}}  
 NULL
@@ -346,7 +350,7 @@ NULL
 #' \code{para} \eqn{= \log(\sigma)}.  It is a slightly slower (sometimes) 
 #' version of \code{\link{loglik_gauss}} but allows for complete marginal 
 #' inference.
-#' @param om an \code{\link{outermod}} object to be referred to
+#' @param om an \code{\link{outermod}} instance to be referred to
 #' @param terms a matrix of \code{terms}, must have as many columns as dims in 
 #' \code{om}
 #' @param y a vector of observations
@@ -373,7 +377,7 @@ NULL
 #' \code{para} \eqn{= \log(\sigma)}.  It is a slightly (sometimes) version of
 #' \code{\link{loglik_std}}  but allows can only handle diagonal variational 
 #' inference.
-#' @param om an \code{\link{outermod}} object to be referred to
+#' @param om an \code{\link{outermod}} instance to be referred to
 #' @param terms a matrix of \code{terms}, must have as many columns as dims in 
 #' \code{om}
 #' @param y a vector of observations
@@ -399,7 +403,7 @@ NULL
 #' variance \eqn{\lambda g(x)}, \eqn{\varepsilon} is an unseen noise vector.
 #' The parameter vector is of length 2 where 
 #' \eqn{\sigma=} \code{exp(para[0])} and \eqn{\lambda=}\code{exp(2 para[1])}.
-#' @param om an \code{\link{outermod}} object to be referred to
+#' @param om an \code{\link{outermod}} instance to be referred to
 #' @param terms a matrix of \code{terms}, must have as many columns as dims in 
 #' \code{om}
 #' @param y a vector of observations
@@ -424,7 +428,7 @@ NULL
 #' where \eqn{c_i} is the variance supplied by \code{om} for the \eqn{i}th term. 
 #' The parameter vector is of length 1 where 
 #' \eqn{\rho=} \code{exp(para[0])}.
-#' @param om an \code{\link{outermod}} object to be referred to
+#' @param om an \code{\link{outermod}} instance to be referred to
 #' @param terms a matrix of \code{terms}, must have as many columns as dims in 
 #' \code{om}
 #' @inherit lpdf description

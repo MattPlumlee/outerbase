@@ -25,7 +25,7 @@ Rcpp::loadModule("obmod", TRUE)
 #' @param ... additional parameters passed to \code{funcw}
 #' @param verbose an integer from 0-3 where larger prints more information
 #' @return a list of information from optimization, with the value stored in
-#' `par`
+#' \code{par}
 #' @export
 BFGS_std <- function(funcw, par, 
                      B = NULL, lr = 0.1, 
@@ -182,14 +182,15 @@ BFGS_std <- function(funcw, par,
 #' Note that \code{om} and \code{logpdf} will be set to optimal 
 #' parameters, the return is simply for information.
 #' 
-#' @param om an \code{\link{outermod}} object
-#' @param logpdf a \code{\link{lpdf}} object
-#' @param par an initial point, initialized from objects if needed
+#' @param om an \code{\link{outermod}} instance
+#' @param logpdf a \code{\link{lpdf}} instance
+#' @param par an initial point, which are pulled from `om` and `logpdf` if not 
+#' provided
 #' @param newt boolean for if Newtons method should be used
 #' @param cgsteps max number of cg iterations, if \code{newt=FALSE}
 #' @param cgtol cg tolerance, if \code{newt=FALSE}
 #' @param ... additional parameters passed to \code{\link{BFGS_std}}
-#' @return A list of information from optimization
+#' @return a list of information from optimization.
 #' @export
 BFGS_lpdf <- function(om, logpdf, par=list(), newt=F, 
                       cgsteps=100, cgtol=0.001, ...){

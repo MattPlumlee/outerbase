@@ -18,10 +18,10 @@ listcov = function() {
 #' @param hyp initial covariance hyperparameters
 #' @param verbose 0-3, how much information on optimization to print to console
 #' @param covnames a d length vector of covariance names, ignored if \code{omst}
+#' is provided
+#' @param nthreads number of threads used in learning
 #' @param numberopts number of optimizations done for hyperparameters, must be
 #' larger than 1
-#' @param nthreads number of threads used in learning
-#' is provided
 #' @return Saving important model information to be used with 
 #' \code{\link{obpred}}
 #' @export
