@@ -49,6 +49,7 @@ using namespace Rcpp;
 //' setcovfs(om, c("mat25", "mat25", "mat25"))
 //' setcovfs(om, c("mat25", "mat25pow", "mat25", "mat25ang"))
 //' @seealso \code{\link{outermod}} 
+//' @returns no value is returned, \code{om} is updated
 void setcovfs(outermod& om, StringVector covstr){
   
   om.d = covstr.size();
@@ -89,6 +90,7 @@ void setcovfs(outermod& om, StringVector covstr){
 //' knotslist = list(seq(0,1,by=0.01),seq(0,1,by=0.01),seq(0,1,by=0.01))
 //' setknot(om, knotslist)
 //' @seealso \code{\link{outermod}}, \code{\link{setcovfs}}
+//' @returns no value is returned, \code{om} is updated
 void setknot(outermod& om, List L){
   if (!om.setcovfs) {
     throw std::range_error("Need to set cov. funcs before setting knots.");
@@ -225,6 +227,7 @@ RCPP_EXPOSED_CLASS(lpdf)
 //' @seealso \code{\link{outerbase}} the main product from an outermod
 //' @seealso \code{\link{setcovfs}}, \code{\link{setknot}}, 
 //' \code{\link{gethyp}}
+//' @returns no returns, this is a class which contains methods
 
 //' @name outermod$updatehyp
 //' @title Update hyperparameters
@@ -234,6 +237,7 @@ RCPP_EXPOSED_CLASS(lpdf)
 //' }
 //' Updates the hyperparameters for the instance of outermod.
 //' @param hyp A vector of hyperparameters
+//' @returns no value is returned, the class instance is updated
 //' @seealso \code{\link{outermod}}
 
 //' @name outermod$selectterms
@@ -293,6 +297,7 @@ RCPP_EXPOSED_CLASS(lpdf)
 //' terms = om$selectterms(40)
 //' basismat = ob$getmat(terms)
 //' @seealso \code{\link{outermod}} the core element that controls outerbase
+//' @returns no returns, this is a class which contains methods
 
 //' @name outerbase$getbase
 //' @title Get base functions
@@ -327,6 +332,7 @@ RCPP_EXPOSED_CLASS(lpdf)
 //' Build (or re-build) a basis based on the recent evaluation 
 //' of \code{\link{outermod}}.
 //' @seealso \code{\link{outerbase}}
+//' @returns nothing is returned, the class instance is updated
 
 //' @name outerbase$matmul
 //' @title Matrix multiply
@@ -404,6 +410,7 @@ RCPP_EXPOSED_CLASS(lpdf)
 //' @seealso derived classes: \code{\link{loglik_std}}, 
 //' \code{\link{loglik_gauss}}, \code{\link{loglik_gda}}, 
 //' \code{\link{logpr_gauss}}
+//' @returns no returns, this is a class which contains methods
 
 //' @name lpdfvec
 //' @aliases
@@ -428,6 +435,7 @@ RCPP_EXPOSED_CLASS(lpdf)
 //' @field lpdfvec$domarg  A boolean that controls if marginal adjustment is 
 //' done
 //' @seealso base class: \code{\link{lpdf}}
+//' @returns no returns, this is a class which contains methods
 
 //' @name lpdf$optcg
 //' @title Optimization via Conjugate Gradient
@@ -442,6 +450,7 @@ RCPP_EXPOSED_CLASS(lpdf)
 //' @param epoch A positive integer representing the maximum number of steps 
 //' conjugate gradient will take.
 //' @seealso \code{\link{lpdf}}
+//' @returns nothing is returned, the class instance is updated
 
 //' @name lpdf$optnewton
 //' @title Optimization via Newton's Method
@@ -453,6 +462,7 @@ RCPP_EXPOSED_CLASS(lpdf)
 //' It currently is designed only for quadratic \code{\link{lpdf}} instances.  
 //' It should take a single step.
 //' @seealso \code{\link{lpdf}}  
+//' @returns nothing is returned, the class instance is updated
 
 //' @name loglik_std
 //' @aliases 
@@ -479,6 +489,7 @@ RCPP_EXPOSED_CLASS(lpdf)
 //' \code{om} and the same number of rows as \code{y}
 //' @inherit lpdf description
 //' @seealso base class: \code{\link{lpdf}}
+//' @returns no returns, this is a class which contains methods
 
 //' @name loglik_gauss
 //' @aliases 
@@ -505,6 +516,7 @@ RCPP_EXPOSED_CLASS(lpdf)
 //' \code{om} and the same number of rows as \code{y}
 //' @inherit lpdf description
 //' @seealso base class: \code{\link{lpdf}}
+//' @returns no returns, this is a class which contains methods
 
 //' @name loglik_gda
 //' @aliases
@@ -530,6 +542,7 @@ RCPP_EXPOSED_CLASS(lpdf)
 //' \code{om} and the same number of rows as \code{y}
 //' @inherit lpdf description
 //' @seealso base class: \code{\link{lpdf}}
+//' @returns no returns, this is a class which contains methods
 
 //' @name logpr_gauss
 //' @aliases 
@@ -551,6 +564,7 @@ RCPP_EXPOSED_CLASS(lpdf)
 //' \code{om}
 //' @inherit lpdf description
 //' @seealso base class: \code{\link{lpdf}}
+//' @returns no returns, this is a class which contains methods
 
 //' @name covf
 //' @aliases 
@@ -571,6 +585,7 @@ RCPP_EXPOSED_CLASS(lpdf)
 //' @seealso derived class: \code{\link{covf_mat25}}, 
 //' \code{\link{covf_mat25pow}}, 
 //' \code{\link{covf_mat25ang}}
+//' @returns no returns, this is a class which contains methods
 
 //' @name covf_mat25
 //' @aliases 
@@ -584,6 +599,7 @@ RCPP_EXPOSED_CLASS(lpdf)
 //' \deqn{c(x_1,x_2) = (1+ |h| + h^2/3) \exp(-|h|) }
 //' where \eqn{h = (x_1-x_2)/\rho} and \eqn{\rho}=\code{exp(2*hyp[0])}.
 //' @seealso base class: \code{\link{covf}}
+//' @returns no returns, this is a class which contains methods
 
 //' @name covf_mat25pow
 //' @aliases 
@@ -600,6 +616,7 @@ RCPP_EXPOSED_CLASS(lpdf)
 //' dimensional vector with \eqn{\rho}=\code{exp(2*hyp[0]+0.25*hyp[1])}
 //' and \eqn{\alpha}=\code{exp(0.25*hyp[1])}.
 //' @seealso base class: \code{\link{covf}}
+//' @returns no returns, this is a class which contains methods
 
 //' @name covf_mat25ang
 //' @aliases 
@@ -617,6 +634,7 @@ RCPP_EXPOSED_CLASS(lpdf)
 //' \code{hyp} is a two dimensional vector with 
 //' \eqn{\rho_s}=\code{exp(2*hyp[0])} and \eqn{\rho_c}=\code{exp(2*hyp[1])}.
 //' @seealso base class: \code{\link{covf}}
+//' @returns no returns, this is a class which contains methods
 
 
 //' @name predictor
@@ -638,6 +656,7 @@ RCPP_EXPOSED_CLASS(lpdf)
 //' @field predictor$var() return the vector of variances for the prediction
 //' @field predictor$setnthreads(k) specifics \code{k} as the number of threads
 //' to use
+//' @returns no returns, this is a class which contains methods
 
 RCPP_MODULE(obmod){
   using namespace Rcpp;
