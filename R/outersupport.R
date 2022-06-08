@@ -14,20 +14,20 @@ Rcpp::loadModule("obmod", TRUE)
 #' BFGS standard
 #' 
 #' Do generic minimization of a function \code{funcw} that takes
-#' a list par using the "Broyden-Fletcher-Goldfarb-Shanno" (BFGS) algorithm.
+#' a list parlist using the "Broyden-Fletcher-Goldfarb-Shanno" (BFGS) algorithm.
 #' Useful for hyperparameter optimization because it handles infinite returns
 #' fairly easily.  
 #' 
 #' @param funcw An object to optimize
-#' @param par An initial point as a list
+#' @param parlist An initial point as a list
 #' @param B An initial Hessian to start from
 #' @param lr An initial learning rate to start from
 #' @param ... additional parameters passed to \code{funcw}
 #' @param verbose an integer from 0-3 where larger prints more information
 #' @return a list of information from optimization, with the value stored in
-#' \code{par}
+#' \code{parlist}
 #' @export
-BFGS_std <- function(funcw, par, 
+BFGS_std <- function(funcw, parlist, 
                      B = NULL, lr = 0.1, 
                      ...,verbose = 0){
   #linesearchparameters
@@ -35,9 +35,9 @@ BFGS_std <- function(funcw, par,
   c2 = 0.9
   numatte0 = 5
   
-  parv = unlist(par)
+  parv = unlist(parlist)
   
-  optid = funcw(relist(parv,par), ...)
+  optid = funcw(relist(parv,parlist), ...)
   valo = optid$val
   go = unlist(optid$gval)
   resetB = TRUE
@@ -45,7 +45,7 @@ BFGS_std <- function(funcw, par,
   if(is.null(B)) B = diag(1/sqrt(go^2+0.001))
   else resetB = FALSE
   
-  twice = F
+  twice = FALSE
   lr0 = lr
   lr00 = lr
   numtimes = 0
@@ -64,7 +64,7 @@ BFGS_std <- function(funcw, par,
       
       st = lr*dirc
       parvp = parv + st
-      optid = funcw(relist(parvp,par), ...)
+      optid = funcw(relist(parvp,parlist), ...)
       wolfcond1 = (optid$val-valo) - c1*lr*(sum(dirc*go))
       wolfcond2 = -(sum(dirc*unlist(optid$gval)))+(c2*(sum(dirc*go)))
       
@@ -86,7 +86,7 @@ BFGS_std <- function(funcw, par,
           else lrh = 2*lrlb
         }
         parvp = parv + lrh*dirc
-        optidh = funcw(relist(parvp,par), ...)
+        optidh = funcw(relist(parvp,parlist), ...)
         wolfcond1 = (optidh$val-valo) - c1*lrh*(sum(dirc*go))
         wolfcond2 = -(sum(dirc*unlist(optidh$gval)))+(c2*(sum(dirc*go)))
         numatte = numatte-1
@@ -103,7 +103,7 @@ BFGS_std <- function(funcw, par,
         if(lr0 < lr00/(10^2+1)){
           break
         }
-        optid = funcw(relist(parv,par), ...) #do not feed it extra info
+        optid = funcw(relist(parv,parlist), ...) #do not feed it extra info
         valo = optid$val
         go = unlist(optid$gval)
         B = diag(1/sqrt(0.001+go^2))
@@ -130,7 +130,7 @@ BFGS_std <- function(funcw, par,
         if (k > 2 && (sum(st*go) > -length(go)/4) && twice){
           break
         } else if (k > 2 && (sum(st*go) > -length(go)/4)){
-          twice = T
+          twice = TRUE
         }
         
         
@@ -162,7 +162,7 @@ BFGS_std <- function(funcw, par,
       stop('initial gradient was undefined, stopping.')
     }
   
-  optid = funcw(relist(parv,par), ...) #finish by evaluating
+  optid = funcw(relist(parv,parlist), ...) #finish by evaluating
   if (verbose > 0){
     cat('num iter: ',k,'  ',
         'obj start: ', optdf[1,2],'  ',
@@ -172,7 +172,7 @@ BFGS_std <- function(funcw, par,
         optid$val+sum(dirc*go), '\n', sep = "")
     if (verbose > 0) cat('#########finished BFGS########', '\n\n')
   } 
-  list(par=relist(parv,par), B=B, lr=lr, optid=optid)
+  list(parlist=relist(parv,parlist), B=B, lr=lr, optid=optid)
 }
 
 #' BFGS lpdf
@@ -184,21 +184,22 @@ BFGS_std <- function(funcw, par,
 #' 
 #' @param om an \code{\link{outermod}} instance
 #' @param logpdf a \code{\link{lpdf}} instance
-#' @param par an initial point, which are pulled from `om` and `logpdf` if not 
-#' provided
+#' @param parlist an initial point, which are pulled from `om` and `logpdf` if 
+#' not provided
 #' @param newt boolean for if Newtons method should be used
 #' @param cgsteps max number of cg iterations, if \code{newt=FALSE}
 #' @param cgtol cg tolerance, if \code{newt=FALSE}
 #' @param ... additional parameters passed to \code{\link{BFGS_std}}
 #' @return a list of information from optimization.
 #' @export
-BFGS_lpdf <- function(om, logpdf, par=list(), newt=F, 
+BFGS_lpdf <- function(om, logpdf, parlist=list(), newt=FALSE, 
                       cgsteps=100, cgtol=0.001, ...){
-  if(is.null(par$hyp)) par$hyp = gethyp(om)
-  if(is.null(par$para)) par$para = getpara(logpdf)
+  if(is.null(parlist$hyp)) parlist$hyp = gethyp(om)
+  if(is.null(parlist$para)) parlist$para = getpara(logpdf)
   
-  .lpdfwrapper(par, om, logpdf, newt=newt) #start by aligning para with actual
-  optsum = BFGS_std(.lpdfwrapper, par, om=om, newt=newt,
+  print(parlist)
+  .lpdfwrapper(parlist, om, logpdf, newt=newt) #start by aligning para with 
+  optsum = BFGS_std(.lpdfwrapper, parlist, om=om, newt=newt,
                     logpdf=logpdf, ...)
   
   optsum
@@ -207,7 +208,7 @@ BFGS_lpdf <- function(om, logpdf, par=list(), newt=F,
 # Optimization wrapper
 # 
 # returns list of \code{val} and \code{grad}
-.lpdfwrapper = function(parlist, om, logpdf, newt = F,
+.lpdfwrapper = function(parlist, om, logpdf, newt = FALSE,
                         cgsteps=100, cgtol=0.001) {
   regpara = logpdf$paralpdf(parlist$para)
   reghyp = om$hyplpdf(parlist$hyp)

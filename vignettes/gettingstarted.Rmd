@@ -62,7 +62,8 @@ obmodel = obfit(0.001*x, y, covnames=rep("mat25pow",8))
 Below is one correct deployment, where `mat25pow` is used for all dimensions.  This should take a bit to run, but it should be around a second on most modern computers.
 ```{r}
 ptm = proc.time()
-obmodel = obfit(x, y, numb=300, covnames=rep("mat25pow",8)) 
+obmodel = obfit(x, y, numb=300, covnames=rep("mat25pow",8),
+                verbose = 3) 
 print((proc.time() - ptm)[3])
 ```
 

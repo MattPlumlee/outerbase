@@ -75,7 +75,8 @@ void domult_(vec& out, const vec& a, vec& temp,
   {
   vec out_ = out;
   vec temp_ = temp;
-  #pragma omp for nowait
+  out_.zeros();
+  #pragma omp for
   for (uword k = 0; k < terms.n_rows; ++k) { 
     temp_.fill(a(k)); 
     for (uword l = 0; l < terms.n_cols; ++l)  
@@ -492,16 +493,16 @@ void domultm_(mat& out, const mat& a, vec& temp,
   if(temp_.n_elem !=  basemat.n_rows) 
     temp_.set_size(basemat.n_rows); 
   out_.zeros();
-  #pragma omp for nowait 
+  #pragma omp for
   for (uword k = 0; k < terms.n_rows; ++k) { 
     temp_.ones(); 
     for (uword l = 0; l < terms.n_cols; ++l)  
       if(terms(k,l)>0) temp_ %= basemat.col(knotptst(l)+terms(k,l)); 
-      out_ += temp_ * a.row(k);  
+    out_ += temp_ * a.row(k);  
   } 
   #pragma omp critical  
   out += out_;  
-}
+  }
   }
 }
 
