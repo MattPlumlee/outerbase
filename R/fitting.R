@@ -191,5 +191,5 @@ obpred = function(obmodel, x){
   kapp = min(1000,kapp) # in case ratio is off
   # cg complexity computes below
   iterest = 1/2 * sqrt(kapp)* log(2*sampsize*sigtonoiseratio/tol) 
-  ceiling(1.5*iterest) # 1.5 is safety feature
+  ceiling(2*iterest) # 2 is safety factor
 }

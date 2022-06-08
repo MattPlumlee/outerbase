@@ -147,5 +147,3 @@ hist((ytest-yhat_fast), main=paste("fast method \n rmse =",
                                    round(t_fast[3],2),'s'), 
      xlab = "prediction residuals")
 ```
-
-
