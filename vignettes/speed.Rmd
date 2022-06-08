@@ -111,7 +111,7 @@ We will use the unsophisticated ` proc.time` to do some quick timing comparisons
 ```{r}
 ptm = proc.time()
 opth = BFGS_lpdf(om, logpdf_slow, 
-                 parlist=parlist_slow, newt=TRUE, verbose=3)    
+                 parlist=parlist_slow, newt=TRUE)    
 t_slow = proc.time() - ptm
 pred_slow = new(predictor,loglik_slow)
 pred_slow$update(xtest)
@@ -123,7 +123,7 @@ print(t_slow)
 ```{r}
 ptm = proc.time()
 opth = BFGS_lpdf(om, logpdf_fast, 
-                 parlist=parlist_fast, newt=F, verbose=3)  
+                 parlist=parlist_fast, newt=FALSE)  
 t_fast = proc.time() - ptm
 pred_fast = new(predictor,loglik_fast)
 pred_fast$update(xtest)

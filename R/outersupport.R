@@ -197,7 +197,6 @@ BFGS_lpdf <- function(om, logpdf, parlist=list(), newt=FALSE,
   if(is.null(parlist$hyp)) parlist$hyp = gethyp(om)
   if(is.null(parlist$para)) parlist$para = getpara(logpdf)
   
-  print(parlist)
   .lpdfwrapper(parlist, om, logpdf, newt=newt) #start by aligning para with 
   optsum = BFGS_std(.lpdfwrapper, parlist, om=om, newt=newt,
                     logpdf=logpdf, ...)
