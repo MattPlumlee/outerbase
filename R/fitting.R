@@ -17,8 +17,7 @@ listcov = function() {
 #' @param numb size of basis to use
 #' @param hyp initial covariance hyperparameters
 #' @param verbose 0-3, how much information on optimization to print to console
-#' @param covnames a d length vector of covariance names, ignored if \code{omst}
-#' is provided
+#' @param covnames a d length vector of covariance names
 #' @param nthreads number of threads used in learning
 #' @param numberopts number of optimizations done for hyperparameters, must be
 #' larger than 1
@@ -83,7 +82,7 @@ obfit = function(x, y, numb=100, verbose = 0,
   yr = y[subsetinds]
   xr = x[subsetinds,]
   loglik = new(loglik_gda, om, terms, yr, xr) #
-  loglik$dodiag = T # for the first round, go ahead and go the diagonal
+  loglik$dodiag = TRUE # for the first round, go ahead and go the diagonal
   logpdf = new(lpdfvec, logpr, loglik)
   if(!is.null(nthreads)) {
     nthreads = ceiling(nthreads)
@@ -106,7 +105,7 @@ obfit = function(x, y, numb=100, verbose = 0,
   
   loglik_faster = new(loglik_gauss, om, terms, y, x) #initial parameter
   logpdf_faster = new(lpdfvec, logpr, loglik_faster)
-  logpdf_faster$domarg = T 
+  logpdf_faster$domarg = TRUE
   #one fewer para, so we will strip that one off
   optinfo$B = optinfo$B[,-ncol(optinfo$B)]
   optinfo$B = optinfo$B[-nrow(optinfo$B),]
@@ -192,5 +191,5 @@ obpred = function(obmodel, x){
   kapp = min(1000,kapp) # in case ratio is off
   # cg complexity computes below
   iterest = 1/2 * sqrt(kapp)* log(2*sampsize*sigtonoiseratio/tol) 
-  ceiling(1.5*iterest) # 1.5 is safety feature
+  ceiling(2*iterest) # 2 is safety factor
 }

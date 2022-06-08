@@ -111,7 +111,7 @@ We will use the unsophisticated ` proc.time` to do some quick timing comparisons
 ```{r}
 ptm = proc.time()
 opth = BFGS_lpdf(om, logpdf_slow, 
-                 par=parlist_slow, newt=T)  
+                 parlist=parlist_slow, newt=TRUE)    
 t_slow = proc.time() - ptm
 pred_slow = new(predictor,loglik_slow)
 pred_slow$update(xtest)
@@ -123,7 +123,7 @@ print(t_slow)
 ```{r}
 ptm = proc.time()
 opth = BFGS_lpdf(om, logpdf_fast, 
-                 par=parlist_fast, newt=F)  
+                 parlist=parlist_fast, newt=FALSE)  
 t_fast = proc.time() - ptm
 pred_fast = new(predictor,loglik_fast)
 pred_fast$update(xtest)
@@ -133,8 +133,7 @@ print(t_fast)
 ## Comparison of results
 
 And simply plotting the results tells the story: faster inference with no discernible drop off in quality.  Note there are serious approximations here, but the approximations just have a negligible effect.
-```{r}
-par(mfrow=c(1,2))
+```{r fig.show="hold", out.width="45%", fig.width=4, fig.height=4}
 rmse_slow = sqrt(mean((ytest-yhat_slow)^2))
 hist((ytest-yhat_slow), main=paste("slow method \n rmse:", 
                                     round(rmse_slow,3),
@@ -148,5 +147,3 @@ hist((ytest-yhat_fast), main=paste("fast method \n rmse =",
                                    round(t_fast[3],2),'s'), 
      xlab = "prediction residuals")
 ```
-
-

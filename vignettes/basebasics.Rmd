@@ -94,8 +94,7 @@ yhat = covftot(xtest,x) %*% solve(cormattot,y)
 ```
 
 This gives prediction accuracy that can be summarized below.
-```{r}
-par(mfrow=c(1,2))
+```{r fig.show="hold", out.width="45%", fig.width=4, fig.height=4}
 ytest = obtest_borehole3d(xtest)
 plot(yhat, ytest, ylab="actual", xlab="prediction") 
 hist(ytest-yhat, main="test residuals",
@@ -221,9 +220,8 @@ basistest = obtest$getmat(terms)
 ```
 
 The predictions are nearly equivalent.
-```{r}
+```{r fig.show="hold", out.width="45%", fig.width=4, fig.height=4}
 yhatob = basistest%*%coeffest
-par(mfrow=c(1,2))
 plot(yhat, ytest, main="typical gp",
      xlab="prediction", ylab="actual")
 plot(yhatob, ytest, main = "outerbase equiv.",
@@ -232,8 +230,8 @@ plot(yhatob, ytest, main = "outerbase equiv.",
 
 
 The histograms of residuals show similar matching.
-```{r}
-par(mfrow=c(1,2))
+
+```{r fig.show="hold", out.width="45%", fig.width=4, fig.height=4}
 hist(ytest-yhat, main="typical gp",
      xlab="test residuals")
 hist(ytest-yhatob, main="outerbase equiv.",
@@ -242,9 +240,9 @@ hist(ytest-yhatob, main="outerbase equiv.",
 
 
 The standardized residuals, which account for the variance, also show similar matching.
-```{r}
+
+```{r fig.show="hold", out.width="45%", fig.width=4, fig.height=4}
 varpredob = basistest%*%postcov%*%t(basistest) 
-par(mfrow=c(1,2))
 hist((ytest-yhat)/sqrt(diag(varpred)), main="typical gp",
      xlab="standarized test residuals")
 hist((ytest-yhatob)/sqrt(diag(varpredob)), main="outerbase equiv.",

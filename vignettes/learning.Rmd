@@ -54,9 +54,9 @@ ob$build() #rebuild after updatehyp
 ```
 
 This leads to an asymmetric basis function set for this first dimension because of the power transform in `?covf_mat25pow`.
-```{r}
+
+```{r fig.show="hold", out.width="45%", fig.width=4, fig.height=4}
 basis_func1 = ob$getbase(1)
-par(mfrow=c(1,2))
 matplot(x[,1],basis_func0[,1:4], 
         type='l', ylab="func", xlab="first dim",
         main="original hyperparameters")
@@ -126,13 +126,13 @@ ytest = obtest_borehole3d(xtest)
 
 We can see the predictive accuracy using the `?predictor` class which automatically pulls correct information out of `loglik` to design predictions.
 
-```{r}
+
+```{r fig.show="hold", out.width="45%", fig.width=4, fig.height=4}
 predt = new(predictor,loglik)
 predt$update(xtest)
 yhat = as.vector(predt$mean())
 varpred = as.vector(predt$var())
 
-par(mfrow=c(1,2))
 plot(yhat,ytest, xlab="prediction", ylab="actual")
 hist((ytest-yhat)/sqrt(varpred),
      main="standarized test residuals",
@@ -176,23 +176,23 @@ opth = BFGS_std(totobj, parlist, verbose=3) #
 Then we just have to update out parameters and re-optimize, and we can check 
 that we are at least must closer to stationary point.
 ```{r}
-totobj(opth$par)
+totobj(opth$parlist)
 ```
 
 These steps can all be nicely wrapped up in another function `?BFGS_lpdf`, which is a simpler call with the same result.  Note because of some things not fully understood, these numbers will not match _exactly_ above, but they will be quite close and functionally the same.
 ```{r}
 opth = BFGS_lpdf(om, logpdf, 
-                 par=parlist, 
-                 verbose = 3, newt= T)  
+                 parlist=parlist, 
+                 verbose = 3, newt= TRUE)  
 ```
 The revised predictions are then built after hyperparameter optimization where we find improved predictive accuracy in nearly every category.  Here we can see a much better alignment between predictions and actual alongside a better plot of standardized residuals (more like a standard normal distribution).
-```{r}
+
+```{r fig.show="hold", out.width="45%", fig.width=4, fig.height=4}
 predtt = new(predictor,loglik)
 predtt$update(xtest)
 yhat = as.vector(predtt$mean())
 varpred = as.vector(predtt$var())
 
-par(mfrow=c(1,2))
 plot(ytest,yhat)
 hist((ytest-yhat)/sqrt(varpred), main="standarized test residuals",
      xlab = "standarized test residuals")

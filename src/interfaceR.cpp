@@ -612,8 +612,8 @@ RCPP_EXPOSED_CLASS(lpdf)
 //' This is the standard Matern covariance function with a power transformation
 //' which has form
 //' \deqn{c(x_1,x_2) = (1+ |h| + h^2/3) \exp(-|h|) }
-//' where \deqn{h = (\sin(x_1)-\sin(x_2))^2/\rho_s + 
-//' (\cos(x_1)-\cos(x_2))^2/\rho_c}.
+//' where \deqn{h = \sqrt{(\sin(x_1)-\sin(x_2))^2/\rho_s + 
+//' (\cos(x_1)-\cos(x_2))^2/\rho_c}.}
 //' \code{hyp} is a two dimensional vector with 
 //' \eqn{\rho_s}=\code{exp(2*hyp[0])} and \eqn{\rho_c}=\code{exp(2*hyp[1])}.
 //' @seealso base class: \code{\link{covf}}

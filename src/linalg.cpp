@@ -30,17 +30,17 @@
 
 // JRR on SO suggested this
 #ifdef _OPENMP
-  #include <omp.h>
+#include <omp.h>
 #else
 // for machines with compilers void of openmp support
-  #define omp_get_num_threads()  1
-  #define omp_get_thread_num()   0
-  #define omp_get_max_threads()  1
-  #define omp_get_thread_limit() 1
-  #define omp_get_num_procs()    1
-  #define omp_set_nested(a)   // empty statement to remove the call
-  #define omp_get_wtime()        0
-  #define omp_in_parallel()      true
+#define omp_get_num_threads()  1
+#define omp_get_thread_num()   0
+#define omp_get_max_threads()  1
+#define omp_get_thread_limit() 1
+#define omp_get_num_procs()    1
+#define omp_set_nested(a)   // empty statement to remove the call
+#define omp_get_wtime()        0
+#define omp_in_parallel()      true
 #endif
 
 using namespace Rcpp;
@@ -63,11 +63,13 @@ void domult_(vec& out, const vec& a, vec& temp,
     temp.set_size(basemat.n_rows); 
   
   out.zeros();
+  uword termsnrows = terms.n_rows;
+  uword termsncols = terms.n_cols;
   if (omp_in_parallel()) {
-    for (uword k = 0; k < terms.n_rows; ++k) { 
-      temp.fill(a(k)); 
-      for (uword l = 0; l < terms.n_cols; ++l)  
-        if(terms(k,l)>0) temp %= basemat.col(knotptst(l)+terms(k,l)); 
+    for (uword k = 0; k < termsnrows; ++k) { 
+      temp.fill(a[k]); 
+      for (uword l = 0; l < termsncols; ++l)  
+        if(terms.at(k,l)>0) temp %= basemat.col(knotptst[l]+terms.at(k,l)); 
       out += temp;  
     }
   } else {
@@ -75,11 +77,12 @@ void domult_(vec& out, const vec& a, vec& temp,
   {
   vec out_ = out;
   vec temp_ = temp;
-  #pragma omp for 
-  for (uword k = 0; k < terms.n_rows; ++k) { 
-    temp_.fill(a(k)); 
-    for (uword l = 0; l < terms.n_cols; ++l)  
-      if(terms(k,l)>0) temp_ %= basemat.col(knotptst(l)+terms(k,l)); 
+  out_.zeros();
+  #pragma omp for
+  for (uword k = 0; k < termsnrows; ++k) { 
+    temp_.fill(a[k]); 
+    for (uword l = 0; l < termsncols; ++l)  
+      if(terms.at(k,l)>0) temp_ %= basemat.col(knotptst[l]+terms.at(k,l)); 
     out_ += temp_;  
   } 
   #pragma omp critical  
@@ -107,7 +110,7 @@ void prodmm_(vec& out,
   vec out_ = out; //local out 
   out_.zeros();
   vec temp_; //local temp vector 
-  #pragma omp for nowait 
+  #pragma omp for nowait  
   for(uword lcv = 0; lcv < loopsize; lcv+=1) { 
     uword startind = lcv*chunksize; 
     uword endind = std::min((lcv+1)*chunksize-1,basemat.n_rows-1); 
@@ -116,11 +119,11 @@ void prodmm_(vec& out,
     
     #pragma omp critical 
     out.subvec(startind,endind) = out_; //putting it back in the right place 
-  } 
+  }
   } 
   } else { // Wide cases 
-  vec temp; //local temp vector 
-  domult_(out, a, temp, terms, knotptst, basemat, num_threads);
+    vec temp; //local temp vector 
+    domult_(out, a, temp, terms, knotptst, basemat, num_threads);
   } 
   out %= basescale; 
 }
@@ -137,22 +140,23 @@ void domultgesub_(vec& out, mat& outge, const vec& a,
                   const mat& basematge, const uvec& gest, const uvec& hypmatch,
                   const uword& k) {
   
-  temp.fill(a(k)); 
+  temp.fill(a[k]); 
+  
   for (uword l = 0; l < terms.n_cols; ++l)  
-    if(terms(k,l)>0) temp %= basemat.col(knotptst(l)+terms(k,l)); 
-  out += temp;  
-  for (uword l = 0; l < (gest.n_elem-1); ++l) { 
-    if(terms(k,hypmatch[l])>0){  
-      tempalt.fill(a(k)); 
-      
-      for (uword m = 0; m < terms.n_cols; ++m) 
-        if(terms(k,m)>0 && m != hypmatch[l]) 
-          tempalt %= basemat.col(knotptst[m]+terms(k,m)); 
+    if(terms.at(k,l)>0) temp %= basemat.col(knotptst[l]+terms.at(k,l)); 
+    out += temp;  
+    for (uword l = 0; l < (gest.n_elem-1); ++l) { 
+      if(terms.at(k,hypmatch[l])>0){  
+        tempalt.fill(a[k]); 
         
-      outge.col(l) += tempalt % basematge.col(gest[l] + terms(k,hypmatch[l]))- 
-        temp % basematge.col(gest[l]); 
+        for (uword m = 0; m < terms.n_cols; ++m) 
+          if(terms.at(k,m)>0 && m != hypmatch[l]) 
+            tempalt %= basemat.col(knotptst[m]+terms.at(k,m)); 
+          
+          outge.col(l) += tempalt%basematge.col(gest[l]+ 
+            terms.at(k,hypmatch[l]))-temp%basematge.col(gest[l]); 
+      }
     }
-  }
 }
 
 /*
@@ -178,8 +182,9 @@ void domultge_(vec& out, mat& outge, const vec& a,
   out.zeros();
   outge.zeros();
   
+  uword termsnrows = terms.n_rows;
   if (omp_in_parallel()) {
-    for (uword k = 0; k < terms.n_rows; ++k)
+    for (uword k = 0; k < termsnrows; ++k)
       domultgesub_(out, outge, a, temp, tempalt,
                    terms, knotptst, basemat,
                    basematge, gest, hypmatch,
@@ -193,15 +198,17 @@ void domultge_(vec& out, mat& outge, const vec& a,
   vec tempalt_ = tempalt; //local temp vector 
   out_.zeros();
   outge_.zeros();
-  #pragma omp for nowait 
-  for (uword k = 0; k < terms.n_rows; ++k)
+  #pragma omp for nowait  
+  for (uword k = 0; k < termsnrows; ++k)
     domultgesub_(out_, outge_, a, temp_, tempalt_,
                  terms, knotptst, basemat,
                  basematge, gest, hypmatch,
                  k);
   #pragma omp critical  
+  {
   out += out_;  
-  outge += outge_;  
+  outge += outge_;
+  }
   }
   }
 }
@@ -235,7 +242,7 @@ void prodmmge_(vec& out, mat& outge,
   vec tempalt_; 
   uword startind; 
   uword endind; 
-  #pragma omp for nowait 
+  #pragma omp for nowait  
   for(uword lcv = 0; lcv < loopsize; lcv+=1){ 
     startind = lcv*chunksize; 
     endind = std::min((lcv+1)*chunksize-1, basemat.n_rows-1); 
@@ -245,18 +252,20 @@ void prodmmge_(vec& out, mat& outge,
               basematge.rows(startind,endind), gest, hypmatch,
               num_threads);
     
-    #pragma omp critical 
-    out.subvec(startind,endind) = out_; 
-    outge.rows(startind,endind) = outge_; 
+  #pragma omp critical
+  {
+  out.subvec(startind,endind) = out_; 
+  outge.rows(startind,endind) = outge_; 
+  }
   } 
   } 
   } else { 
-  vec temp_; 
-  vec tempalt_; 
-  domultge_(out, outge, a, temp_, tempalt_,
-            terms, knotptst, basemat,
-            basematge, gest, hypmatch,
-            num_threads);
+    vec temp_; 
+    vec tempalt_; 
+    domultge_(out, outge, a, temp_, tempalt_,
+              terms, knotptst, basemat,
+              basematge, gest, hypmatch,
+              num_threads);
   } 
   for (uword l = 0; l < (gest.n_elem-1); ++l) 
     outge.col(l) += basematge.col(gest[l]) % out; 
@@ -277,7 +286,7 @@ void dotmultsub_(vec& out, vec& temp,
                  const uword& k) {
   temp = b; 
   for (uword l = 0; l < terms.n_cols; ++l) 
-    if(terms(k,l)>0) temp %= basemat.col(knotptst[l]+terms(k,l)); 
+    if(terms.at(k,l)>0) temp %= basemat.col(knotptst[l]+terms.at(k,l)); 
   out(k) += sum(temp); 
 }
 
@@ -306,14 +315,15 @@ void tprodmm_(vec& out,
   mat basemat_; 
   vec b_;
   out_.zeros();
-  #pragma omp for nowait 
+  #pragma omp for nowait  
   for(uword lcv = 0; lcv < loopsize; lcv+=1){
     uword startind = lcv*chunksize; 
     uword endind = std::min((lcv+1)*chunksize-1, basemat.n_rows-1); 
     basemat_ = basemat.rows(startind,endind); //extract rows 
     b_ = b.subvec(startind,endind);
     
-    for (uword k = 0; k < terms.n_rows; ++k) 
+    uword termsnrows = terms.n_rows;
+    for (uword k = 0; k < termsnrows; ++k) 
       dotmultsub_(out_, temp_, basemat_,
                   knotptst, terms, b_,
                   k);
@@ -328,8 +338,9 @@ void tprodmm_(vec& out,
   vec temp_; //local temp vector 
   out_.zeros();
   
-  #pragma omp for nowait 
-  for (uword k = 0; k < terms.n_rows; ++k) 
+  uword termsnrows = terms.n_rows;
+  #pragma omp for nowait  
+  for (uword k = 0; k < termsnrows; ++k) 
     dotmultsub_(out_, temp_, basemat,
                 knotptst, terms, b,
                 k);
@@ -354,18 +365,19 @@ void dotmultgesub_(vec& out, mat& outge,
                    const umat& terms, const vec& b,
                    const uword& k) {
   temp = b;
+  
   for (uword l = 0; l < terms.n_cols; ++l) 
-    if(terms(k,l)>0) temp %= basemat.col(knotptst[l]+terms(k,l));
+    if(terms.at(k,l)>0) temp %= basemat.col(knotptst[l]+terms.at(k,l));
   out(k) += sum(temp);
-    
+  
   for (uword l = 0; l < outge.n_cols; ++l) { 
-    if (terms(k,hypmatch[l]) > 0){ 
+    if (terms.at(k,hypmatch[l]) > 0){ 
       tempalt = b;
       for (uword m = 0; m < terms.n_cols; ++m) 
-        if(terms(k,m)>0 && m != hypmatch[l]) 
-          tempalt %= basemat.col(knotptst[m]+terms(k,m)); 
+        if(terms.at(k,m)>0 && m != hypmatch[l]) 
+          tempalt %= basemat.col(knotptst[m]+terms.at(k,m)); 
       outge(k,l) += dot(tempalt, basematge.col(gest[l] +
-        terms(k,hypmatch[l])));
+        terms.at(k,hypmatch[l])));
     } else outge(k,l) += dot(temp, basematge.col(gest[l]));
   } 
 }
@@ -404,15 +416,15 @@ void tprodmmge_(vec& out, mat& outge,
   vec b_;
   out_.zeros();
   outge_.zeros();
-  #pragma omp for nowait 
-  for(uword lcv = 0; lcv < loopsize; lcv+=1){ 
+  #pragma omp for nowait  
+  for (uword lcv = 0; lcv < loopsize; lcv+=1) { 
     uword startind = lcv*chunksize; 
     uword endind = std::min((lcv+1)*chunksize-1,basemat.n_rows-1); 
     basemat_ = basemat.rows(startind,endind); //extract rows 
     basematge_ = basematge.rows(startind,endind); //extract rows 
     b_ = b.subvec(startind,endind);
-    
-    for (uword k = 0; k < terms.n_rows; ++k) 
+    uword termsnrows = terms.n_rows;
+    for (uword k = 0; k < termsnrows; ++k) 
       dotmultgesub_(out_, outge_,
                     temp, tempalt, 
                     basemat_, 
@@ -420,9 +432,11 @@ void tprodmmge_(vec& out, mat& outge,
                     gest, hypmatch, knotptst, 
                     terms, b_, k);
   }
-  #pragma omp critical 
-  out += out_;
-  outge += outge_;
+  #pragma omp critical
+  {
+    out += out_;
+    outge += outge_;
+  }
   }
   } else {
   #pragma omp parallel num_threads(num_threads)
@@ -435,17 +449,20 @@ void tprodmmge_(vec& out, mat& outge,
   
   out_.zeros();
   outge_.zeros();
-  #pragma omp for nowait 
-  for (uword k = 0; k < terms.n_rows; ++k) 
+  uword termsnrows = terms.n_rows;
+  #pragma omp for nowait  
+  for (uword k = 0; k < termsnrows; ++k) 
     dotmultgesub_(out_, outge_,
                   temp, tempalt, 
                   basemat, 
                   basematge, 
                   gest, hypmatch, knotptst, 
                   terms, b, k);
-  #pragma omp critical 
+  #pragma omp critical
+  {
   out += out_;
   outge += outge_;
+  }
   }
   }
 }
@@ -459,41 +476,42 @@ void tprodmmge_(vec& out, mat& outge,
  */
 
 void domultm_(mat& out, const mat& a, vec& temp, 
-             const umat& terms, const uvec& knotptst, const mat& basemat,
-             int num_threads) {
+              const umat& terms, const uvec& knotptst, const mat& basemat,
+              int num_threads) {
   if(out.n_elem !=  basemat.n_rows || out.n_cols !=  a.n_cols) 
     out.set_size(basemat.n_rows, a.n_cols); 
   if(temp.n_elem !=  basemat.n_rows) 
     temp.set_size(basemat.n_rows); 
   
   out.zeros();
+  uword termsnrows = terms.n_rows;
   if (omp_in_parallel()) {
-    for (uword k = 0; k < terms.n_rows; ++k) { 
+    for (uword k = 0; k < termsnrows; ++k) { 
       temp.ones(); 
       for (uword l = 0; l < terms.n_cols; ++l)  
-        if(terms(k,l)>0) temp %= basemat.col(knotptst(l)+terms(k,l)); 
+        if(terms.at(k,l)>0) temp %= basemat.col(knotptst[l]+terms.at(k,l)); 
       out += temp * a.row(k);  
     }
   } else {
-    #pragma omp parallel num_threads(num_threads)
-    {
-      mat out_ = out;
-      vec temp_ = temp;
-      if(out_.n_elem !=  basemat.n_rows || out_.n_cols !=  a.n_cols) 
-        out_.set_size(basemat.n_rows, a.n_cols); 
-      if(temp_.n_elem !=  basemat.n_rows) 
-        temp_.set_size(basemat.n_rows); 
-      out_.zeros();
-      #pragma omp for 
-      for (uword k = 0; k < terms.n_rows; ++k) { 
-        temp_.ones(); 
-        for (uword l = 0; l < terms.n_cols; ++l)  
-          if(terms(k,l)>0) temp_ %= basemat.col(knotptst(l)+terms(k,l)); 
-        out_ += temp_ * a.row(k);  
-      } 
-      #pragma omp critical  
-      out += out_;  
-    }
+  #pragma omp parallel num_threads(num_threads)
+  {
+  mat out_ = out;
+  vec temp_ = temp;
+  if(out_.n_elem !=  basemat.n_rows || out_.n_cols !=  a.n_cols) 
+    out_.set_size(basemat.n_rows, a.n_cols); 
+  if(temp_.n_elem !=  basemat.n_rows) 
+    temp_.set_size(basemat.n_rows); 
+  out_.zeros();
+  #pragma omp for
+  for (uword k = 0; k < termsnrows; ++k) { 
+    temp_.ones(); 
+    for (uword l = 0; l < terms.n_cols; ++l)  
+      if(terms.at(k,l)>0) temp_ %= basemat.col(knotptst[l]+terms.at(k,l)); 
+    out_ += temp_ * a.row(k);  
+  } 
+  #pragma omp critical  
+  out += out_;  
+  }
   }
 }
 
@@ -514,19 +532,19 @@ void prodmm_(mat& out,
   if (vertpl) { // Tall cases 
   #pragma omp parallel num_threads(num_threads)
   { 
-    mat out_ = out; //local out 
-    out_.zeros();
-    vec temp_; //local temp vector 
-    #pragma omp for nowait 
-    for(uword lcv = 0; lcv < loopsize; lcv+=1) { 
-      uword startind = lcv*chunksize; 
-      uword endind = std::min((lcv+1)*chunksize-1,basemat.n_rows-1); 
-      domultm_(out_, a, temp_, terms, knotptst, basemat.rows(startind,endind), 
-              num_threads);
-      
-      #pragma omp critical 
-      out.rows(startind,endind) = out_; //putting it back in the right place 
-    } 
+  mat out_ = out; //local out 
+  out_.zeros();
+  vec temp_; //local temp vector 
+  #pragma omp for nowait  
+  for(uword lcv = 0; lcv < loopsize; lcv+=1) { 
+    uword startind = lcv*chunksize; 
+    uword endind = std::min((lcv+1)*chunksize-1,basemat.n_rows-1); 
+    domultm_(out_, a, temp_, terms, knotptst, basemat.rows(startind,endind), 
+             num_threads);
+    
+    #pragma omp critical 
+    out.rows(startind,endind) = out_; //putting it back in the right place 
+  } 
   } 
   } else { // Wide cases 
     vec temp; //local temp vector 
@@ -544,12 +562,12 @@ void prodmm_(mat& out,
  */
 
 void dotmmultsub_(mat& out, vec& temp, 
-                 const mat& basemat,
-                 const uvec& knotptst, const umat& terms, const mat& b,
-                 const uword& k) {
+                  const mat& basemat,
+                  const uvec& knotptst, const umat& terms, const mat& b,
+                  const uword& k) {
   temp.ones(); 
   for (uword l = 0; l < terms.n_cols; ++l) 
-    if(terms(k,l)>0) temp %= basemat.col(knotptst[l]+terms(k,l)); 
+    if(terms.at(k,l)>0) temp %= basemat.col(knotptst[l]+terms.at(k,l)); 
   out.row(k) += temp.t() * b; 
 }
 
@@ -579,18 +597,18 @@ void tprodmm_(mat& out,
   mat basemat_; 
   mat b_;
   out_.zeros();
-  #pragma omp for nowait 
+  #pragma omp for nowait  
   for(uword lcv = 0; lcv < loopsize; lcv+=1){
     uword startind = lcv*chunksize; 
     uword endind = std::min((lcv+1)*chunksize-1, basemat.n_rows-1); 
     basemat_ = basemat.rows(startind,endind); //extract rows 
     b_ = b.rows(startind,endind);
     temp_.set_size(b_.n_rows);
-    
-    for (uword k = 0; k < terms.n_rows; ++k) 
+    uword termsnrows = terms.n_rows;
+    for (uword k = 0; k < termsnrows; ++k) 
       dotmmultsub_(out_, temp_, basemat_,
-                  knotptst, terms, b_,
-                  k);
+                   knotptst, terms, b_,
+                   k);
   }
   #pragma omp critical 
   out += out_; 
@@ -603,11 +621,11 @@ void tprodmm_(mat& out,
   out_.zeros();
   temp_.set_size(b.n_rows);
   
-  #pragma omp for nowait 
+  #pragma omp for nowait  
   for (uword k = 0; k < terms.n_rows; ++k) 
     dotmmultsub_(out_, temp_, basemat,
-                knotptst, terms, b,
-                k);
+                 knotptst, terms, b,
+                 k);
   
   #pragma omp critical 
   out += out_; 
@@ -624,34 +642,34 @@ void tprodmm_(mat& out,
  */
 
 void domat_(mat& out, vec& temp, 
-              const umat& terms, const uvec& knotptst, const mat& basemat,
-              int num_threads) {
+            const umat& terms, const uvec& knotptst, const mat& basemat,
+            int num_threads) {
   if(out.n_elem !=  basemat.n_rows || out.n_cols !=  terms.n_rows) 
     out.set_size(basemat.n_rows, terms.n_rows); 
-  if(temp.n_elem !=  basemat.n_rows) 
-    temp.set_size(basemat.n_rows); 
+  if(temp.n_elem !=  basemat.n_rows) temp.set_size(basemat.n_rows); 
   if (omp_in_parallel()) {
-    for (uword k = 0; k < terms.n_rows; ++k) { 
+    uword termsnrows = terms.n_rows;
+    for (uword k = 0; k < termsnrows; ++k) { 
       temp.ones(); 
       for (uword l = 0; l < terms.n_cols; ++l)  
-        if(terms(k,l)>0) temp %= basemat.col(knotptst(l)+terms(k,l)); 
+        if(terms.at(k,l)>0) temp %= basemat.col(knotptst[l]+terms.at(k,l)); 
       out.col(k) = temp;  
     }
   } else {
-#pragma omp parallel num_threads(num_threads)
-{
+  #pragma omp parallel num_threads(num_threads)
+  {
   vec temp_ = temp;
-  if(temp_.n_elem !=  basemat.n_rows) 
-    temp_.set_size(basemat.n_rows); 
-  #pragma omp for 
-  for (uword k = 0; k < terms.n_rows; ++k) { 
+  if(temp_.n_elem !=  basemat.n_rows) temp_.set_size(basemat.n_rows); 
+  uword termsnrows = terms.n_rows;
+  #pragma omp for nowait
+  for (uword k = 0; k < termsnrows; ++k) { 
     temp_.ones(); 
     for (uword l = 0; l < terms.n_cols; ++l)  
-      if(terms(k,l)>0) temp_ %= basemat.col(knotptst(l)+terms(k,l)); 
+      if(terms.at(k,l)>0) temp_ %= basemat.col(knotptst[l]+terms.at(k,l)); 
     #pragma omp critical  
     out.col(k) = temp_;  
-  } 
-}
+  }
+  }
   }
 }
 
@@ -662,27 +680,27 @@ void domat_(mat& out, vec& temp,
  */
 
 void getm_(mat& out, 
-             const umat& terms, 
-             const mat& basemat, const vec& basescale, const uvec& knotptst,
-             bool vertpl, uword chunksize, uword loopsize, int num_threads) {
+           const umat& terms, 
+           const mat& basemat, const vec& basescale, const uvec& knotptst,
+           bool vertpl, uword chunksize, uword loopsize, int num_threads) {
   if(out.n_elem !=  basemat.n_rows || out.n_cols !=  terms.n_rows) 
     out.set_size(basemat.n_rows, terms.n_rows); 
   out.zeros();
   if (vertpl) { // Tall cases 
-#pragma omp parallel num_threads(num_threads)
-{ 
+  #pragma omp parallel num_threads(num_threads)
+  { 
   
   mat out_ = out; //local out 
   out_.zeros();
   vec temp_; //local temp vector 
-#pragma omp for nowait 
+  #pragma omp for nowait  
   for(uword lcv = 0; lcv < loopsize; lcv+=1) { 
     uword startind = lcv*chunksize; 
     uword endind = std::min((lcv+1)*chunksize-1,basemat.n_rows-1); 
     domat_(out_, temp_, terms, knotptst, basemat.rows(startind,endind), 
-             num_threads);
+           num_threads);
     
-  #pragma omp critical 
+    #pragma omp critical 
     out.rows(startind,endind) = out_; //putting it back in the right place 
   } 
   } 
@@ -721,9 +739,10 @@ void dogetmge_(cube& outge,
       for (uword l = 0; l < (gest.n_elem-1); ++l) { 
         tempalt.ones(); 
         for (uword m = 0; m < terms.n_cols; ++m)
-          if(terms(k,m)>0 && m != hypmatch[l])
-            tempalt %= basemat.col(knotptst[m]+terms(k,m)); 
-        outge.slice(l).col(k) = tempalt % basematge.col(gest[l] + terms(k,hypmatch[l])); 
+          if(terms.at(k,m)>0 && m != hypmatch[l])
+            tempalt %= basemat.col(knotptst[m]+terms.at(k,m)); 
+        outge.slice(l).col(k) = tempalt % basematge.col(gest[l] + 
+          terms.at(k,hypmatch[l])); 
       }
     }
   } else {
@@ -731,15 +750,16 @@ void dogetmge_(cube& outge,
   {
   vec temp_ = temp; //local temp vector 
   vec tempalt_ = tempalt; //local temp vector 
-  #pragma omp for nowait 
+  #pragma omp for nowait  
   for (uword k = 0; k < terms.n_rows; ++k){
     for (uword l = 0; l < (gest.n_elem-1); ++l) { 
       tempalt_.ones(); 
       for (uword m = 0; m < terms.n_cols; ++m)
-        if(terms(k,m)>0 && m != hypmatch[l])
-          tempalt_ %= basemat.col(knotptst[m]+terms(k,m)); 
+        if(terms.at(k,m)>0 && m != hypmatch[l])
+          tempalt_ %= basemat.col(knotptst[m]+terms.at(k,m)); 
       #pragma omp critical  
-      outge.slice(l).col(k) = tempalt_% basematge.col(gest[l] + terms(k,hypmatch[l])); 
+      outge.slice(l).col(k) = tempalt_%basematge.col(gest[l]+
+        terms.at(k,hypmatch[l])); 
     }
   }
   }
@@ -753,10 +773,10 @@ void dogetmge_(cube& outge,
  */
 
 void getmge_(cube& outge, 
-               const umat& terms, 
-               const mat& basemat, const vec& basescale, const uvec& knotptst,
-               const mat& basematge, const uvec& gest, const uvec& hypmatch,
-               bool vertpl, uword chunksize, uword loopsize, int num_threads) {
+             const umat& terms, 
+             const mat& basemat, const vec& basescale, const uvec& knotptst,
+             const mat& basematge, const uvec& gest, const uvec& hypmatch,
+             bool vertpl, uword chunksize, uword loopsize, int num_threads) {
   if(outge.n_rows !=  basemat.n_rows || 
      outge.n_cols !=  terms.n_rows ||
      outge.n_slices !=  gest.n_elem-1) 
@@ -773,16 +793,14 @@ void getmge_(cube& outge,
   vec tempalt_; 
   uword startind; 
   uword endind; 
-  #pragma omp for nowait 
+  #pragma omp for nowait  
   for(uword lcv = 0; lcv < loopsize; lcv+=1){ 
     startind = lcv*chunksize; 
     endind = std::min((lcv+1)*chunksize-1, basemat.n_rows-1); 
-    
     dogetmge_(outge, temp_, tempalt_,
               terms, knotptst, basemat.rows(startind,endind),
               basematge.rows(startind,endind), gest, hypmatch,
               num_threads);
-    
     #pragma omp critical 
     outge.rows(startind,endind) = outge_; 
   }
