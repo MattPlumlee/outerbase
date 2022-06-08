@@ -55,7 +55,7 @@ ob$build() #rebuild after updatehyp
 
 This leads to an asymmetric basis function set for this first dimension because of the power transform in `?covf_mat25pow`.
 
-```{r fig.show="hold", out.width="45%"}
+```{r fig.show="hold", out.width="45%", fig.width=4, fig.height=4}
 basis_func1 = ob$getbase(1)
 matplot(x[,1],basis_func0[,1:4], 
         type='l', ylab="func", xlab="first dim",
@@ -127,7 +127,7 @@ ytest = obtest_borehole3d(xtest)
 We can see the predictive accuracy using the `?predictor` class which automatically pulls correct information out of `loglik` to design predictions.
 
 
-```{r fig.show="hold", out.width="45%"}
+```{r fig.show="hold", out.width="45%", fig.width=4, fig.height=4}
 predt = new(predictor,loglik)
 predt$update(xtest)
 yhat = as.vector(predt$mean())
@@ -187,7 +187,7 @@ opth = BFGS_lpdf(om, logpdf,
 ```
 The revised predictions are then built after hyperparameter optimization where we find improved predictive accuracy in nearly every category.  Here we can see a much better alignment between predictions and actual alongside a better plot of standardized residuals (more like a standard normal distribution).
 
-```{r fig.show="hold", out.width="45%"}
+```{r fig.show="hold", out.width="45%", fig.width=4, fig.height=4}
 predtt = new(predictor,loglik)
 predtt$update(xtest)
 yhat = as.vector(predtt$mean())

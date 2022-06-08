@@ -133,7 +133,7 @@ print(t_fast)
 ## Comparison of results
 
 And simply plotting the results tells the story: faster inference with no discernible drop off in quality.  Note there are serious approximations here, but the approximations just have a negligible effect.
-```{r fig.show="hold", out.width="45%"}
+```{r fig.show="hold", out.width="45%", fig.width=4, fig.height=4}
 rmse_slow = sqrt(mean((ytest-yhat_slow)^2))
 hist((ytest-yhat_slow), main=paste("slow method \n rmse:", 
                                     round(rmse_slow,3),
