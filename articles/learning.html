@@ -122,14 +122,13 @@
 <p>This leads to an asymmetric basis function set for this first dimension because of the power transform in <code><a href="../reference/covf_mat25pow.html">?covf_mat25pow</a></code>.</p>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">basis_func1</span> <span class="op">=</span> <span class="va">ob</span><span class="op">$</span><span class="fu">getbase</span><span class="op">(</span><span class="fl">1</span><span class="op">)</span>
-<span class="fu"><a href="https://rdrr.io/r/graphics/par.html" class="external-link">par</a></span><span class="op">(</span>mfrow<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>,<span class="fl">2</span><span class="op">)</span><span class="op">)</span>
 <span class="fu"><a href="https://rdrr.io/r/graphics/matplot.html" class="external-link">matplot</a></span><span class="op">(</span><span class="va">x</span><span class="op">[</span>,<span class="fl">1</span><span class="op">]</span>,<span class="va">basis_func0</span><span class="op">[</span>,<span class="fl">1</span><span class="op">:</span><span class="fl">4</span><span class="op">]</span>, 
         type<span class="op">=</span><span class="st">'l'</span>, ylab<span class="op">=</span><span class="st">"func"</span>, xlab<span class="op">=</span><span class="st">"first dim"</span>,
         main<span class="op">=</span><span class="st">"original hyperparameters"</span><span class="op">)</span>
 <span class="fu"><a href="https://rdrr.io/r/graphics/matplot.html" class="external-link">matplot</a></span><span class="op">(</span><span class="va">x</span><span class="op">[</span>,<span class="fl">1</span><span class="op">]</span>,<span class="va">basis_func1</span><span class="op">[</span>,<span class="fl">1</span><span class="op">:</span><span class="fl">4</span><span class="op">]</span>, 
         type<span class="op">=</span><span class="st">'l'</span>, ylab<span class="op">=</span><span class="st">"func"</span>, xlab<span class="op">=</span><span class="st">"first dim"</span>,
         main<span class="op">=</span><span class="st">"new hyperparameters"</span><span class="op">)</span></code></pre></div>
-<p><img src="learning_files/figure-html/unnamed-chunk-5-1.png" width="700"></p>
+<p><img src="learning_files/figure-html/unnamed-chunk-5-1.png" width="45%"><img src="learning_files/figure-html/unnamed-chunk-5-2.png" width="45%"></p>
 </div>
 <div class="section level2">
 <h2 id="lpdf-for-learning">lpdf for learning<a class="anchor" aria-label="anchor" href="#lpdf-for-learning"></a>
@@ -154,15 +153,15 @@
 <span class="va">coeff0</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="fl">0</span>,<span class="va">loglik</span><span class="op">$</span><span class="va">nterms</span><span class="op">)</span>
 <span class="va">loglik</span><span class="op">$</span><span class="fu">update</span><span class="op">(</span><span class="va">coeff0</span><span class="op">)</span> <span class="co"># update it to get gradients</span>
 <span class="va">loglik</span><span class="op">$</span><span class="va">val</span>
-<span class="co">#&gt; [1] -170.302</span>
+<span class="co">#&gt; [1] -162.3605</span>
 <span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">loglik</span><span class="op">$</span><span class="va">grad</span><span class="op">)</span> <span class="co"># dim 60 for number of coeffients</span>
 <span class="co">#&gt;             [,1]</span>
-<span class="co">#&gt; [1,] -0.16039611</span>
-<span class="co">#&gt; [2,]  3.92062723</span>
-<span class="co">#&gt; [3,] -0.07053718</span>
-<span class="co">#&gt; [4,] -0.15633036</span>
-<span class="co">#&gt; [5,] -1.93074778</span>
-<span class="co">#&gt; [6,]  0.07351618</span></code></pre></div>
+<span class="co">#&gt; [1,]  0.05722811</span>
+<span class="co">#&gt; [2,] -1.02372442</span>
+<span class="co">#&gt; [3,]  3.08825903</span>
+<span class="co">#&gt; [4,] -0.85779700</span>
+<span class="co">#&gt; [5,]  0.04123885</span>
+<span class="co">#&gt; [6,]  0.12130500</span></code></pre></div>
 <p>A reasonable statistical model also needs prior on the coefficients. This tells us what distribution we expect on the coefficients.</p>
 <div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">logpr</span> <span class="op">=</span> <span class="fu">new</span><span class="op">(</span><span class="va">logpr_gauss</span>, <span class="va">om</span>, <span class="va">terms</span><span class="op">)</span></code></pre></div>
@@ -172,12 +171,12 @@
 <span class="va">para0</span> <span class="op">=</span> <span class="fu"><a href="../reference/getpara.html">getpara</a></span><span class="op">(</span><span class="va">logpdf</span><span class="op">)</span>
 <span class="va">para0</span>
 <span class="co">#&gt; noisescale coeffscale </span>
-<span class="co">#&gt;   2.833675   6.000000</span>
+<span class="co">#&gt;   2.998531   6.000000</span>
 <span class="va">para0</span><span class="op">[</span><span class="fl">2</span><span class="op">]</span> <span class="op">=</span> <span class="fl">4</span>
 <span class="va">logpdf</span><span class="op">$</span><span class="fu">updatepara</span><span class="op">(</span><span class="va">para0</span><span class="op">)</span>
 <span class="fu"><a href="../reference/getpara.html">getpara</a></span><span class="op">(</span><span class="va">logpdf</span><span class="op">)</span>
 <span class="co">#&gt; noisescale coeffscale </span>
-<span class="co">#&gt;   2.833675   4.000000</span></code></pre></div>
+<span class="co">#&gt;   2.998531   4.000000</span></code></pre></div>
 <p>The coefficients <code>coeff</code> are considered ancillary parameters that need to be optimized out (or something more sophisticated, hint on current research). For this class, it is easiest to do this via <code>lpdf$optnewton</code>, which takes a single Newton step to optimize the coefficients.</p>
 <div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">logpdf</span><span class="op">$</span><span class="fu">optnewton</span><span class="op">(</span><span class="op">)</span></code></pre></div>
@@ -193,12 +192,11 @@
 <span class="va">yhat</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/vector.html" class="external-link">as.vector</a></span><span class="op">(</span><span class="va">predt</span><span class="op">$</span><span class="fu">mean</span><span class="op">(</span><span class="op">)</span><span class="op">)</span>
 <span class="va">varpred</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/vector.html" class="external-link">as.vector</a></span><span class="op">(</span><span class="va">predt</span><span class="op">$</span><span class="fu">var</span><span class="op">(</span><span class="op">)</span><span class="op">)</span>
 
-<span class="fu"><a href="https://rdrr.io/r/graphics/par.html" class="external-link">par</a></span><span class="op">(</span>mfrow<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>,<span class="fl">2</span><span class="op">)</span><span class="op">)</span>
 <span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">yhat</span>,<span class="va">ytest</span>, xlab<span class="op">=</span><span class="st">"prediction"</span>, ylab<span class="op">=</span><span class="st">"actual"</span><span class="op">)</span>
 <span class="fu"><a href="https://rdrr.io/r/graphics/hist.html" class="external-link">hist</a></span><span class="op">(</span><span class="op">(</span><span class="va">ytest</span><span class="op">-</span><span class="va">yhat</span><span class="op">)</span><span class="op">/</span><span class="fu"><a href="https://rdrr.io/r/base/MathFun.html" class="external-link">sqrt</a></span><span class="op">(</span><span class="va">varpred</span><span class="op">)</span>,
      main<span class="op">=</span><span class="st">"standarized test residuals"</span>,
      xlab <span class="op">=</span> <span class="st">"standarized test residuals"</span><span class="op">)</span></code></pre></div>
-<p><img src="learning_files/figure-html/unnamed-chunk-14-1.png" width="700"></p>
+<p><img src="learning_files/figure-html/unnamed-chunk-14-1.png" width="45%"><img src="learning_files/figure-html/unnamed-chunk-14-2.png" width="45%"></p>
 </div>
 <div class="section level2">
 <h2 id="lpdf-and-hyperparameters">lpdf and hyperparameters<a class="anchor" aria-label="anchor" href="#lpdf-and-hyperparameters"></a>
@@ -207,17 +205,17 @@
 <div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">logpdf</span><span class="op">$</span><span class="fu">optnewton</span><span class="op">(</span><span class="op">)</span>
 <span class="va">logpdf</span><span class="op">$</span><span class="va">gradhyp</span>    <span class="co"># dim 6 for all hyperparameter</span>
-<span class="co">#&gt;           [,1]</span>
-<span class="co">#&gt; [1,] 0.2707932</span>
-<span class="co">#&gt; [2,] 0.2934191</span>
-<span class="co">#&gt; [3,] 7.7737231</span>
-<span class="co">#&gt; [4,] 0.9170998</span>
-<span class="co">#&gt; [5,] 8.7837737</span>
-<span class="co">#&gt; [6,] 0.8851393</span>
+<span class="co">#&gt;            [,1]</span>
+<span class="co">#&gt; [1,] -1.2881402</span>
+<span class="co">#&gt; [2,]  0.1953868</span>
+<span class="co">#&gt; [3,]  7.6048040</span>
+<span class="co">#&gt; [4,]  0.8263557</span>
+<span class="co">#&gt; [5,]  7.3687454</span>
+<span class="co">#&gt; [6,]  0.7514282</span>
 <span class="va">logpdf</span><span class="op">$</span><span class="va">gradpara</span>   <span class="co"># dim 2 since 2 parameters</span>
 <span class="co">#&gt;            [,1]</span>
-<span class="co">#&gt; [1,] -18.015040</span>
-<span class="co">#&gt; [2,]  -4.128491</span></code></pre></div>
+<span class="co">#&gt; [1,] -18.860908</span>
+<span class="co">#&gt; [2,]  -3.017927</span></code></pre></div>
 <p>This allows us to use custom functions to learn these hyperparameters to give maximum predictive power. The goal right now is a single point estimate of these hyperparameters. One has to be very careful to keep these in good ranges, and the call below will make sure to return <code>-inf</code> if there is a problem with the chosen hyperparameters.</p>
 <div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">totobj</span> <span class="op">=</span> <span class="kw">function</span><span class="op">(</span><span class="va">parlist</span><span class="op">)</span> <span class="op">{</span> <span class="co">#my optimization function for tuning</span>
@@ -239,99 +237,99 @@
 <code class="sourceCode R"><span class="va">parlist</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>para <span class="op">=</span> <span class="fu"><a href="../reference/getpara.html">getpara</a></span><span class="op">(</span><span class="va">logpdf</span><span class="op">)</span>, hyp <span class="op">=</span> <span class="fu"><a href="../reference/gethyp.html">gethyp</a></span><span class="op">(</span><span class="va">om</span><span class="op">)</span><span class="op">)</span>
 <span class="fu">totobj</span><span class="op">(</span><span class="va">parlist</span><span class="op">)</span>
 <span class="co">#&gt; $val</span>
-<span class="co">#&gt; [1] 81.29338</span>
+<span class="co">#&gt; [1] 84.71802</span>
 <span class="co">#&gt; </span>
 <span class="co">#&gt; $gval</span>
 <span class="co">#&gt; $gval$para</span>
 <span class="co">#&gt;           [,1]</span>
-<span class="co">#&gt; [1,] 18.015040</span>
-<span class="co">#&gt; [2,]  3.628491</span>
+<span class="co">#&gt; [1,] 18.860908</span>
+<span class="co">#&gt; [2,]  2.517927</span>
 <span class="co">#&gt; </span>
 <span class="co">#&gt; $gval$hyp</span>
 <span class="co">#&gt;             [,1]</span>
-<span class="co">#&gt; [1,]  -5.6279360</span>
-<span class="co">#&gt; [2,]  -0.2934191</span>
-<span class="co">#&gt; [3,] -13.1308660</span>
-<span class="co">#&gt; [4,]  -0.9170998</span>
-<span class="co">#&gt; [5,] -14.1409165</span>
-<span class="co">#&gt; [6,]  -0.8851393</span>
+<span class="co">#&gt; [1,]  -4.0690027</span>
+<span class="co">#&gt; [2,]  -0.1953868</span>
+<span class="co">#&gt; [3,] -12.9619468</span>
+<span class="co">#&gt; [4,]  -0.8263557</span>
+<span class="co">#&gt; [5,] -12.7258883</span>
+<span class="co">#&gt; [6,]  -0.7514282</span>
 <span class="va">opth</span> <span class="op">=</span> <span class="fu"><a href="../reference/BFGS_std.html">BFGS_std</a></span><span class="op">(</span><span class="va">totobj</span>, <span class="va">parlist</span>, verbose<span class="op">=</span><span class="fl">3</span><span class="op">)</span> <span class="co">#</span>
 <span class="co">#&gt; </span>
 <span class="co">#&gt; ########started BFGS#######</span>
 <span class="co">#&gt;  iter.no obj.value wolfe.cond.1 wolfe.cond.2 learning.rate</span>
-<span class="co">#&gt;        0   81.2934           NA           NA           0.1</span>
+<span class="co">#&gt;        0    84.718           NA           NA           0.1</span>
 <span class="co">#&gt;  iter.no obj.value wolfe.cond.1 wolfe.cond.2 learning.rate</span>
-<span class="co">#&gt;        1    78.101     -3.19178     -44.7111           0.1</span>
+<span class="co">#&gt;        1   81.8474     -2.87006     -44.0269           0.1</span>
 <span class="co">#&gt;  iter.no obj.value wolfe.cond.1 wolfe.cond.2 learning.rate</span>
-<span class="co">#&gt;        2   72.9212     -5.17932    -0.365126       0.50357</span>
+<span class="co">#&gt;        2   76.7373     -5.10962    -0.247768       0.50357</span>
 <span class="co">#&gt;  iter.no obj.value wolfe.cond.1 wolfe.cond.2 learning.rate</span>
-<span class="co">#&gt;        3   54.9313     -17.9873     -28.5224      0.539329</span>
+<span class="co">#&gt;        3   58.9371     -17.7975      -34.662      0.539329</span>
 <span class="co">#&gt;  iter.no obj.value wolfe.cond.1 wolfe.cond.2 learning.rate</span>
-<span class="co">#&gt;        4    49.535     -5.39564     -3.50325      0.573679</span>
+<span class="co">#&gt;        4   53.3272     -5.60932     -1.31941      0.573679</span>
 <span class="co">#&gt;  iter.no obj.value wolfe.cond.1 wolfe.cond.2 learning.rate</span>
-<span class="co">#&gt;        5    41.522     -8.01189     -6.75999      0.606459</span>
+<span class="co">#&gt;        5   38.4061     -14.9188     -20.8919      0.606459</span>
 <span class="co">#&gt;  iter.no obj.value wolfe.cond.1 wolfe.cond.2 learning.rate</span>
-<span class="co">#&gt;        6   32.5292     -8.99177     -4.81442      0.637561</span>
+<span class="co">#&gt;        6    31.707     -6.69828     -4.71335      0.637561</span>
 <span class="co">#&gt;  iter.no obj.value wolfe.cond.1 wolfe.cond.2 learning.rate</span>
-<span class="co">#&gt;        7   25.3822      -7.1459      -8.8609      0.666913</span>
+<span class="co">#&gt;        7   26.3263     -5.37932     -23.7253      0.666913</span>
 <span class="co">#&gt;  iter.no obj.value wolfe.cond.1 wolfe.cond.2 learning.rate</span>
-<span class="co">#&gt;        8   23.9013     -1.48053     -6.74046      0.694484</span>
+<span class="co">#&gt;        8   24.6494     -1.67654     -4.94048      0.694484</span>
 <span class="co">#&gt;  iter.no obj.value wolfe.cond.1 wolfe.cond.2 learning.rate</span>
-<span class="co">#&gt;        9   23.4517    -0.449443     -2.39941      0.720271</span>
-<span class="co">#&gt; num iter: 10  obj start: 81.29338  obj end: 23.2931</span>
+<span class="co">#&gt;        9   24.4007    -0.248728    -0.491311      0.720271</span>
+<span class="co">#&gt; num iter: 10  obj start: 84.71802  obj end: 24.37882</span>
 <span class="co">#&gt; final learning rate: 0.7442976</span>
-<span class="co">#&gt; approx lower bound (not achieved): 22.97849</span>
+<span class="co">#&gt; approx lower bound (not achieved): 24.33783</span>
 <span class="co">#&gt; #########finished BFGS########</span></code></pre></div>
 <p>Then we just have to update out parameters and re-optimize, and we can check that we are at least must closer to stationary point.</p>
 <div class="sourceCode" id="cb18"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="fu">totobj</span><span class="op">(</span><span class="va">opth</span><span class="op">$</span><span class="va">par</span><span class="op">)</span>
+<code class="sourceCode R"><span class="fu">totobj</span><span class="op">(</span><span class="va">opth</span><span class="op">$</span><span class="va">parlist</span><span class="op">)</span>
 <span class="co">#&gt; $val</span>
-<span class="co">#&gt; [1] 23.2931</span>
+<span class="co">#&gt; [1] 24.37882</span>
 <span class="co">#&gt; </span>
 <span class="co">#&gt; $gval</span>
 <span class="co">#&gt; $gval$para</span>
 <span class="co">#&gt;            [,1]</span>
-<span class="co">#&gt; [1,] -0.7722822</span>
-<span class="co">#&gt; [2,] -0.4491662</span>
+<span class="co">#&gt; [1,] -0.3085386</span>
+<span class="co">#&gt; [2,] -0.7890125</span>
 <span class="co">#&gt; </span>
 <span class="co">#&gt; $gval$hyp</span>
-<span class="co">#&gt;            [,1]</span>
-<span class="co">#&gt; [1,] -2.3408540</span>
-<span class="co">#&gt; [2,] -0.4241775</span>
-<span class="co">#&gt; [3,] -1.5021488</span>
-<span class="co">#&gt; [4,] -0.3756881</span>
-<span class="co">#&gt; [5,] -1.6582343</span>
-<span class="co">#&gt; [6,] -0.5299604</span></code></pre></div>
+<span class="co">#&gt;              [,1]</span>
+<span class="co">#&gt; [1,] -0.391388835</span>
+<span class="co">#&gt; [2,] -0.174548227</span>
+<span class="co">#&gt; [3,]  0.001860574</span>
+<span class="co">#&gt; [4,] -0.112255207</span>
+<span class="co">#&gt; [5,] -0.004062475</span>
+<span class="co">#&gt; [6,] -0.117660493</span></code></pre></div>
 <p>These steps can all be nicely wrapped up in another function <code><a href="../reference/BFGS_lpdf.html">?BFGS_lpdf</a></code>, which is a simpler call with the same result. Note because of some things not fully understood, these numbers will not match <em>exactly</em> above, but they will be quite close and functionally the same.</p>
 <div class="sourceCode" id="cb19"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">opth</span> <span class="op">=</span> <span class="fu"><a href="../reference/BFGS_lpdf.html">BFGS_lpdf</a></span><span class="op">(</span><span class="va">om</span>, <span class="va">logpdf</span>, 
-                 par<span class="op">=</span><span class="va">parlist</span>, 
-                 verbose <span class="op">=</span> <span class="fl">3</span>, newt<span class="op">=</span> <span class="cn">T</span><span class="op">)</span>  
+                 parlist<span class="op">=</span><span class="va">parlist</span>, 
+                 verbose <span class="op">=</span> <span class="fl">3</span>, newt<span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span>  
 <span class="co">#&gt; </span>
 <span class="co">#&gt; ########started BFGS#######</span>
 <span class="co">#&gt;  iter.no obj.value wolfe.cond.1 wolfe.cond.2 learning.rate</span>
-<span class="co">#&gt;        0   81.2934           NA           NA           0.1</span>
+<span class="co">#&gt;        0    84.718           NA           NA           0.1</span>
 <span class="co">#&gt;  iter.no obj.value wolfe.cond.1 wolfe.cond.2 learning.rate</span>
-<span class="co">#&gt;        1    78.101     -3.19178     -44.7111           0.1</span>
+<span class="co">#&gt;        1   81.8474     -2.87006     -44.0269           0.1</span>
 <span class="co">#&gt;  iter.no obj.value wolfe.cond.1 wolfe.cond.2 learning.rate</span>
-<span class="co">#&gt;        2   72.9212     -5.17932    -0.365126       0.50357</span>
+<span class="co">#&gt;        2   76.7373     -5.10962    -0.247768       0.50357</span>
 <span class="co">#&gt;  iter.no obj.value wolfe.cond.1 wolfe.cond.2 learning.rate</span>
-<span class="co">#&gt;        3   54.9313     -17.9873     -28.5224      0.539329</span>
+<span class="co">#&gt;        3   58.7014     -18.0332     -33.8683      0.539329</span>
 <span class="co">#&gt;  iter.no obj.value wolfe.cond.1 wolfe.cond.2 learning.rate</span>
-<span class="co">#&gt;        4    49.535     -5.39564     -3.50325      0.573679</span>
+<span class="co">#&gt;        4   53.2508     -5.45004     -1.50296      0.573679</span>
 <span class="co">#&gt;  iter.no obj.value wolfe.cond.1 wolfe.cond.2 learning.rate</span>
-<span class="co">#&gt;        5    41.522     -8.01189     -6.75999      0.606459</span>
+<span class="co">#&gt;        5   38.9133     -14.3354     -19.5508      0.606459</span>
 <span class="co">#&gt;  iter.no obj.value wolfe.cond.1 wolfe.cond.2 learning.rate</span>
-<span class="co">#&gt;        6   32.5292     -8.99177     -4.81442      0.637561</span>
+<span class="co">#&gt;        6   31.5874      -7.3249      -7.4432      0.637561</span>
 <span class="co">#&gt;  iter.no obj.value wolfe.cond.1 wolfe.cond.2 learning.rate</span>
-<span class="co">#&gt;        7   25.3822      -7.1459      -8.8609      0.666913</span>
+<span class="co">#&gt;        7   25.7799     -5.80626     -17.6252      0.666913</span>
 <span class="co">#&gt;  iter.no obj.value wolfe.cond.1 wolfe.cond.2 learning.rate</span>
-<span class="co">#&gt;        8   23.9013     -1.48053     -6.74046      0.694484</span>
+<span class="co">#&gt;        8   24.6044     -1.17531     -2.85999      0.694484</span>
 <span class="co">#&gt;  iter.no obj.value wolfe.cond.1 wolfe.cond.2 learning.rate</span>
-<span class="co">#&gt;        9   23.4517    -0.449443     -2.39941      0.720271</span>
-<span class="co">#&gt; num iter: 10  obj start: 81.29338  obj end: 23.2931</span>
+<span class="co">#&gt;        9   24.4094    -0.194928    -0.316068      0.720271</span>
+<span class="co">#&gt; num iter: 10  obj start: 84.71802  obj end: 24.38374</span>
 <span class="co">#&gt; final learning rate: 0.7442976</span>
-<span class="co">#&gt; approx lower bound (not achieved): 22.97849</span>
+<span class="co">#&gt; approx lower bound (not achieved): 24.33459</span>
 <span class="co">#&gt; #########finished BFGS########</span></code></pre></div>
 <p>The revised predictions are then built after hyperparameter optimization where we find improved predictive accuracy in nearly every category. Here we can see a much better alignment between predictions and actual alongside a better plot of standardized residuals (more like a standard normal distribution).</p>
 <div class="sourceCode" id="cb20"><pre class="downlit sourceCode r">
@@ -340,11 +338,10 @@
 <span class="va">yhat</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/vector.html" class="external-link">as.vector</a></span><span class="op">(</span><span class="va">predtt</span><span class="op">$</span><span class="fu">mean</span><span class="op">(</span><span class="op">)</span><span class="op">)</span>
 <span class="va">varpred</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/vector.html" class="external-link">as.vector</a></span><span class="op">(</span><span class="va">predtt</span><span class="op">$</span><span class="fu">var</span><span class="op">(</span><span class="op">)</span><span class="op">)</span>
 
-<span class="fu"><a href="https://rdrr.io/r/graphics/par.html" class="external-link">par</a></span><span class="op">(</span>mfrow<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>,<span class="fl">2</span><span class="op">)</span><span class="op">)</span>
 <span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">ytest</span>,<span class="va">yhat</span><span class="op">)</span>
 <span class="fu"><a href="https://rdrr.io/r/graphics/hist.html" class="external-link">hist</a></span><span class="op">(</span><span class="op">(</span><span class="va">ytest</span><span class="op">-</span><span class="va">yhat</span><span class="op">)</span><span class="op">/</span><span class="fu"><a href="https://rdrr.io/r/base/MathFun.html" class="external-link">sqrt</a></span><span class="op">(</span><span class="va">varpred</span><span class="op">)</span>, main<span class="op">=</span><span class="st">"standarized test residuals"</span>,
      xlab <span class="op">=</span> <span class="st">"standarized test residuals"</span><span class="op">)</span></code></pre></div>
-<p><img src="learning_files/figure-html/unnamed-chunk-20-1.png" width="700"></p>
+<p><img src="learning_files/figure-html/unnamed-chunk-20-1.png" width="45%"><img src="learning_files/figure-html/unnamed-chunk-20-2.png" width="45%"></p>
 </div>
   </main><aside class="col-md-3"><nav id="toc"><h2>On this page</h2>
     </nav></aside>

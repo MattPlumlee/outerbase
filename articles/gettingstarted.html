@@ -141,10 +141,81 @@
 <p>Below is one correct deployment, where <code>mat25pow</code> is used for all dimensions. This should take a bit to run, but it should be around a second on most modern computers.</p>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">ptm</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/proc.time.html" class="external-link">proc.time</a></span><span class="op">(</span><span class="op">)</span>
-<span class="va">obmodel</span> <span class="op">=</span> <span class="fu"><a href="../reference/obfit.html">obfit</a></span><span class="op">(</span><span class="va">x</span>, <span class="va">y</span>, numb<span class="op">=</span><span class="fl">300</span>, covnames<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="st">"mat25pow"</span>,<span class="fl">8</span><span class="op">)</span><span class="op">)</span> 
+<span class="va">obmodel</span> <span class="op">=</span> <span class="fu"><a href="../reference/obfit.html">obfit</a></span><span class="op">(</span><span class="va">x</span>, <span class="va">y</span>, numb<span class="op">=</span><span class="fl">300</span>, covnames<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="st">"mat25pow"</span>,<span class="fl">8</span><span class="op">)</span>,
+                verbose <span class="op">=</span> <span class="fl">3</span><span class="op">)</span> 
+<span class="co">#&gt; doing partial optimization  </span>
+<span class="co">#&gt; max number of cg steps set to 100 </span>
+<span class="co">#&gt; </span>
+<span class="co">#&gt; ########started BFGS#######</span>
+<span class="co">#&gt;  iter.no obj.value wolfe.cond.1 wolfe.cond.2 learning.rate</span>
+<span class="co">#&gt;        0   219.972           NA           NA           0.1</span>
+<span class="co">#&gt;  iter.no obj.value wolfe.cond.1 wolfe.cond.2 learning.rate</span>
+<span class="co">#&gt;        1  -297.691     -517.607     -133.875           0.4</span>
+<span class="co">#&gt;  iter.no obj.value wolfe.cond.1 wolfe.cond.2 learning.rate</span>
+<span class="co">#&gt;        2  -805.879     -508.117     -5454.71      0.109596</span>
+<span class="co">#&gt;  iter.no obj.value wolfe.cond.1 wolfe.cond.2 learning.rate</span>
+<span class="co">#&gt;        3  -1104.33     -298.414     -263.212      0.546858</span>
+<span class="co">#&gt;  iter.no obj.value wolfe.cond.1 wolfe.cond.2 learning.rate</span>
+<span class="co">#&gt;        4  -1177.11     -72.7609     -1064.03       0.29044</span>
+<span class="co">#&gt;  iter.no obj.value wolfe.cond.1 wolfe.cond.2 learning.rate</span>
+<span class="co">#&gt;        5  -1243.58     -66.4631      -106.39      0.328663</span>
+<span class="co">#&gt;  iter.no obj.value wolfe.cond.1 wolfe.cond.2 learning.rate</span>
+<span class="co">#&gt;        6  -1290.52     -46.9305     -81.8935      0.367347</span>
+<span class="co">#&gt;  iter.no obj.value wolfe.cond.1 wolfe.cond.2 learning.rate</span>
+<span class="co">#&gt;        7  -1310.18     -19.6604     -20.0822       0.40604</span>
+<span class="co">#&gt;  iter.no obj.value wolfe.cond.1 wolfe.cond.2 learning.rate</span>
+<span class="co">#&gt;        8  -1326.15     -15.9656     -11.6497      0.444336</span>
+<span class="co">#&gt;  iter.no obj.value wolfe.cond.1 wolfe.cond.2 learning.rate</span>
+<span class="co">#&gt;        9  -1342.25     -16.1001     -12.3439      0.481882</span>
+<span class="co">#&gt;  iter.no obj.value wolfe.cond.1 wolfe.cond.2 learning.rate</span>
+<span class="co">#&gt;       10  -1354.71     -12.4503     -14.3806      0.518378</span>
+<span class="co">#&gt;  iter.no obj.value wolfe.cond.1 wolfe.cond.2 learning.rate</span>
+<span class="co">#&gt;       11  -1360.57     -5.86408     -11.8349      0.553582</span>
+<span class="co">#&gt;  iter.no obj.value wolfe.cond.1 wolfe.cond.2 learning.rate</span>
+<span class="co">#&gt;       12  -1363.19     -2.62132     -8.66017      0.587305</span>
+<span class="co">#&gt;  iter.no obj.value wolfe.cond.1 wolfe.cond.2 learning.rate</span>
+<span class="co">#&gt;       13  -1364.57     -1.37938     -2.63908      0.619409</span>
+<span class="co">#&gt; num iter: 14  obj start: 219.9723  obj end: -1365.049</span>
+<span class="co">#&gt; final learning rate: 0.6497998</span>
+<span class="co">#&gt; approx lower bound (not achieved): -1366.432</span>
+<span class="co">#&gt; #########finished BFGS######## </span>
+<span class="co">#&gt; </span>
+<span class="co">#&gt; doing optimization  1 </span>
+<span class="co">#&gt; max number of cg steps set to 313 </span>
+<span class="co">#&gt; </span>
+<span class="co">#&gt; ########started BFGS#######</span>
+<span class="co">#&gt;  iter.no obj.value wolfe.cond.1 wolfe.cond.2 learning.rate</span>
+<span class="co">#&gt;        0  -1370.94           NA           NA        0.3249</span>
+<span class="co">#&gt;  iter.no obj.value wolfe.cond.1 wolfe.cond.2 learning.rate</span>
+<span class="co">#&gt;        1  -1373.69       -2.748      -1.4711        0.3249</span>
+<span class="co">#&gt;  iter.no obj.value wolfe.cond.1 wolfe.cond.2 learning.rate</span>
+<span class="co">#&gt;        2  -1377.71     -4.01659     -4.25315      0.363559</span>
+<span class="co">#&gt;  iter.no obj.value wolfe.cond.1 wolfe.cond.2 learning.rate</span>
+<span class="co">#&gt;        3  -1379.55     -1.84395     -2.93156       0.40227</span>
+<span class="co">#&gt; num iter: 4  obj start: -1370.942  obj end: -1380.155</span>
+<span class="co">#&gt; final learning rate: 0.4406213</span>
+<span class="co">#&gt; approx lower bound (not achieved): -1382.22</span>
+<span class="co">#&gt; #########finished BFGS######## </span>
+<span class="co">#&gt; </span>
+<span class="co">#&gt; doing optimization  2 </span>
+<span class="co">#&gt; max number of cg steps set to 315 </span>
+<span class="co">#&gt; </span>
+<span class="co">#&gt; ########started BFGS#######</span>
+<span class="co">#&gt;  iter.no obj.value wolfe.cond.1 wolfe.cond.2 learning.rate</span>
+<span class="co">#&gt;        0   -1380.1           NA           NA      0.220311</span>
+<span class="co">#&gt;  iter.no obj.value wolfe.cond.1 wolfe.cond.2 learning.rate</span>
+<span class="co">#&gt;        1  -1380.15   -0.0484034   -0.0368389      0.220311</span>
+<span class="co">#&gt;  iter.no obj.value wolfe.cond.1 wolfe.cond.2 learning.rate</span>
+<span class="co">#&gt;        2  -1380.18   -0.0366984   -0.0308869       0.25629</span>
+<span class="co">#&gt;  iter.no obj.value wolfe.cond.1 wolfe.cond.2 learning.rate</span>
+<span class="co">#&gt;        3  -1380.21   -0.0261193   -0.0247482      0.293669</span>
+<span class="co">#&gt; num iter: 4  obj start: -1380.098  obj end: -1380.222</span>
+<span class="co">#&gt; final learning rate: 0.3319501</span>
+<span class="co">#&gt; approx lower bound (not achieved): -1380.27</span>
+<span class="co">#&gt; #########finished BFGS########</span>
 <span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/proc.time.html" class="external-link">proc.time</a></span><span class="op">(</span><span class="op">)</span> <span class="op">-</span> <span class="va">ptm</span><span class="op">)</span><span class="op">[</span><span class="fl">3</span><span class="op">]</span><span class="op">)</span>
 <span class="co">#&gt; elapsed </span>
-<span class="co">#&gt;   0.796</span></code></pre></div>
+<span class="co">#&gt;   1.004</span></code></pre></div>
 <p>Note that the package is made using custom parallelization at the linear-algebra level. The package relies on <code>omp</code> for parallelization, so if the package was not compiled with that in place there will be no benefits. The default call of <code>obfit</code> grabs all available threads, which is ideal for desktops/laptops. It might be less ideal for large clusters where the CPU might be shared.</p>
 <p>We can adjust the number of threads manually. Below we reduce ourselves to a single thread, which should slow things down.</p>
 <div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
@@ -153,7 +224,7 @@
                 nthreads<span class="op">=</span><span class="fl">1</span><span class="op">)</span> <span class="co">#optional input</span>
 <span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/proc.time.html" class="external-link">proc.time</a></span><span class="op">(</span><span class="op">)</span> <span class="op">-</span> <span class="va">ptm</span><span class="op">)</span><span class="op">[</span><span class="fl">3</span><span class="op">]</span><span class="op">)</span>
 <span class="co">#&gt; elapsed </span>
-<span class="co">#&gt;   1.373</span></code></pre></div>
+<span class="co">#&gt;   1.665</span></code></pre></div>
 <p>We can then predict using <code><a href="../reference/obpred.html">?obpred</a></code>. While it is not an exact interpolator, it is close.</p>
 <div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">predtr</span> <span class="op">=</span> <span class="fu"><a href="../reference/obpred.html">obpred</a></span><span class="op">(</span><span class="va">obmodel</span>, <span class="va">x</span><span class="op">)</span>

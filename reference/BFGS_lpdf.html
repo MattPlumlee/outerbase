@@ -74,8 +74,8 @@ parameters, the return is simply for information.</p>
     <div class="sourceCode"><pre class="sourceCode r"><code><span class="fu">BFGS_lpdf</span><span class="op">(</span>
   <span class="va">om</span>,
   <span class="va">logpdf</span>,
-  par <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="op">)</span>,
-  newt <span class="op">=</span> <span class="cn">F</span>,
+  parlist <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="op">)</span>,
+  newt <span class="op">=</span> <span class="cn">FALSE</span>,
   cgsteps <span class="op">=</span> <span class="fl">100</span>,
   cgtol <span class="op">=</span> <span class="fl">0.001</span>,
   <span class="va">...</span>
@@ -88,9 +88,9 @@ parameters, the return is simply for information.</p>
 <dd><p>an <code><a href="outermod.html">outermod</a></code> instance</p></dd>
 <dt>logpdf</dt>
 <dd><p>a <code><a href="lpdf.html">lpdf</a></code> instance</p></dd>
-<dt>par</dt>
-<dd><p>an initial point, which are pulled from `om` and `logpdf` if not 
-provided</p></dd>
+<dt>parlist</dt>
+<dd><p>an initial point, which are pulled from `om` and `logpdf` if 
+not provided</p></dd>
 <dt>newt</dt>
 <dd><p>boolean for if Newtons method should be used</p></dd>
 <dt>cgsteps</dt>

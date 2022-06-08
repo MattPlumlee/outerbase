@@ -159,12 +159,11 @@
 <code class="sourceCode R"><span class="va">yhat</span> <span class="op">=</span> <span class="fu">covftot</span><span class="op">(</span><span class="va">xtest</span>,<span class="va">x</span><span class="op">)</span> <span class="op"><a href="https://rdrr.io/r/base/matmult.html" class="external-link">%*%</a></span> <span class="fu"><a href="https://rdrr.io/r/base/solve.html" class="external-link">solve</a></span><span class="op">(</span><span class="va">cormattot</span>,<span class="va">y</span><span class="op">)</span></code></pre></div>
 <p>This gives prediction accuracy that can be summarized below.</p>
 <div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/graphics/par.html" class="external-link">par</a></span><span class="op">(</span>mfrow<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>,<span class="fl">2</span><span class="op">)</span><span class="op">)</span>
-<span class="va">ytest</span> <span class="op">=</span> <span class="fu"><a href="../reference/obtest_borehole3d.html">obtest_borehole3d</a></span><span class="op">(</span><span class="va">xtest</span><span class="op">)</span>
+<code class="sourceCode R"><span class="va">ytest</span> <span class="op">=</span> <span class="fu"><a href="../reference/obtest_borehole3d.html">obtest_borehole3d</a></span><span class="op">(</span><span class="va">xtest</span><span class="op">)</span>
 <span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">yhat</span>, <span class="va">ytest</span>, ylab<span class="op">=</span><span class="st">"actual"</span>, xlab<span class="op">=</span><span class="st">"prediction"</span><span class="op">)</span> 
 <span class="fu"><a href="https://rdrr.io/r/graphics/hist.html" class="external-link">hist</a></span><span class="op">(</span><span class="va">ytest</span><span class="op">-</span><span class="va">yhat</span>, main<span class="op">=</span><span class="st">"test residuals"</span>,
      xlab <span class="op">=</span> <span class="st">"test residuals"</span><span class="op">)</span></code></pre></div>
-<p><img src="basebasics_files/figure-html/unnamed-chunk-11-1.png" width="700"></p>
+<p><img src="basebasics_files/figure-html/unnamed-chunk-11-1.png" width="45%"><img src="basebasics_files/figure-html/unnamed-chunk-11-2.png" width="45%"></p>
 <p>We can also use this framework to get predictive variances. These equations will not be explained in this documentation for brevity. One point here is that is does pretty well! The plot below looks standard Normal enough.</p>
 <div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">sigma2hat</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/double.html" class="external-link">as.double</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/t.html" class="external-link">t</a></span><span class="op">(</span><span class="va">y</span><span class="op">)</span><span class="op"><a href="https://rdrr.io/r/base/matmult.html" class="external-link">%*%</a></span> <span class="fu"><a href="https://rdrr.io/r/base/solve.html" class="external-link">solve</a></span><span class="op">(</span><span class="va">cormattot</span>,<span class="va">y</span><span class="op">)</span><span class="op">/</span><span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">y</span><span class="op">)</span><span class="op">)</span>
@@ -232,11 +231,11 @@
 <span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">terms</span><span class="op">)</span>
 <span class="co">#&gt;      [,1] [,2] [,3]</span>
 <span class="co">#&gt; [1,]    0    0    0</span>
-<span class="co">#&gt; [2,]    0    0    1</span>
-<span class="co">#&gt; [3,]    1    0    0</span>
+<span class="co">#&gt; [2,]    1    0    0</span>
+<span class="co">#&gt; [3,]    0    0    1</span>
 <span class="co">#&gt; [4,]    0    1    0</span>
 <span class="co">#&gt; [5,]    0    1    1</span>
-<span class="co">#&gt; [6,]    1    1    0</span></code></pre></div>
+<span class="co">#&gt; [6,]    1    0    1</span></code></pre></div>
 <p><code>outermod$getvar</code> returns the vector of variances associated with these coefficients at these <code>terms</code>.</p>
 <div class="sourceCode" id="cb20"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">covcoeff</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/vector.html" class="external-link">as.vector</a></span><span class="op">(</span><span class="va">om</span><span class="op">$</span><span class="fu">getvar</span><span class="op">(</span><span class="va">terms</span><span class="op">)</span><span class="op">)</span></code></pre></div>
@@ -250,12 +249,12 @@
   <span class="va">ob</span><span class="op">$</span><span class="fu">getbase</span><span class="op">(</span><span class="fl">3</span><span class="op">)</span><span class="op">[</span>,<span class="va">terms</span><span class="op">[</span><span class="va">termno</span>,<span class="fl">3</span><span class="op">]</span><span class="op">+</span><span class="fl">1</span><span class="op">]</span>
 
 <span class="fu"><a href="https://rdrr.io/r/base/cbind.html" class="external-link">cbind</a></span><span class="op">(</span><span class="va">basevec</span><span class="op">[</span><span class="fl">1</span><span class="op">:</span><span class="fl">5</span><span class="op">]</span>,<span class="va">basismat</span><span class="op">[</span><span class="fl">1</span><span class="op">:</span><span class="fl">5</span>,<span class="fl">5</span><span class="op">]</span><span class="op">)</span> <span class="co"># expect equal</span>
-<span class="co">#&gt;             [,1]        [,2]</span>
-<span class="co">#&gt; [1,]  0.68869591  0.68869591</span>
-<span class="co">#&gt; [2,] -0.07080254 -0.07080254</span>
-<span class="co">#&gt; [3,]  0.95224625  0.95224625</span>
-<span class="co">#&gt; [4,] -1.46478135 -1.46478135</span>
-<span class="co">#&gt; [5,]  0.04049818  0.04049818</span></code></pre></div>
+<span class="co">#&gt;           [,1]      [,2]</span>
+<span class="co">#&gt; [1,] 0.6676573 0.6676573</span>
+<span class="co">#&gt; [2,] 0.4536695 0.4536695</span>
+<span class="co">#&gt; [3,] 1.3868073 1.3868073</span>
+<span class="co">#&gt; [4,] 0.2860132 0.2860132</span>
+<span class="co">#&gt; [5,] 0.4488649 0.4488649</span></code></pre></div>
 </div>
 </div>
 <div class="section level2">
@@ -268,18 +267,18 @@
 
 <span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/Round.html" class="external-link">round</a></span><span class="op">(</span><span class="va">cormattot</span><span class="op">[</span><span class="fl">1</span><span class="op">:</span><span class="fl">5</span>,<span class="fl">1</span><span class="op">:</span><span class="fl">5</span><span class="op">]</span>,<span class="fl">3</span><span class="op">)</span><span class="op">)</span> <span class="co"># typical gp</span>
 <span class="co">#&gt;       [,1]  [,2]  [,3]  [,4]  [,5]</span>
-<span class="co">#&gt; [1,] 1.000 0.677 0.988 0.477 0.852</span>
-<span class="co">#&gt; [2,] 0.677 1.000 0.650 0.523 0.848</span>
-<span class="co">#&gt; [3,] 0.988 0.650 1.000 0.513 0.867</span>
-<span class="co">#&gt; [4,] 0.477 0.523 0.513 1.000 0.692</span>
-<span class="co">#&gt; [5,] 0.852 0.848 0.867 0.692 1.000</span>
+<span class="co">#&gt; [1,] 1.000 0.992 0.950 0.835 0.552</span>
+<span class="co">#&gt; [2,] 0.992 1.000 0.917 0.847 0.614</span>
+<span class="co">#&gt; [3,] 0.950 0.917 1.000 0.797 0.422</span>
+<span class="co">#&gt; [4,] 0.835 0.847 0.797 1.000 0.562</span>
+<span class="co">#&gt; [5,] 0.552 0.614 0.422 0.562 1.000</span>
 <span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/Round.html" class="external-link">round</a></span><span class="op">(</span><span class="va">cormatob</span><span class="op">[</span><span class="fl">1</span><span class="op">:</span><span class="fl">5</span>,<span class="fl">1</span><span class="op">:</span><span class="fl">5</span><span class="op">]</span>,<span class="fl">3</span><span class="op">)</span><span class="op">)</span> <span class="co"># outerbase</span>
 <span class="co">#&gt;       [,1]  [,2]  [,3]  [,4]  [,5]</span>
-<span class="co">#&gt; [1,] 1.000 0.677 0.988 0.477 0.852</span>
-<span class="co">#&gt; [2,] 0.677 1.000 0.650 0.523 0.848</span>
-<span class="co">#&gt; [3,] 0.988 0.650 1.000 0.513 0.867</span>
-<span class="co">#&gt; [4,] 0.477 0.523 0.513 1.000 0.692</span>
-<span class="co">#&gt; [5,] 0.852 0.848 0.867 0.692 1.000</span></code></pre></div>
+<span class="co">#&gt; [1,] 1.000 0.992 0.950 0.835 0.552</span>
+<span class="co">#&gt; [2,] 0.992 1.000 0.917 0.847 0.614</span>
+<span class="co">#&gt; [3,] 0.950 0.917 1.000 0.796 0.422</span>
+<span class="co">#&gt; [4,] 0.835 0.847 0.796 1.000 0.562</span>
+<span class="co">#&gt; [5,] 0.552 0.614 0.422 0.562 1.000</span></code></pre></div>
 <p>They means that we can leverage <a href="https://en.wikipedia.org/wiki/Bayesian_linear_regression" class="external-link">Bayesian linear regression</a> to do prediction. This will require assuming that there is some <code>noisevar</code>, which is also called the nugget in the Gaussian process literature.</p>
 <div class="sourceCode" id="cb23"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">noisevar</span> <span class="op">=</span> <span class="fl">10</span><span class="op">^</span><span class="op">(</span><span class="op">-</span><span class="fl">4</span><span class="op">)</span>
@@ -302,29 +301,26 @@
 <p>The predictions are nearly equivalent.</p>
 <div class="sourceCode" id="cb25"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">yhatob</span> <span class="op">=</span> <span class="va">basistest</span><span class="op"><a href="https://rdrr.io/r/base/matmult.html" class="external-link">%*%</a></span><span class="va">coeffest</span>
-<span class="fu"><a href="https://rdrr.io/r/graphics/par.html" class="external-link">par</a></span><span class="op">(</span>mfrow<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>,<span class="fl">2</span><span class="op">)</span><span class="op">)</span>
 <span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">yhat</span>, <span class="va">ytest</span>, main<span class="op">=</span><span class="st">"typical gp"</span>,
      xlab<span class="op">=</span><span class="st">"prediction"</span>, ylab<span class="op">=</span><span class="st">"actual"</span><span class="op">)</span>
 <span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">yhatob</span>, <span class="va">ytest</span>, main <span class="op">=</span> <span class="st">"outerbase equiv."</span>,
      xlab<span class="op">=</span><span class="st">"prediction"</span>, ylab<span class="op">=</span><span class="st">"actual"</span><span class="op">)</span></code></pre></div>
-<p><img src="basebasics_files/figure-html/unnamed-chunk-25-1.png" width="700"></p>
+<p><img src="basebasics_files/figure-html/unnamed-chunk-25-1.png" width="45%"><img src="basebasics_files/figure-html/unnamed-chunk-25-2.png" width="45%"></p>
 <p>The histograms of residuals show similar matching.</p>
 <div class="sourceCode" id="cb26"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/graphics/par.html" class="external-link">par</a></span><span class="op">(</span>mfrow<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>,<span class="fl">2</span><span class="op">)</span><span class="op">)</span>
-<span class="fu"><a href="https://rdrr.io/r/graphics/hist.html" class="external-link">hist</a></span><span class="op">(</span><span class="va">ytest</span><span class="op">-</span><span class="va">yhat</span>, main<span class="op">=</span><span class="st">"typical gp"</span>,
+<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/graphics/hist.html" class="external-link">hist</a></span><span class="op">(</span><span class="va">ytest</span><span class="op">-</span><span class="va">yhat</span>, main<span class="op">=</span><span class="st">"typical gp"</span>,
      xlab<span class="op">=</span><span class="st">"test residuals"</span><span class="op">)</span>
 <span class="fu"><a href="https://rdrr.io/r/graphics/hist.html" class="external-link">hist</a></span><span class="op">(</span><span class="va">ytest</span><span class="op">-</span><span class="va">yhatob</span>, main<span class="op">=</span><span class="st">"outerbase equiv."</span>,
      xlab<span class="op">=</span><span class="st">"test residuals"</span><span class="op">)</span></code></pre></div>
-<p><img src="basebasics_files/figure-html/unnamed-chunk-26-1.png" width="700"></p>
+<p><img src="basebasics_files/figure-html/unnamed-chunk-26-1.png" width="45%"><img src="basebasics_files/figure-html/unnamed-chunk-26-2.png" width="45%"></p>
 <p>The standardized residuals, which account for the variance, also show similar matching.</p>
 <div class="sourceCode" id="cb27"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">varpredob</span> <span class="op">=</span> <span class="va">basistest</span><span class="op"><a href="https://rdrr.io/r/base/matmult.html" class="external-link">%*%</a></span><span class="va">postcov</span><span class="op"><a href="https://rdrr.io/r/base/matmult.html" class="external-link">%*%</a></span><span class="fu"><a href="https://rdrr.io/r/base/t.html" class="external-link">t</a></span><span class="op">(</span><span class="va">basistest</span><span class="op">)</span> 
-<span class="fu"><a href="https://rdrr.io/r/graphics/par.html" class="external-link">par</a></span><span class="op">(</span>mfrow<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>,<span class="fl">2</span><span class="op">)</span><span class="op">)</span>
 <span class="fu"><a href="https://rdrr.io/r/graphics/hist.html" class="external-link">hist</a></span><span class="op">(</span><span class="op">(</span><span class="va">ytest</span><span class="op">-</span><span class="va">yhat</span><span class="op">)</span><span class="op">/</span><span class="fu"><a href="https://rdrr.io/r/base/MathFun.html" class="external-link">sqrt</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/diag.html" class="external-link">diag</a></span><span class="op">(</span><span class="va">varpred</span><span class="op">)</span><span class="op">)</span>, main<span class="op">=</span><span class="st">"typical gp"</span>,
      xlab<span class="op">=</span><span class="st">"standarized test residuals"</span><span class="op">)</span>
 <span class="fu"><a href="https://rdrr.io/r/graphics/hist.html" class="external-link">hist</a></span><span class="op">(</span><span class="op">(</span><span class="va">ytest</span><span class="op">-</span><span class="va">yhatob</span><span class="op">)</span><span class="op">/</span><span class="fu"><a href="https://rdrr.io/r/base/MathFun.html" class="external-link">sqrt</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/diag.html" class="external-link">diag</a></span><span class="op">(</span><span class="va">varpredob</span><span class="op">)</span><span class="op">)</span>, main<span class="op">=</span><span class="st">"outerbase equiv."</span>,
      xlab<span class="op">=</span><span class="st">"standarized test residuals"</span><span class="op">)</span></code></pre></div>
-<p><img src="basebasics_files/figure-html/unnamed-chunk-27-1.png" width="700"></p>
+<p><img src="basebasics_files/figure-html/unnamed-chunk-27-1.png" width="45%"><img src="basebasics_files/figure-html/unnamed-chunk-27-2.png" width="45%"></p>
 </div>
   </main><aside class="col-md-3"><nav id="toc"><h2>On this page</h2>
     </nav></aside>

@@ -158,33 +158,32 @@
 <div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">ptm</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/proc.time.html" class="external-link">proc.time</a></span><span class="op">(</span><span class="op">)</span>
 <span class="va">opth</span> <span class="op">=</span> <span class="fu"><a href="../reference/BFGS_lpdf.html">BFGS_lpdf</a></span><span class="op">(</span><span class="va">om</span>, <span class="va">logpdf_slow</span>, 
-                 par<span class="op">=</span><span class="va">parlist_slow</span>, newt<span class="op">=</span><span class="cn">T</span><span class="op">)</span>  
+                 parlist<span class="op">=</span><span class="va">parlist_slow</span>, newt<span class="op">=</span><span class="cn">TRUE</span><span class="op">)</span>    
 <span class="va">t_slow</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/proc.time.html" class="external-link">proc.time</a></span><span class="op">(</span><span class="op">)</span> <span class="op">-</span> <span class="va">ptm</span>
 <span class="va">pred_slow</span> <span class="op">=</span> <span class="fu">new</span><span class="op">(</span><span class="va">predictor</span>,<span class="va">loglik_slow</span><span class="op">)</span>
 <span class="va">pred_slow</span><span class="op">$</span><span class="fu">update</span><span class="op">(</span><span class="va">xtest</span><span class="op">)</span>
 <span class="va">yhat_slow</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/vector.html" class="external-link">as.vector</a></span><span class="op">(</span><span class="va">pred_slow</span><span class="op">$</span><span class="fu">mean</span><span class="op">(</span><span class="op">)</span><span class="op">)</span>
 <span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">t_slow</span><span class="op">)</span>
 <span class="co">#&gt;    user  system elapsed </span>
-<span class="co">#&gt;  19.179   0.008  18.500</span></code></pre></div>
+<span class="co">#&gt;  23.983   0.028  23.145</span></code></pre></div>
 <div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">ptm</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/proc.time.html" class="external-link">proc.time</a></span><span class="op">(</span><span class="op">)</span>
 <span class="va">opth</span> <span class="op">=</span> <span class="fu"><a href="../reference/BFGS_lpdf.html">BFGS_lpdf</a></span><span class="op">(</span><span class="va">om</span>, <span class="va">logpdf_fast</span>, 
-                 par<span class="op">=</span><span class="va">parlist_fast</span>, newt<span class="op">=</span><span class="cn">F</span><span class="op">)</span>  
+                 parlist<span class="op">=</span><span class="va">parlist_fast</span>, newt<span class="op">=</span><span class="cn">FALSE</span><span class="op">)</span>  
 <span class="va">t_fast</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/proc.time.html" class="external-link">proc.time</a></span><span class="op">(</span><span class="op">)</span> <span class="op">-</span> <span class="va">ptm</span>
 <span class="va">pred_fast</span> <span class="op">=</span> <span class="fu">new</span><span class="op">(</span><span class="va">predictor</span>,<span class="va">loglik_fast</span><span class="op">)</span>
 <span class="va">pred_fast</span><span class="op">$</span><span class="fu">update</span><span class="op">(</span><span class="va">xtest</span><span class="op">)</span>
 <span class="va">yhat_fast</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/vector.html" class="external-link">as.vector</a></span><span class="op">(</span><span class="va">pred_fast</span><span class="op">$</span><span class="fu">mean</span><span class="op">(</span><span class="op">)</span><span class="op">)</span>
 <span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">t_fast</span><span class="op">)</span>
 <span class="co">#&gt;    user  system elapsed </span>
-<span class="co">#&gt;   1.769   0.069   1.170</span></code></pre></div>
+<span class="co">#&gt;   2.390   0.116   1.549</span></code></pre></div>
 </div>
 <div class="section level2">
 <h2 id="comparison-of-results">Comparison of results<a class="anchor" aria-label="anchor" href="#comparison-of-results"></a>
 </h2>
 <p>And simply plotting the results tells the story: faster inference with no discernible drop off in quality. Note there are serious approximations here, but the approximations just have a negligible effect.</p>
 <div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/graphics/par.html" class="external-link">par</a></span><span class="op">(</span>mfrow<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>,<span class="fl">2</span><span class="op">)</span><span class="op">)</span>
-<span class="va">rmse_slow</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/MathFun.html" class="external-link">sqrt</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/mean.html" class="external-link">mean</a></span><span class="op">(</span><span class="op">(</span><span class="va">ytest</span><span class="op">-</span><span class="va">yhat_slow</span><span class="op">)</span><span class="op">^</span><span class="fl">2</span><span class="op">)</span><span class="op">)</span>
+<code class="sourceCode R"><span class="va">rmse_slow</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/MathFun.html" class="external-link">sqrt</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/mean.html" class="external-link">mean</a></span><span class="op">(</span><span class="op">(</span><span class="va">ytest</span><span class="op">-</span><span class="va">yhat_slow</span><span class="op">)</span><span class="op">^</span><span class="fl">2</span><span class="op">)</span><span class="op">)</span>
 <span class="fu"><a href="https://rdrr.io/r/graphics/hist.html" class="external-link">hist</a></span><span class="op">(</span><span class="op">(</span><span class="va">ytest</span><span class="op">-</span><span class="va">yhat_slow</span><span class="op">)</span>, main<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste</a></span><span class="op">(</span><span class="st">"slow method \n rmse:"</span>, 
                                     <span class="fu"><a href="https://rdrr.io/r/base/Round.html" class="external-link">round</a></span><span class="op">(</span><span class="va">rmse_slow</span>,<span class="fl">3</span><span class="op">)</span>,
                                    <span class="st">", time:"</span>,
@@ -196,7 +195,7 @@
                                    <span class="st">", time:"</span>,
                                    <span class="fu"><a href="https://rdrr.io/r/base/Round.html" class="external-link">round</a></span><span class="op">(</span><span class="va">t_fast</span><span class="op">[</span><span class="fl">3</span><span class="op">]</span>,<span class="fl">2</span><span class="op">)</span>,<span class="st">'s'</span><span class="op">)</span>, 
      xlab <span class="op">=</span> <span class="st">"prediction residuals"</span><span class="op">)</span></code></pre></div>
-<p><img src="speed_files/figure-html/unnamed-chunk-16-1.png" width="700"></p>
+<p><img src="speed_files/figure-html/unnamed-chunk-16-1.png" width="45%"><img src="speed_files/figure-html/unnamed-chunk-16-2.png" width="45%"></p>
 </div>
   </main><aside class="col-md-3"><nav id="toc"><h2>On this page</h2>
     </nav></aside>
