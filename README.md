@@ -29,8 +29,15 @@ under the MIT license. For details on installation and references to
 papers, see the [webpage
 docs](https://mattplumlee.github.io/outerbase/).
 
-A `CRAN` package is on the way, but `Github` will be a reliable way to
-try out the code. The code can be pulled directly using `{devtools}`.
+A [CRAN](https://cran.r-project.org/) package is now up! This means
+outerbase can now be installed directly using `?install.packages`.
+
+``` r
+install.packages("outerbase")
+```
+
+For development purposes, Github will be a reliable way to try out the
+code. The code can be pulled directly using `{devtools}`.
 
 <div class=".outerbase-devel">
 
