@@ -549,7 +549,7 @@ void outerbase::build() {
     mat xp_; //local xp 
     uword startind; 
     uword endind; 
-    #pragma omp for nowait
+    #pragma omp for 
     for (uword j = 0; j < loopsize; ++j) {  // if we have a tall n_row,  
       // just loop over d 
       startind = j*chunksize;  
@@ -563,6 +563,9 @@ void outerbase::build() {
         basescalemat.col(k).rows(startind, endind) = R.col(0);
         basescale.rows(startind, endind) %= R.col(0); 
         R.col(0).ones();
+        
+        #pragma omp critical
+        {
         basemat.submat(startind, knotptst[k],
                        endind, knotptst[k+1]-1) = R;
         //save the squared vers.
@@ -578,12 +581,14 @@ void outerbase::build() {
                                      (Rt.slice(l-hypst[k]) % R); 
         }
         }
+        }
       }
+      #pragma omp critical
       basescalesq.rows(startind, endind) =\
         square(basescale.rows(startind, endind));//save the squared vers.
     }
   } else { 
-    #pragma omp for nowait
+    #pragma omp for 
     for (uword k = 0; k < d; ++k) {   
       if(dograd) om.buildob(R, Rt, xp, k); 
       else om.buildob(R, xp, k);
@@ -591,6 +596,8 @@ void outerbase::build() {
       basescalemat.col(k) = R.col(0);
       basescale %= R.col(0); //keep the first column multipled for scaling 
       R.col(0).ones();
+      #pragma omp critical
+      {
       basemat.cols(om.knotptst[k],om.knotptst[k+1]-1) = R; //put it in the 
         //right  place 
       basematsq.cols(om.knotptst[k],om.knotptst[k+1]-1) = square(R); 
@@ -600,6 +607,7 @@ void outerbase::build() {
                                  Rt.slice(l-hypst[k]);
         basematsq_gradhyp.cols(gest[l], gest[l+1]-1) =\
           2*(Rt.slice(l-hypst[k]) % R); 
+      }
       }
       }
     }
