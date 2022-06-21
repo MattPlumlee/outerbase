@@ -86,6 +86,7 @@ public:
   
   
   vec mm_out(const umat& terms, const vec& a) const; 
+  vec mmEigen_out(const umat& terms, const vec& a) const; 
   vec tmm_out(const umat& terms, const vec& a) const; 
   mat mm_gradhyp_out(const umat& terms, const vec& a) const;  
   mat tmm_gradhyp_out(const umat& terms, const vec& a) const;

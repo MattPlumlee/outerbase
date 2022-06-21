@@ -684,6 +684,7 @@ RCPP_MODULE(obmod){
     .method("getmat",&outerbase::getmat)
     .method("build",&outerbase::build)
     .method("matmul",&outerbase::mm_out)
+    .method("matmulEigen",&outerbase::mmEigen_out)
     .method("tmatmul",&outerbase::tmm_out)
     .method("getmat_gradhyp",&outerbase::getmat_gradhyp)
     .method("matmul_gradhyp",&outerbase::mm_gradhyp_out)

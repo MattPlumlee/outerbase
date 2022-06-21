@@ -13,7 +13,7 @@ URL: https://mattplumlee.github.io/outerbase/, https://github.com/MattPlumlee/ou
 BugReports: https://github.com/MattPlumlee/outerbase/issues
 NeedsCompilation: yes
 Imports: methods, Rcpp, utils, stats
-LinkingTo: Rcpp, RcppArmadillo
+LinkingTo: Rcpp, RcppArmadillo, RcppEigen
 SystemRequirements: GNU make
 Encoding: UTF-8
 RoxygenNote: 7.2.0

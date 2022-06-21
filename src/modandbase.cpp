@@ -49,6 +49,7 @@ using namespace Rcpp;
 #include "covfuncs.h"
 #include "modandbase.h"  
 #include "linalg.h"  
+#include "linalgEigen.h"  
 
 /* 
  **************************************************************************** 
@@ -681,6 +682,21 @@ vec outerbase::mm_out(const umat& terms, const vec& a) const {
   outerbase::mm(out, terms, a); 
   return out; 
 } 
+
+
+/* 
+ * outerbase::mmEigen_out
+ * 
+ * mm with return using Eigen 
+ */ 
+
+vec outerbase::mmEigen_out(const umat& terms, const vec& a) const {   
+  vec out; 
+  prodmmE_(out, terms, a, basemat, basescale, knotptst, 
+          vertpl, chunksize, loopsize, nthreads); 
+  return out; 
+} 
+
 
 /* 
  * outerbase::tmm 
