@@ -56,12 +56,9 @@ void prodmmE_(vec& out,
   const Eigen::ArrayXXd eigen_B = Eigen::Map<const Eigen::ArrayXXd>(
     basemat.memptr(),basemat.n_rows,basemat.n_cols);
   const Eigen::ArrayXXf eigen_Bf = eigen_B.cast <float> ();
-  //Eigen::ArrayXd eigen_out(basemat.n_rows);
-  //Eigen::ArrayXd eigen_temp(basemat.n_rows);
   Eigen::ArrayXf eigen_outf(basemat.n_rows);
   Eigen::ArrayXf eigen_tempf(basemat.n_rows);
   
-  //eigen_out.setZero();
   eigen_outf.setZero();
   unsigned int termsnrows = terms.n_rows;
   unsigned int termsncols = terms.n_cols;

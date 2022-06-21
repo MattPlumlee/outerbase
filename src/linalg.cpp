@@ -634,45 +634,6 @@ void tprodmm_(mat& out,
 }
 
 
-
-/*
- * domat_
- *
- * supporting function for prodmm_
- */
-
-void domat_(mat& out, vec& temp, 
-            const umat& terms, const uvec& knotptst, const mat& basemat,
-            int num_threads) {
-  if(out.n_elem !=  basemat.n_rows || out.n_cols !=  terms.n_rows) 
-    out.set_size(basemat.n_rows, terms.n_rows); 
-  if(temp.n_elem !=  basemat.n_rows) temp.set_size(basemat.n_rows); 
-  if (omp_in_parallel()) {
-    uword termsnrows = terms.n_rows;
-    for (uword k = 0; k < termsnrows; ++k) { 
-      temp.ones(); 
-      for (uword l = 0; l < terms.n_cols; ++l)  
-        if(terms.at(k,l)>0) temp %= basemat.col(knotptst[l]+terms.at(k,l)); 
-      out.col(k) = temp;  
-    }
-  } else {
-  #pragma omp parallel num_threads(num_threads)
-  {
-  vec temp_ = temp;
-  if(temp_.n_elem !=  basemat.n_rows) temp_.set_size(basemat.n_rows); 
-  uword termsnrows = terms.n_rows;
-  #pragma omp for nowait
-  for (uword k = 0; k < termsnrows; ++k) { 
-    temp_.ones(); 
-    for (uword l = 0; l < terms.n_cols; ++l)  
-      if(terms.at(k,l)>0) temp_ %= basemat.col(knotptst[l]+terms.at(k,l)); 
-    #pragma omp critical  
-    out.col(k) = temp_;  
-  }
-  }
-  }
-}
-
 /*
  * prodmm_
  *
@@ -686,28 +647,22 @@ void getm_(mat& out,
   if(out.n_elem !=  basemat.n_rows || out.n_cols !=  terms.n_rows) 
     out.set_size(basemat.n_rows, terms.n_rows); 
   out.zeros();
-  if (vertpl) { // Tall cases 
-  #pragma omp parallel num_threads(num_threads)
-  { 
-  
-  mat out_ = out; //local out 
-  out_.zeros();
-  vec temp_; //local temp vector 
-  #pragma omp for nowait  
-  for(uword lcv = 0; lcv < loopsize; lcv+=1) { 
-    uword startind = lcv*chunksize; 
-    uword endind = std::min((lcv+1)*chunksize-1,basemat.n_rows-1); 
-    domat_(out_, temp_, terms, knotptst, basemat.rows(startind,endind), 
-           num_threads);
-    
-    #pragma omp critical 
-    out.rows(startind,endind) = out_; //putting it back in the right place 
-  } 
-  } 
-  } else { // Wide cases 
-    vec temp; //local temp vector 
-    domat_(out, temp, terms, knotptst, basemat, num_threads);
-  } 
+
+  vec temp; //local temp vector 
+  // #pragma omp parallel num_threads(num_threads)
+  {
+  vec temp_ = temp;
+  if(temp_.n_elem !=  basemat.n_rows) temp_.set_size(basemat.n_rows); 
+  uword termsnrows = terms.n_rows;
+  //#pragma omp for nowait
+  for (uword k = 0; k < termsnrows; ++k) { 
+    temp_.ones(); 
+    for (uword l = 0; l < terms.n_cols; ++l)  
+      if(terms.at(k,l)>0) temp_ %= basemat.col(knotptst[l]+terms.at(k,l)); 
+    //#pragma omp critical  
+    out.col(k) = temp_;  
+  }
+  }
   out.each_col() %= basescale; 
 }
 

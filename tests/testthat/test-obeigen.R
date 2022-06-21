@@ -19,8 +19,8 @@ library(outerbase)
 
 om = new(outermod)
 
-ss=2000
-nterms = 500
+ss=6000
+nterms = 2000
 d = 8
 set.seed(42)
 xo = matrix(runif(ss*d),ncol=d)
@@ -52,14 +52,17 @@ basemat_getmat = ob$getmat(terms)
 
 getmatgetbasediff = sum(abs(basemat_getmat-basemat_getbase))
 
+vec1_matmulEigen = ob$matmulEigen(terms,theta)
 vec1_getmat = basemat_getmat %*% theta
 vec1_matmul = ob$matmul(terms,theta)
 
 plot(vec1_getmat,vec1_matmul)
+vec2_matmul = ob$matmul(terms,theta)
+plot(vec1_getmat,vec2_matmul)
 
-vec1_matmulEigen = ob$matmulEigen(terms,theta)
 plot(vec1_getmat,vec1_matmulEigen)
 
-library(microbenchmark)
+plot((vec1_getmat-vec1_matmulEigen))
 
-microbenchmark(ob$matmul(terms,theta), ob$matmulEigen(terms,theta))
+#library(microbenchmark)
+#microbenchmark(ob$matmul(terms,theta), ob$matmulEigen(terms,theta))
