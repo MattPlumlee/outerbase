@@ -19,8 +19,8 @@ library(outerbase)
 
 om = new(outermod)
 
-ss=12000
-nterms = 2500
+ss=40000
+nterms =2500
 d = 8
 set.seed(42)
 xo = matrix(runif(ss*d),ncol=d)
@@ -41,6 +41,12 @@ om$updatehyp(hyp0)
 
 terms = om$selectterms(nterms)
 ob = new(outerbase,om,x) #build a basis mat, X
+
+ob$chunksize
+ob$vertpl
+ob$loopsize
+
+ob$vertpl = F
 theta = sqrt(om$getvar(terms)/20)*rnorm(nterms)
 
 basemat_getbase = matrix(1,ncol=nterms,nrow=ss)
@@ -57,5 +63,5 @@ vec1_matmul = ob$matmul(terms,theta)
 
 plot(vec1_getmat,vec1_matmul)
 
-# library(microbenchmark)
-# microbenchmark(ob$matmul(terms,theta), basemat_getmat %*% theta)
+library(microbenchmark)
+microbenchmark(ob$matmul(terms,theta), basemat_getmat %*% theta)

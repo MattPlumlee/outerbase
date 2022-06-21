@@ -65,6 +65,8 @@ public:
   uword n_hyp;
   bool dograd;
   uvec hypst;
+  uword loopsize; //used for omp
+  uword chunksize = 128; //used for omp
   
   uword nthreads;//used for omp
   bool vertpl = false;//used for omp
@@ -115,11 +117,10 @@ private:
   uvec gest;
   uvec hypmatch;
   
-  uword loopsize; //used for omp
-  uword chunksize = 64; //used for omp
   
   void setvals_();
   void setsizes_();
+  void setloopvals_();
   mat sqbasemat_gradhyp() const;
 };
 

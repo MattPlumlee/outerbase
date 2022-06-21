@@ -449,22 +449,6 @@ umat outermod::selectterms(const unsigned int numele) const {
  */ 
 
 
-/* 
- * outerbase::outerbase 
- * 
- * initialize the basis, which is tied to outermod and the prediction point 
- */ 
-
-outerbase::outerbase(const outermod& om_, mat xp_) :  
-  om(om_), xp(xp_)
-{ 
-  dograd = true;
-  n_row = xp.n_rows; 
-  nthreads = omp_get_num_procs(); 
-  
-  outerbase::build();  
-}  
-
 
 /* 
  * outerbase::outerbase 
@@ -476,6 +460,22 @@ outerbase::outerbase(const outermod& om_, mat xp_, bool dograd_) :
   om(om_), xp(xp_)
 { 
   dograd = dograd_;
+  n_row = xp.n_rows; 
+  nthreads = omp_get_num_procs(); 
+  
+  outerbase::build();  
+}  
+
+/* 
+ * outerbase::outerbase 
+ * 
+ * initialize the basis, which is tied to outermod and the prediction point 
+ */ 
+
+outerbase::outerbase(const outermod& om_, mat xp_)  :  
+  om(om_), xp(xp_)
+{ 
+  dograd = true;
   n_row = xp.n_rows; 
   nthreads = omp_get_num_procs(); 
   
@@ -498,11 +498,19 @@ void outerbase::setvals_(){
   knotptst = om.knotptst;   
   n_hyp = om.hypmatch.n_elem; 
   
-  //reset loopsize in case chunk size changed 
-  loopsize = (n_row+chunksize-1)/chunksize; // used for omp 
-  vertpl = loopsize > 20; //hardcoded after some testing 
-  //only split vertically for very large datasets 
 } 
+
+
+void outerbase::setloopvals_(){ 
+  uword maxchunk = 1+(2048/nthreads);
+  uword minchunk = 32;
+  chunksize = std::max(minchunk, std::min(maxchunk,n_row/(4*nthreads)+1));
+  
+  //reset loopsize in case chunk size changed  
+  loopsize = (n_row+chunksize-1)/chunksize; // used for omp  
+  vertpl = loopsize > 20; //hardcoded after some testing  
+  //only split vertically for very large datasets  
+}
 
 /* 
  * outerbase::setsizes_ 
@@ -540,6 +548,7 @@ void outerbase::build() {
   // set values from source 
   setvals_(); // setting values 
   setsizes_(); // resizing 
+  setloopvals_();
   
 #pragma omp parallel num_threads(nthreads)//start up an omp region 
 { 
