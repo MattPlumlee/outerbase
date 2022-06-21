@@ -63,5 +63,7 @@ vec1_matmul = ob$matmul(terms,theta)
 
 plot(vec1_getmat,vec1_matmul)
 
+if(F){
 library(microbenchmark)
 microbenchmark(ob$matmul(terms,theta), basemat_getmat %*% theta)
+}
