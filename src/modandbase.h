@@ -116,7 +116,7 @@ private:
   uvec hypmatch;
   
   uword loopsize; //used for omp
-  uword chunksize = 200; //used for omp
+  uword chunksize = 64; //used for omp
   
   void setvals_();
   void setsizes_();

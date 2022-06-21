@@ -680,6 +680,7 @@ RCPP_MODULE(obmod){
   class_<outerbase>("outerbase")
     .constructor<const outermod &, mat>()
     .field("nthreads", &outerbase::nthreads)
+    .field("vertpl", &outerbase::vertpl)
     .method("getbase",&outerbase::getbase)
     .method("getmat",&outerbase::getmat)
     .method("build",&outerbase::build)
