@@ -19,7 +19,7 @@ library(outerbase)
 
 om = new(outermod)
 
-ss=6000
+ss=12000
 nterms = 2000
 d = 8
 set.seed(42)
@@ -64,5 +64,5 @@ plot(vec1_getmat,vec1_matmulEigen)
 
 plot((vec1_getmat-vec1_matmulEigen))
 
-#library(microbenchmark)
-#microbenchmark(ob$matmul(terms,theta), ob$matmulEigen(terms,theta))
+library(microbenchmark)
+microbenchmark(ob$matmul(terms,theta), ob$matmulEigen(terms,theta))

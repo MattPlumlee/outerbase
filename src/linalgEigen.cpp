@@ -59,11 +59,15 @@ void prodmmE_(vec& out,
   Eigen::ArrayXf eigen_outf(basemat.n_rows);
   Eigen::ArrayXf eigen_tempf(basemat.n_rows);
   
+  const Eigen::ArrayXd eigen_a = Eigen::Map<const Eigen::ArrayXd>(
+    a.memptr(),a.n_elem);
+  const Eigen::ArrayXXf eigen_af = eigen_a.cast <float> ();
+  
   eigen_outf.setZero();
   unsigned int termsnrows = terms.n_rows;
   unsigned int termsncols = terms.n_cols;
   for (unsigned int k = 0; k < termsnrows; ++k) { 
-    eigen_tempf.setConstant(a[k]);
+    eigen_tempf.setConstant(eigen_af(k));
     for (unsigned int l = 0; l < termsncols; ++l)  
       if(terms.at(k,l)>0) eigen_tempf *= eigen_Bf.col(knotptst[l]+terms.at(k,l)); 
     eigen_outf += eigen_tempf;
