@@ -142,21 +142,23 @@ void domultgesub_(vec& out, mat& outge, const vec& a,
   
   temp.fill(a[k]); 
   
-  for (uword l = 0; l < terms.n_cols; ++l)  
+  for (uword l = 0; l < terms.n_cols; ++l) {
     if(terms.at(k,l)>0) temp %= basemat.col(knotptst[l]+terms.at(k,l)); 
     out += temp;  
     for (uword l = 0; l < (gest.n_elem-1); ++l) { 
       if(terms.at(k,hypmatch[l])>0){  
         tempalt.fill(a[k]); 
         
-        for (uword m = 0; m < terms.n_cols; ++m) 
+        for (uword m = 0; m < terms.n_cols; ++m) {
           if(terms.at(k,m)>0 && m != hypmatch[l]) 
             tempalt %= basemat.col(knotptst[m]+terms.at(k,m)); 
           
           outge.col(l) += tempalt%basematge.col(gest[l]+ 
             terms.at(k,hypmatch[l]))-temp%basematge.col(gest[l]); 
+        }
       }
     }
+  }
 }
 
 /*
