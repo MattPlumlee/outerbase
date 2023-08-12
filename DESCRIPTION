@@ -12,7 +12,7 @@ License: MIT + file LICENSE
 URL: https://mattplumlee.github.io/outerbase/, https://github.com/MattPlumlee/outerbase/
 BugReports: https://github.com/MattPlumlee/outerbase/issues
 NeedsCompilation: yes
-Imports: methods, Rcpp, utils, stats
+Imports: methods, Rcpp, utils, stats, pkgbuild
 LinkingTo: Rcpp, RcppArmadillo
 SystemRequirements: GNU make
 Encoding: UTF-8
