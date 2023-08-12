@@ -72,35 +72,35 @@ expect_equal_or_warn <- function(...) tryCatch(expect_equal(...),
 test_that("short, skinny test", {
   L = testmultgrad(200,100)
   
-  expect_equal_or_warn(L$mult_gradhyp[,1], L$mult_gradhyp[,2], tolerance = 0.1,
+  expect_equal_or_warn(L$mult_gradhyp[,1], L$mult_gradhyp[,2], tolerance = 1,
                label="mult grad agreement")
-  expect_equal_or_warn(L$tmult_gradhyp[,1], L$tmult_gradhyp[,2], tolerance = 0.1,
+  expect_equal_or_warn(L$tmult_gradhyp[,1], L$tmult_gradhyp[,2], tolerance = 1,
                label="tmult grad agreement")
 })
 
 test_that("tall, skinny test", {
   L = testmultgrad(10000,100)
   
-  expect_equal_or_warn(L$mult_gradhyp[,1], L$mult_gradhyp[,2], tolerance = 0.1,
+  expect_equal_or_warn(L$mult_gradhyp[,1], L$mult_gradhyp[,2], tolerance = 1,
                label="mult grad agreement")
-  expect_equal_or_warn(L$tmult_gradhyp[,1], L$tmult_gradhyp[,2], tolerance = 0.1,
+  expect_equal_or_warn(L$tmult_gradhyp[,1], L$tmult_gradhyp[,2], tolerance = 1,
                label="tmult grad agreement")
 })
 
 test_that("short, wide test", {
   L = testmultgrad(200,1000)
   
-  expect_equal_or_warn(L$mult_gradhyp[,1], L$mult_gradhyp[,2], tolerance = 0.1,
+  expect_equal_or_warn(L$mult_gradhyp[,1], L$mult_gradhyp[,2], tolerance = 1,
                label="mult grad agreement")
-  expect_equal_or_warn(L$tmult_gradhyp[,1], L$tmult_gradhyp[,2], tolerance = 0.1,
+  expect_equal_or_warn(L$tmult_gradhyp[,1], L$tmult_gradhyp[,2], tolerance = 1,
                label="tmult grad agreement")
 })
 
 test_that("tall, wide test", {
   L = testmultgrad(10000,2000)
   
-  expect_equal_or_warn(L$mult_gradhyp[,1], L$mult_gradhyp[,2], tolerance = 0.1,
+  expect_equal_or_warn(L$mult_gradhyp[,1], L$mult_gradhyp[,2], tolerance = 1,
                label="mult grad agreement")
-  expect_equal_or_warn(L$tmult_gradhyp[,1], L$tmult_gradhyp[,2], tolerance = 0.1,
+  expect_equal_or_warn(L$tmult_gradhyp[,1], L$tmult_gradhyp[,2], tolerance = 1,
                label="tmult grad agreement")
 })

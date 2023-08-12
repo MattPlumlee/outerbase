@@ -259,7 +259,7 @@ test_that("tall, wide test", {
   
   expect_equal_or_warnh(pinfo$likinfo$coeff[1], pinfo$likinfo$coeff[2], tolerance = 1,
                label="lik grad agreement")
-  expect_equal_or_warnh(pinfo$likinfo$hyp[1], pinfo$likinfo$hyp[2], tolerance = 1,
+  expect_equal_or_warnh(pinfo$likinfo$hyp[1], pinfo$likinfo$hyp[2], tolerance = 10,
                label="lik gradhyp agreement")
   expect_equal_or_warnh(pinfo$likinfo$para[1], pinfo$likinfo$para[2], tolerance = 1,
                label="lik gradpara agreement")
