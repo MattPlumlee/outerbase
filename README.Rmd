@@ -48,5 +48,5 @@ devtools::install_github("mattplumlee/outerbase")
 
 :::
 
-The project was originated and is actively maintained by Matthew Plumlee (
-mplumlee@northwestern.edu)
+The project was originated by Matthew Plumlee
+(mplumlee@northwestern.edu).  As of August 2023, it is no longer under active development, but it remains managed against for bugs and small issues.

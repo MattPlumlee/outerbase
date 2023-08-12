@@ -36,8 +36,7 @@ outerbase can now be installed directly using `?install.packages`.
 install.packages("outerbase")
 ```
 
-For development purposes, Github will be a reliable way to try out the
-code. The code can be pulled directly using `{devtools}`.
+The code can be pulled directly using `{devtools}`.
 
 <div class=".outerbase-devel">
 
@@ -47,5 +46,5 @@ devtools::install_github("mattplumlee/outerbase")
 
 </div>
 
-The project was originated and is actively maintained by Matthew Plumlee
-( <mplumlee@northwestern.edu>)
+The project was originated by Matthew Plumlee
+( <mplumlee@northwestern.edu>).  As of August 2023, it is no longer under active development but is maintained for bugfixs and problems.
