@@ -152,11 +152,13 @@ void domultgesub_(vec& out, mat& outge, const vec& a,
       tempalt.fill(a[k]); 
       
       for (uword m = 0; m < terms.n_cols; ++m) 
+      {
         if(terms.at(k,m)>0 && m != hypmatch[l]) 
           tempalt %= basemat.unsafe_col(knotptst[m]+terms.at(k,m)); 
         
         outge.unsafe_col(l) += tempalt%basematge.unsafe_col(gest[l]+ 
           terms.at(k,hypmatch[l]))-temp%basematge.unsafe_col(gest[l]); 
+      }
     }
   }
 }
