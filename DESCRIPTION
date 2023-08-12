@@ -19,6 +19,7 @@ Encoding: UTF-8
 RoxygenNote: 7.2.0
 Suggests:
     rmarkdown,
+    microbenchmark,
     knitr,
     testthat (>= 3.0.0)
 VignetteBuilder: knitr

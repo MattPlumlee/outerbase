@@ -66,23 +66,25 @@ void domult_(vec& out, const vec& a, vec& temp,
   uword termsnrows = terms.n_rows;
   uword termsncols = terms.n_cols;
   if (omp_in_parallel()) {
+    uword l = 0;
     for (uword k = 0; k < termsnrows; ++k) { 
       temp.fill(a[k]); 
-      for (uword l = 0; l < termsncols; ++l)  
-        if(terms.at(k,l)>0) temp %= basemat.col(knotptst[l]+terms.at(k,l)); 
+      for (l = 0; l < termsncols; ++l)  
+        if(terms.at(k,l)>0) temp %= basemat.unsafe_col(knotptst[l]+terms.at(k,l)); 
       out += temp;  
     }
   } else {
   #pragma omp parallel num_threads(num_threads)
   {
+  uword l = 0;
   vec out_ = out;
   vec temp_ = temp;
   out_.zeros();
   #pragma omp for
   for (uword k = 0; k < termsnrows; ++k) { 
     temp_.fill(a[k]); 
-    for (uword l = 0; l < termsncols; ++l)  
-      if(terms.at(k,l)>0) temp_ %= basemat.col(knotptst[l]+terms.at(k,l)); 
+    for (l = 0; l < termsncols; ++l)  
+      if(terms.at(k,l)>0) temp_ %= basemat.unsafe_col(knotptst[l]+terms.at(k,l)); 
     out_ += temp_;  
   } 
   #pragma omp critical  
@@ -143,20 +145,22 @@ void domultgesub_(vec& out, mat& outge, const vec& a,
   temp.fill(a[k]); 
   
   for (uword l = 0; l < terms.n_cols; ++l)  
-    if(terms.at(k,l)>0) temp %= basemat.col(knotptst[l]+terms.at(k,l)); 
-    out += temp;  
-    for (uword l = 0; l < (gest.n_elem-1); ++l) { 
-      if(terms.at(k,hypmatch[l])>0){  
-        tempalt.fill(a[k]); 
+    if(terms.at(k,l)>0) temp %= basemat.unsafe_col(knotptst[l]+terms.at(k,l)); 
+  out += temp;  
+  for (uword l = 0; l < (gest.n_elem-1); ++l) { 
+    if(terms.at(k,hypmatch[l])>0){  
+      tempalt.fill(a[k]); 
+      
+      for (uword m = 0; m < terms.n_cols; ++m) 
+      {
+        if(terms.at(k,m)>0 && m != hypmatch[l]) 
+          tempalt %= basemat.unsafe_col(knotptst[m]+terms.at(k,m)); 
         
-        for (uword m = 0; m < terms.n_cols; ++m) 
-          if(terms.at(k,m)>0 && m != hypmatch[l]) 
-            tempalt %= basemat.col(knotptst[m]+terms.at(k,m)); 
-          
-          outge.col(l) += tempalt%basematge.col(gest[l]+ 
-            terms.at(k,hypmatch[l]))-temp%basematge.col(gest[l]); 
+        outge.unsafe_col(l) += tempalt%basematge.unsafe_col(gest[l]+ 
+          terms.at(k,hypmatch[l]))-temp%basematge.unsafe_col(gest[l]); 
       }
     }
+  }
 }
 
 /*
@@ -268,7 +272,7 @@ void prodmmge_(vec& out, mat& outge,
               num_threads);
   } 
   for (uword l = 0; l < (gest.n_elem-1); ++l) 
-    outge.col(l) += basematge.col(gest[l]) % out; 
+    outge.unsafe_col(l) += basematge.unsafe_col(gest[l]) % out; 
   out %= basescale;
   outge.each_col() %= basescale;  
 }
@@ -286,7 +290,7 @@ void dotmultsub_(vec& out, vec& temp,
                  const uword& k) {
   temp = b; 
   for (uword l = 0; l < terms.n_cols; ++l) 
-    if(terms.at(k,l)>0) temp %= basemat.col(knotptst[l]+terms.at(k,l)); 
+    if(terms.at(k,l)>0) temp %= basemat.unsafe_col(knotptst[l]+terms.at(k,l)); 
   out(k) += sum(temp); 
 }
 
@@ -367,7 +371,7 @@ void dotmultgesub_(vec& out, mat& outge,
   temp = b;
   
   for (uword l = 0; l < terms.n_cols; ++l) 
-    if(terms.at(k,l)>0) temp %= basemat.col(knotptst[l]+terms.at(k,l));
+    if(terms.at(k,l)>0) temp %= basemat.unsafe_col(knotptst[l]+terms.at(k,l));
   out(k) += sum(temp);
   
   for (uword l = 0; l < outge.n_cols; ++l) { 
@@ -375,10 +379,10 @@ void dotmultgesub_(vec& out, mat& outge,
       tempalt = b;
       for (uword m = 0; m < terms.n_cols; ++m) 
         if(terms.at(k,m)>0 && m != hypmatch[l]) 
-          tempalt %= basemat.col(knotptst[m]+terms.at(k,m)); 
-      outge(k,l) += dot(tempalt, basematge.col(gest[l] +
+          tempalt %= basemat.unsafe_col(knotptst[m]+terms.at(k,m)); 
+      outge(k,l) += dot(tempalt, basematge.unsafe_col(gest[l] +
         terms.at(k,hypmatch[l])));
-    } else outge(k,l) += dot(temp, basematge.col(gest[l]));
+    } else outge(k,l) += dot(temp, basematge.unsafe_col(gest[l]));
   } 
 }
 
@@ -489,7 +493,7 @@ void domultm_(mat& out, const mat& a, vec& temp,
     for (uword k = 0; k < termsnrows; ++k) { 
       temp.ones(); 
       for (uword l = 0; l < terms.n_cols; ++l)  
-        if(terms.at(k,l)>0) temp %= basemat.col(knotptst[l]+terms.at(k,l)); 
+        if(terms.at(k,l)>0) temp %= basemat.unsafe_col(knotptst[l]+terms.at(k,l)); 
       out += temp * a.row(k);  
     }
   } else {
@@ -506,7 +510,7 @@ void domultm_(mat& out, const mat& a, vec& temp,
   for (uword k = 0; k < termsnrows; ++k) { 
     temp_.ones(); 
     for (uword l = 0; l < terms.n_cols; ++l)  
-      if(terms.at(k,l)>0) temp_ %= basemat.col(knotptst[l]+terms.at(k,l)); 
+      if(terms.at(k,l)>0) temp_ %= basemat.unsafe_col(knotptst[l]+terms.at(k,l)); 
     out_ += temp_ * a.row(k);  
   } 
   #pragma omp critical  
@@ -567,7 +571,7 @@ void dotmmultsub_(mat& out, vec& temp,
                   const uword& k) {
   temp.ones(); 
   for (uword l = 0; l < terms.n_cols; ++l) 
-    if(terms.at(k,l)>0) temp %= basemat.col(knotptst[l]+terms.at(k,l)); 
+    if(terms.at(k,l)>0) temp %= basemat.unsafe_col(knotptst[l]+terms.at(k,l)); 
   out.row(k) += temp.t() * b; 
 }
 
@@ -652,8 +656,8 @@ void domat_(mat& out, vec& temp,
     for (uword k = 0; k < termsnrows; ++k) { 
       temp.ones(); 
       for (uword l = 0; l < terms.n_cols; ++l)  
-        if(terms.at(k,l)>0) temp %= basemat.col(knotptst[l]+terms.at(k,l)); 
-      out.col(k) = temp;  
+        if(terms.at(k,l)>0) temp %= basemat.unsafe_col(knotptst[l]+terms.at(k,l)); 
+      out.unsafe_col(k) = temp;  
     }
   } else {
   #pragma omp parallel num_threads(num_threads)
@@ -665,9 +669,9 @@ void domat_(mat& out, vec& temp,
   for (uword k = 0; k < termsnrows; ++k) { 
     temp_.ones(); 
     for (uword l = 0; l < terms.n_cols; ++l)  
-      if(terms.at(k,l)>0) temp_ %= basemat.col(knotptst[l]+terms.at(k,l)); 
+      if(terms.at(k,l)>0) temp_ %= basemat.unsafe_col(knotptst[l]+terms.at(k,l)); 
     #pragma omp critical  
-    out.col(k) = temp_;  
+    out.unsafe_col(k) = temp_;  
   }
   }
   }
@@ -740,8 +744,8 @@ void dogetmge_(cube& outge,
         tempalt.ones(); 
         for (uword m = 0; m < terms.n_cols; ++m)
           if(terms.at(k,m)>0 && m != hypmatch[l])
-            tempalt %= basemat.col(knotptst[m]+terms.at(k,m)); 
-        outge.slice(l).col(k) = tempalt % basematge.col(gest[l] + 
+            tempalt %= basemat.unsafe_col(knotptst[m]+terms.at(k,m)); 
+        outge.slice(l).unsafe_col(k) = tempalt % basematge.unsafe_col(gest[l] + 
           terms.at(k,hypmatch[l])); 
       }
     }
@@ -756,9 +760,9 @@ void dogetmge_(cube& outge,
       tempalt_.ones(); 
       for (uword m = 0; m < terms.n_cols; ++m)
         if(terms.at(k,m)>0 && m != hypmatch[l])
-          tempalt_ %= basemat.col(knotptst[m]+terms.at(k,m)); 
+          tempalt_ %= basemat.unsafe_col(knotptst[m]+terms.at(k,m)); 
       #pragma omp critical  
-      outge.slice(l).col(k) = tempalt_%basematge.col(gest[l]+
+      outge.slice(l).unsafe_col(k) = tempalt_%basematge.unsafe_col(gest[l]+
         terms.at(k,hypmatch[l])); 
     }
   }
