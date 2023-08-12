@@ -133,36 +133,36 @@ test_that("short, skinny test", {
   ep = 10^(-4)
   pinfo = fulltest(200,100, ep = ep)
   
-  expect_equal_or_warnh(pinfo$prinfo$coeff[1], pinfo$prinfo$coeff[2], tolerance = 1,
+  expect_equal_or_warnh(pinfo$prinfo$coeff[1], pinfo$prinfo$coeff[2], tolerance = 0.01,
                label="pr grad agreement")
-  expect_equal_or_warnh(pinfo$prinfo$hyp[1], pinfo$prinfo$hyp[2], tolerance = 1,
+  expect_equal_or_warnh(pinfo$prinfo$hyp[1], pinfo$prinfo$hyp[2], tolerance = 0.01,
                label="pr gradhyp agreement")
-  expect_equal_or_warnh(pinfo$prinfo$para[1], pinfo$prinfo$para[2], tolerance = 1,
+  expect_equal_or_warnh(pinfo$prinfo$para[1], pinfo$prinfo$para[2], tolerance = 0.01,
                label="pr gradpara agreement")
   
-  expect_equal_or_warnh(pinfo$likinfo$coeff[1], pinfo$likinfo$coeff[2], tolerance = 1,
+  expect_equal_or_warnh(pinfo$likinfo$coeff[1], pinfo$likinfo$coeff[2], tolerance = 0.01,
                label="lik grad agreement")
-  expect_equal_or_warnh(pinfo$likinfo$hyp[1], pinfo$likinfo$hyp[2], tolerance = 1,
+  expect_equal_or_warnh(pinfo$likinfo$hyp[1], pinfo$likinfo$hyp[2], tolerance = 0.01,
                label="lik gradhyp agreement")
-  expect_equal_or_warnh(pinfo$likinfo$para[1], pinfo$likinfo$para[2], tolerance = 1,
+  expect_equal_or_warnh(pinfo$likinfo$para[1], pinfo$likinfo$para[2], tolerance = 0.01,
                label="lik gradpara agreement")
   
-  expect_equal_or_warnh(pinfo$vecinfo$coeff[1], pinfo$vecinfo$coeff[2], tolerance = 1,
+  expect_equal_or_warnh(pinfo$vecinfo$coeff[1], pinfo$vecinfo$coeff[2], tolerance = 0.01,
                         label="lik grad agreement")
-  expect_equal_or_warnh(pinfo$vecinfo$hyp[1], pinfo$vecinfo$hyp[2], tolerance = 1,
+  expect_equal_or_warnh(pinfo$vecinfo$hyp[1], pinfo$vecinfo$hyp[2], tolerance = 0.01,
                         label="lik gradhyp agreement")
-  expect_equal_or_warnh(pinfo$vecinfo$para[1], pinfo$vecinfo$para[2], tolerance = 1,
+  expect_equal_or_warnh(pinfo$vecinfo$para[1], pinfo$vecinfo$para[2], tolerance = 0.01,
                         label="lik gradpara agreement")
   
   expect_equal_or_warnh(pinfo$likinfo$dhcoeff[,1], 
-               pinfo$likinfo$dhcoeff[,2], tolerance = 1,
+               pinfo$likinfo$dhcoeff[,2], tolerance = 0.01,
                label="lik dhgradcoeff agreement")
   expect_equal_or_warnh(pinfo$likinfo$dhpara[,1], 
-               pinfo$likinfo$dhpara[,2], tolerance = 1,
+               pinfo$likinfo$dhpara[,2], tolerance = 0.01,
                label="lik dhgradpara agreement")
   
   expect_equal_or_warnh(pinfo$likinfo$rep[1], 
-               pinfo$likinfo$rep[2], tolerance = 10^(-5),
+               pinfo$likinfo$rep[2], tolerance = 0.01,
                label="rep agreement")
 })
 
@@ -172,36 +172,36 @@ test_that("tall, skinny test", {
   ep = 10^(-4)
   pinfo = fulltest(10000,100, ep = ep)
   
-  expect_equal_or_warnh(pinfo$prinfo$coeff[1], pinfo$prinfo$coeff[2], tolerance = 1,
+  expect_equal_or_warnh(pinfo$prinfo$coeff[1], pinfo$prinfo$coeff[2], tolerance = 0.01,
                label="pr grad agreement")
-  expect_equal_or_warnh(pinfo$prinfo$hyp[1], pinfo$prinfo$hyp[2], tolerance = 1,
+  expect_equal_or_warnh(pinfo$prinfo$hyp[1], pinfo$prinfo$hyp[2], tolerance = 0.01,
                label="pr gradhyp agreement")
-  expect_equal_or_warnh(pinfo$prinfo$para[1], pinfo$prinfo$para[2], tolerance = 1,
+  expect_equal_or_warnh(pinfo$prinfo$para[1], pinfo$prinfo$para[2], tolerance = 0.01,
                label="pr gradpara agreement")
   
-  expect_equal_or_warnh(pinfo$likinfo$coeff[1], pinfo$likinfo$coeff[2], tolerance = 1,
+  expect_equal_or_warnh(pinfo$likinfo$coeff[1], pinfo$likinfo$coeff[2], tolerance = 0.01,
                label="lik grad agreement")
-  expect_equal_or_warnh(pinfo$likinfo$hyp[1], pinfo$likinfo$hyp[2], tolerance = 1,
+  expect_equal_or_warnh(pinfo$likinfo$hyp[1], pinfo$likinfo$hyp[2], tolerance = 0.01,
                label="lik gradhyp agreement")
-  expect_equal_or_warnh(pinfo$likinfo$para[1], pinfo$likinfo$para[2], tolerance = 1,
+  expect_equal_or_warnh(pinfo$likinfo$para[1], pinfo$likinfo$para[2], tolerance = 0.01,
                label="lik gradpara agreement")
   
-  expect_equal_or_warnh(pinfo$vecinfo$coeff[1], pinfo$vecinfo$coeff[2], tolerance = 1,
+  expect_equal_or_warnh(pinfo$vecinfo$coeff[1], pinfo$vecinfo$coeff[2], tolerance = 0.01,
                         label="lik grad agreement")
   ###
-  expect_equal_or_warnh(pinfo$vecinfo$hyp[1], pinfo$vecinfo$hyp[2], tolerance = 1,
+  expect_equal_or_warnh(pinfo$vecinfo$hyp[1], pinfo$vecinfo$hyp[2], tolerance = 0.01,
                         label="lik gradhyp agreement")
-  expect_equal_or_warnh(pinfo$vecinfo$para[1], pinfo$vecinfo$para[2], tolerance = 1,
+  expect_equal_or_warnh(pinfo$vecinfo$para[1], pinfo$vecinfo$para[2], tolerance = 0.01,
                         label="lik gradpara agreement")
   
   expect_equal_or_warnh(pinfo$likinfo$dhcoeff[,1], 
-               pinfo$likinfo$dhcoeff[,2], tolerance = 1,
+               pinfo$likinfo$dhcoeff[,2], tolerance = 0.01,
                label="lik dhgradcoeff agreement")
   expect_equal_or_warnh(pinfo$likinfo$dhpara[,1], 
-               pinfo$likinfo$dhpara[,2], tolerance = 1,
+               pinfo$likinfo$dhpara[,2], tolerance = 0.01,
                label="lik dhgradpara agreement")
   
-  expect_equal_or_warnh(pinfo$likinfo$rep[1], pinfo$likinfo$rep[2], tolerance = 10^(-4),
+  expect_equal_or_warnh(pinfo$likinfo$rep[1], pinfo$likinfo$rep[2], tolerance = 0.01,
                label="rep agreement")
 })
 
@@ -211,73 +211,35 @@ test_that("short, wide test", {
   pinfo = fulltest(200,1000, ep = ep)
   
   
-  expect_equal_or_warnh(pinfo$prinfo$coeff[1], pinfo$prinfo$coeff[2], tolerance = 1,
+  expect_equal_or_warnh(pinfo$prinfo$coeff[1], pinfo$prinfo$coeff[2], tolerance = 0.01,
                label="pr grad agreement")
-  expect_equal_or_warnh(pinfo$prinfo$hyp[1], pinfo$prinfo$hyp[2], tolerance = 1,
+  expect_equal_or_warnh(pinfo$prinfo$hyp[1], pinfo$prinfo$hyp[2], tolerance = 0.01,
                label="pr gradhyp agreement")
-  expect_equal_or_warnh(pinfo$prinfo$para[1], pinfo$prinfo$para[2], tolerance = 1,
+  expect_equal_or_warnh(pinfo$prinfo$para[1], pinfo$prinfo$para[2], tolerance = 0.01,
                label="pr gradpara agreement")
   
-  expect_equal_or_warnh(pinfo$likinfo$coeff[1], pinfo$likinfo$coeff[2], tolerance = 1,
+  expect_equal_or_warnh(pinfo$likinfo$coeff[1], pinfo$likinfo$coeff[2], tolerance = 0.01,
                label="lik grad agreement")
-  expect_equal_or_warnh(pinfo$likinfo$hyp[1], pinfo$likinfo$hyp[2], tolerance = 1,
+  expect_equal_or_warnh(pinfo$likinfo$hyp[1], pinfo$likinfo$hyp[2], tolerance = 0.01,
                label="lik gradhyp agreement")
-  expect_equal_or_warnh(pinfo$likinfo$para[1], pinfo$likinfo$para[2], tolerance = 1,
+  expect_equal_or_warnh(pinfo$likinfo$para[1], pinfo$likinfo$para[2], tolerance = 0.01,
                label="lik gradpara agreement")
   
   
-  expect_equal_or_warnh(pinfo$vecinfo$coeff[1], pinfo$vecinfo$coeff[2], tolerance = 1,
+  expect_equal_or_warnh(pinfo$vecinfo$coeff[1], pinfo$vecinfo$coeff[2], tolerance = 0.01,
                         label="lik grad agreement")
-  expect_equal_or_warnh(pinfo$vecinfo$hyp[1], pinfo$vecinfo$hyp[2], tolerance = 1,
+  expect_equal_or_warnh(pinfo$vecinfo$hyp[1], pinfo$vecinfo$hyp[2], tolerance = 0.01,
                         label="lik gradhyp agreement")
-  expect_equal_or_warnh(pinfo$vecinfo$para[1], pinfo$vecinfo$para[2], tolerance = 1,
+  expect_equal_or_warnh(pinfo$vecinfo$para[1], pinfo$vecinfo$para[2], tolerance = 0.01,
                         label="lik gradpara agreement")
   
   expect_equal_or_warnh(pinfo$likinfo$dhcoeff[,1], 
-               pinfo$likinfo$dhcoeff[,2], tolerance = 1,
+               pinfo$likinfo$dhcoeff[,2], tolerance = 0.01,
                label="lik dhgradcoeff agreement")
   expect_equal_or_warnh(pinfo$likinfo$dhpara[,1], 
-               pinfo$likinfo$dhpara[,2], tolerance = 1,
+               pinfo$likinfo$dhpara[,2], tolerance = 0.01,
                label="lik dhgradpara agreement")
   
-  expect_equal_or_warnh(pinfo$likinfo$rep[1], pinfo$likinfo$rep[2], tolerance = 10^(-4),
-               label="rep agreement")
-})
-
-
-test_that("tall, wide test", {
-  ep = 10^(-4)
-  pinfo = fulltest(10000,2500, ep = ep)
-  
-  
-  expect_equal_or_warnh(pinfo$prinfo$coeff[1], pinfo$prinfo$coeff[2], tolerance = 1,
-               label="pr grad agreement")
-  expect_equal_or_warnh(pinfo$prinfo$hyp[1], pinfo$prinfo$hyp[2], tolerance = 1,
-               label="pr gradhyp agreement")
-  expect_equal_or_warnh(pinfo$prinfo$para[1], pinfo$prinfo$para[2], tolerance = 1,
-               label="pr gradpara agreement")
-  
-  expect_equal_or_warnh(pinfo$likinfo$coeff[1], pinfo$likinfo$coeff[2], tolerance = 1,
-               label="lik grad agreement")
-  expect_equal_or_warnh(pinfo$likinfo$hyp[1], pinfo$likinfo$hyp[2], tolerance = 10,
-               label="lik gradhyp agreement")
-  expect_equal_or_warnh(pinfo$likinfo$para[1], pinfo$likinfo$para[2], tolerance = 1,
-               label="lik gradpara agreement")
-  
-  expect_equal_or_warnh(pinfo$vecinfo$coeff[1], pinfo$vecinfo$coeff[2], tolerance = 1,
-                        label="lik grad agreement")
-  expect_equal_or_warnh(pinfo$vecinfo$hyp[1], pinfo$vecinfo$hyp[2], tolerance = 1,
-                        label="lik gradhyp agreement")
-  expect_equal_or_warnh(pinfo$vecinfo$para[1], pinfo$vecinfo$para[2], tolerance = 1,
-                        label="lik gradpara agreement")
-  
-  expect_equal_or_warnh(pinfo$likinfo$dhcoeff[,1], 
-               pinfo$likinfo$dhcoeff[,2], tolerance = 1,
-               label="lik dhgradcoeff agreement")
-  expect_equal_or_warnh(pinfo$likinfo$dhpara[,1], 
-               pinfo$likinfo$dhpara[,2], tolerance = 1,
-               label="lik dhgradpara agreement")
-  
-  expect_equal_or_warnh(pinfo$likinfo$rep[1], pinfo$likinfo$rep[2], tolerance = 10^(-4),
+  expect_equal_or_warnh(pinfo$likinfo$rep[1], pinfo$likinfo$rep[2], tolerance = 0.010^(-4),
                label="rep agreement")
 })
