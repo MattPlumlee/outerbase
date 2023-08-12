@@ -449,22 +449,6 @@ umat outermod::selectterms(const unsigned int numele) const {
  */ 
 
 
-/* 
- * outerbase::outerbase 
- * 
- * initialize the basis, which is tied to outermod and the prediction point 
- */ 
-
-outerbase::outerbase(const outermod& om_, mat xp_) :  
-  om(om_), xp(xp_)
-{ 
-  dograd = true;
-  n_row = xp.n_rows; 
-  nthreads = omp_get_num_procs(); 
-  
-  outerbase::build();  
-}  
-
 
 /* 
  * outerbase::outerbase 
@@ -476,6 +460,22 @@ outerbase::outerbase(const outermod& om_, mat xp_, bool dograd_) :
   om(om_), xp(xp_)
 { 
   dograd = dograd_;
+  n_row = xp.n_rows; 
+  nthreads = omp_get_num_procs(); 
+  
+  outerbase::build();  
+}  
+
+/* 
+ * outerbase::outerbase 
+ * 
+ * initialize the basis, which is tied to outermod and the prediction point 
+ */ 
+
+outerbase::outerbase(const outermod& om_, mat xp_)  :  
+  om(om_), xp(xp_)
+{ 
+  dograd = true;
   n_row = xp.n_rows; 
   nthreads = omp_get_num_procs(); 
   
@@ -498,11 +498,19 @@ void outerbase::setvals_(){
   knotptst = om.knotptst;   
   n_hyp = om.hypmatch.n_elem; 
   
-  //reset loopsize in case chunk size changed 
-  loopsize = (n_row+chunksize-1)/chunksize; // used for omp 
-  vertpl = loopsize > 20; //hardcoded after some testing 
-  //only split vertically for very large datasets 
 } 
+
+
+void outerbase::setloopvals_(){ 
+  uword maxchunk = 1+(2048/nthreads);
+  uword minchunk = 32;
+  chunksize = std::max(minchunk, std::min(maxchunk,n_row/(4*nthreads)+1));
+  
+  //reset loopsize in case chunk size changed  
+  loopsize = (n_row+chunksize-1)/chunksize; // used for omp  
+  vertpl = loopsize > 20; //hardcoded after some testing  
+  //only split vertically for very large datasets  
+}
 
 /* 
  * outerbase::setsizes_ 
@@ -540,6 +548,7 @@ void outerbase::build() {
   // set values from source 
   setvals_(); // setting values 
   setsizes_(); // resizing 
+  setloopvals_();
   
 #pragma omp parallel num_threads(nthreads)//start up an omp region 
 { 
@@ -549,7 +558,7 @@ void outerbase::build() {
     mat xp_; //local xp 
     uword startind; 
     uword endind; 
-    #pragma omp for nowait
+    #pragma omp for 
     for (uword j = 0; j < loopsize; ++j) {  // if we have a tall n_row,  
       // just loop over d 
       startind = j*chunksize;  
@@ -563,6 +572,9 @@ void outerbase::build() {
         basescalemat.col(k).rows(startind, endind) = R.col(0);
         basescale.rows(startind, endind) %= R.col(0); 
         R.col(0).ones();
+        
+        #pragma omp critical
+        {
         basemat.submat(startind, knotptst[k],
                        endind, knotptst[k+1]-1) = R;
         //save the squared vers.
@@ -578,12 +590,14 @@ void outerbase::build() {
                                      (Rt.slice(l-hypst[k]) % R); 
         }
         }
+        }
       }
+      #pragma omp critical
       basescalesq.rows(startind, endind) =\
         square(basescale.rows(startind, endind));//save the squared vers.
     }
   } else { 
-    #pragma omp for nowait
+    #pragma omp for 
     for (uword k = 0; k < d; ++k) {   
       if(dograd) om.buildob(R, Rt, xp, k); 
       else om.buildob(R, xp, k);
@@ -591,6 +605,8 @@ void outerbase::build() {
       basescalemat.col(k) = R.col(0);
       basescale %= R.col(0); //keep the first column multipled for scaling 
       R.col(0).ones();
+      #pragma omp critical
+      {
       basemat.cols(om.knotptst[k],om.knotptst[k+1]-1) = R; //put it in the 
         //right  place 
       basematsq.cols(om.knotptst[k],om.knotptst[k+1]-1) = square(R); 
@@ -600,6 +616,7 @@ void outerbase::build() {
                                  Rt.slice(l-hypst[k]);
         basematsq_gradhyp.cols(gest[l], gest[l+1]-1) =\
           2*(Rt.slice(l-hypst[k]) % R); 
+      }
       }
       }
     }
