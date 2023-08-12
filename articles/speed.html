@@ -189,7 +189,7 @@ quick timing comparisons.</p>
 <span><span class="va">yhat_slow</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/vector.html" class="external-link">as.vector</a></span><span class="op">(</span><span class="va">pred_slow</span><span class="op">$</span><span class="fu">mean</span><span class="op">(</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">t_slow</span><span class="op">)</span></span>
 <span><span class="co">#&gt;    user  system elapsed </span></span>
-<span><span class="co">#&gt;   5.983   1.377   3.730</span></span></code></pre></div>
+<span><span class="co">#&gt;   5.054   1.105   3.110</span></span></code></pre></div>
 <div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">ptm</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/proc.time.html" class="external-link">proc.time</a></span><span class="op">(</span><span class="op">)</span></span>
 <span><span class="va">opth</span> <span class="op">=</span> <span class="fu"><a href="../reference/BFGS_lpdf.html">BFGS_lpdf</a></span><span class="op">(</span><span class="va">om</span>, <span class="va">logpdf_fast</span>, </span>
@@ -200,7 +200,7 @@ quick timing comparisons.</p>
 <span><span class="va">yhat_fast</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/vector.html" class="external-link">as.vector</a></span><span class="op">(</span><span class="va">pred_fast</span><span class="op">$</span><span class="fu">mean</span><span class="op">(</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">t_fast</span><span class="op">)</span></span>
 <span><span class="co">#&gt;    user  system elapsed </span></span>
-<span><span class="co">#&gt;   5.085   1.760   3.480</span></span></code></pre></div>
+<span><span class="co">#&gt;   5.552   1.788   3.722</span></span></code></pre></div>
 </div>
 <div class="section level2">
 <h2 id="comparison-of-results">Comparison of results<a class="anchor" aria-label="anchor" href="#comparison-of-results"></a>
